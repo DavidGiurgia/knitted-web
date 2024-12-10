@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Stilizare scrollbar generală */
+.overflow-y-auto::-webkit-scrollbar {
+    width: 8px; /* Dimensiunea scrollbarului */
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background-color: rgba(128, 128, 128, 0.4); /* Gri transparent */
+    border-radius: 4px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(128, 128, 128, 0.6); /* Gri mai opac la hover */
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent; /* Fundalul scrollbarului */
+  }
+  
+  /* Doar pentru ecrane mari */
+  @media (min-width: 768px) {
+    .overflow-y-auto::-webkit-scrollbar {
+      width: 6px;
+    }
+  
+    .overflow-y-auto::-webkit-scrollbar-thumb {
+      background-color: rgba(128, 128, 128, 0.3);
+    }
+  }

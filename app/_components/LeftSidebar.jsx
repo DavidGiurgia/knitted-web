@@ -1,0 +1,124 @@
+"use client";
+
+import {
+  HomeIcon as HomeOutline,
+  MagnifyingGlassIcon as SearchOutline,
+  ChatBubbleLeftRightIcon as ChatOutline,
+  UserGroupIcon as GroupOutline,
+  BellIcon as BellOutline,
+  ArrowRightStartOnRectangleIcon,
+} from "@heroicons/react/24/outline";
+
+import {
+  HomeIcon as HomeSolid,
+  MagnifyingGlassIcon as SearchSolid,
+  ChatBubbleLeftRightIcon as ChatSolid,
+  UserGroupIcon as GroupSolid,
+  BellIcon as BellSolid,
+} from "@heroicons/react/24/solid";
+
+import React, { useState } from "react";
+import { useAuth } from "../_context/AuthContext";
+import { usePanel } from "../_context/PanelContext";
+import { Avatar, Button, Image, Tooltip } from "@nextui-org/react";
+
+const links = [
+  { label: "Home", iconOutline: HomeOutline, iconSolid: HomeSolid },
+  { label: "Search", iconOutline: SearchOutline, iconSolid: SearchSolid },
+  { label: "Chats", iconOutline: ChatOutline, iconSolid: ChatSolid },
+  { label: "Groups", iconOutline: GroupOutline, iconSolid: GroupSolid },
+  { label: "Notifications", iconOutline: BellOutline, iconSolid: BellSolid },
+  { label: "Account", isAvatar: true },
+];
+
+const LeftSidebar = () => {
+  const { activePanel, switchPanel } = usePanel();
+  const { logout } = useAuth();
+
+  const handleLinkClick = (label) => {
+    switchPanel(label);
+  };
+
+  const handleLogoutClick = () => {
+    logout();
+  };
+
+  return (
+    <div className="hidden md:flex h-screen">
+      <nav className="overflow-y-auto h-screen w-20 flex-shrink-0 flex flex-col items-center justify-between bg-white dark:bg-gray-900 border-r border-gray-300 dark:border-gray-700 py-6">
+        <div className="space-y-16">
+          <div
+            className="flex justify-center"
+            onClick={() => {
+              handleLinkClick("Home");
+            }}
+          >
+            <Image
+              isBlurred
+              width={30}
+              src="/assets/Z-logo.svg"
+              alt="Logo"
+              className="mt-4 rounded-none"
+            />
+          </div>
+
+          <div className="flex flex-col space-y-2">
+            {links.map(
+              ({
+                label,
+                iconOutline: IconOutline,
+                iconSolid: IconSolid,
+                isAvatar,
+              }) => (
+                <Tooltip
+                  placement="right"
+                  showArrow
+                  content={label}
+                  key={label}
+                >
+                  <Button
+                    isIconOnly
+                    variant="light"
+                    onClick={() => handleLinkClick(label)}
+                    className={`w-12 h-12 rounded-lg 
+                 ${
+                   activePanel === label ? "!bg-gray-100 dark:!bg-gray-800" : ""
+                 }`}
+                  >
+                    {isAvatar ? (
+                      <Avatar
+                        src="/assets/profile.jpg"
+                        radius="full"
+                        size="sm"
+                        name="GD"
+                        className="w-8 h-8"
+                        isBordered={activePanel === "Account"}
+                        color={activePanel === "Account" && "primary"}
+                      />
+                    ) : activePanel === label ? (
+                      <IconSolid className="w-6 h-6 text-primary" />
+                    ) : (
+                      <IconOutline className="w-6 h-6 " />
+                    )}
+                  </Button>
+                </Tooltip>
+              )
+            )}
+          </div>
+        </div>
+
+        <Tooltip placement="right" showArrow content="Logout">
+          <Button
+            isIconOnly
+            onClick={() => handleLogoutClick()}
+            className="w-12 h-12 rounded-lg bg-trnasparent"
+          >
+            <ArrowRightStartOnRectangleIcon className="w-6 h-6 " />
+          </Button>
+        </Tooltip>
+      </nav>
+    </div>
+  );
+};
+
+export default LeftSidebar;
