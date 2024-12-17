@@ -27,9 +27,10 @@ const AuthLayout = ({ children }) => {
       if (group) {
         // Redirecționează utilizatorul către pagina grupului
         router.push(`/group-room/${group._id}`);
-      }
-      else{
-        toast.error("Sorry, there is no such group right now. Please try again!");
+      } else {
+        toast.error(
+          "Sorry, there is no such group right now. Please try again!"
+        );
         setCode("");
         return;
       }
@@ -42,7 +43,7 @@ const AuthLayout = ({ children }) => {
   return (
     <div className="h-screen flex flex-col w-full md:flex-row overflow-auto">
       {/* Fixed Left Section */}
-      <div className="flex flex-col md:items-start px-8 pt-16 pb-10 md:h-screen md:w-1/2 lg:w-fit bg-primary justify-center md:px-16 md:py-16 text-white dark:text-gray-900">
+      <div className="flex flex-col md:items-start px-8 pt-16 pb-10 md:h-screen md:w-1/2  bg-primary justify-center md:px-16 md:py-16 text-white dark:text-gray-900">
         <h1 className="font-semibold text-[24px] md:text-[36px] mb-3">
           Joining a private group?
         </h1>

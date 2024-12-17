@@ -4,12 +4,14 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUserFromApi, loginUser, registerUser } from "../api/auth";
 import { getToken, removeToken, setToken } from "../services/tokenService";
+import { getFriendsAndRelations } from "../api/friends";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null); // Detalii utilizator
+  const [userRelations, setUserRelations] = useState(null); // Detalii utilizator
   const [loading, setLoading] = useState(true); // Previne redirecționările premature
   const router = useRouter();
 
@@ -28,6 +30,9 @@ export const AuthProvider = ({ children }) => {
 
       if (profile) {
         setUser(profile);
+        const relations = await getFriendsAndRelations(profile?._id);
+        setUserRelations(relations);
+
         setIsAuthenticated(true);
         router.push("/");
       } else {
@@ -47,6 +52,7 @@ export const AuthProvider = ({ children }) => {
   // Verificare sesiune (autentificare automată la încărcarea aplicației)
   useEffect(() => {
     fetchProfile();
+    
   }, []);
 
   // Funcție pentru înregistrare
@@ -75,6 +81,9 @@ export const AuthProvider = ({ children }) => {
         setToken(token); // Salvează token-ul în localStorage
         await fetchProfile(); // Reîncarcă profilul utilizatorului
         router.push("/"); // Redirecționează utilizatorul
+
+        console.log("user: " + user, "relations: " + userRelations);
+
         return true;
       } else {
         throw new Error("Autentificare eșuată");
@@ -89,6 +98,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     removeToken(); // Șterge token-ul din localStorage
     setUser(null);
+    setUserRelations(null);
     setIsAuthenticated(false);
     router.push("/login");
   };
@@ -98,10 +108,12 @@ export const AuthProvider = ({ children }) => {
       value={{
         isAuthenticated,
         user,
+        userRelations,
         register,
         login,
         logout,
         loading,
+        fetchProfile
       }}
     >
       {children}

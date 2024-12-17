@@ -7,7 +7,7 @@ import GroupsSection from "./GroupsSection";
 const GroupsPanel = () => {
   const { activeSubPanel } = usePanel();
   return (
-    <div className={`${activeSubPanel !== "Groups" && "hidden"}`}>
+    <div className={`h-full ${activeSubPanel !== "Groups" && "hidden"}`}>
       <GroupsSection />
     </div>
   );

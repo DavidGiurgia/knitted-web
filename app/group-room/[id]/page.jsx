@@ -4,18 +4,33 @@ import ChatBox from "@/app/_components/ChatBox";
 import GroupInfoSidebar from "@/app/_components/GroupInfoSidebar";
 import { useAuth } from "@/app/_context/AuthContext";
 import { getGroupById } from "@/app/services/groupService";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  EyeSlashIcon,
+  FingerPrintIcon,
+  NoSymbolIcon,
+  PencilIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
+import {
+  Avatar,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@nextui-org/react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const GroupRoom =  () => {
-  const { user } = useAuth();
+const GroupRoom = () => {
+  const { user, isAuthenticated } = useAuth();
   const params = useParams();
   const router = useRouter();
   const [sidebar, setSidebar] = useState(false);
   const [anonymous, setIdentity] = useState(false);
   const [groupDetails, setGroupDetails] = useState(null); // To store group data
   const [onlineUsers, setOnlineUsers] = useState(0);
+  const [alias, setAlias] = useState("");
 
   useEffect(() => {
     const fetchGroupDetails = async () => {
@@ -39,33 +54,71 @@ const GroupRoom =  () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
-      <div className="flex bg-white dark:bg-gray-900 items-center justify-between py-4 px-6 border-b border-gray-300 dark:border-gray-800">
-        <div className="flex justify-between">
+      <div className="flex bg-white dark:bg-gray-900 items-center justify-between py-3 px-6 border-b border-gray-300 dark:border-gray-800">
+        <div className="flex justify-between items-center">
           <div onClick={() => setSidebar(!sidebar)}>
             <Bars3Icon className="size-6" />
           </div>
 
-          <div className="ml-6 text-lg">
+          <div className="ml-6 text-lg hidden md:block">
             {groupDetails ? groupDetails.name : "Loading..."}
           </div>
         </div>
 
-        {anonymous ? (
-          <div
-            onClick={() => {
-              setIdentity(!anonymous);
-            }}
-            className=""
-          >
-            <div className="avatar" />
-          </div>
-        ) : (
-          <div className="flex items-center ">
+        <div className="flex items-center justify-center gap-x-4">
+          {!isAuthenticated ? (
+            <Popover>
+              <PopoverTrigger className="cursor-pointer">
+                {alias || <PencilIcon className="size-4"/>}
+              </PopoverTrigger>
+              <PopoverContent className="max-w-[240px]">
+                {() => (
+                  <div className="px-1 py-2 w-full">
+                    <div className="mt-2 flex flex-col gap-2 w-full ">
+                      <Input
+                        maxLength={30}
+                        autoFocus
+                        value={alias}
+                        onChange={(e) => setAlias(e.target.value)}
+                        label="Alias"
+                        size="sm"
+                        variant="default"
+                      />
+                    </div>
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
+          ) : (
             <div>
-              <div>avatar</div>
+              {!anonymous && user?.username}
             </div>
-          </div>
-        )}
+          )}
+
+          {anonymous ? (
+            <div
+              className="w-8 h-8"
+              onClick={() => {
+                setIdentity(false);
+              }}
+            >
+              <UserIcon className="p-1" />
+            </div>
+          ) : (
+            <div
+              className="w-8 h-8"
+              onClick={() => {
+                setIdentity(true);
+              }}
+            >
+              <Avatar
+              showFallback
+                src={isAuthenticated ? user?.avatarUrl : null}
+                className="w-full h-full"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex overflow-y-auto h-screen">

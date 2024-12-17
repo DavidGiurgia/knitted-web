@@ -1,50 +1,91 @@
 "use client";
 
-import { CalendarDaysIcon, ClockIcon, HashtagIcon, LockClosedIcon, MoonIcon, UsersIcon } from "@heroicons/react/24/outline";
+import {
+  CalendarDaysIcon,
+  ClockIcon,
+  HashtagIcon,
+  LockClosedIcon,
+  MoonIcon,
+  UsersIcon,
+} from "@heroicons/react/24/outline";
 import { useAuth } from "../_context/AuthContext";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { format } from "date-fns";
+import { getUserById } from "../services/userService";
+import { useEffect, useState } from "react";
+import CustomModal from "./modals/CustomModal";
+import { deleteGroup } from "../services/groupService";
+import { Button, useDisclosure } from "@nextui-org/react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import GroupModal from "./modals/GroupModal";
 
 const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
   const { user } = useAuth();
-  const isCreator = currentGroup?.creatorId === user?._id
+  const router = useRouter();
+  const [creator, setCreator] = useState(null);
+  const isCreator = currentGroup?.creatorId === user?._id;
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: onDeleteModaOpen,
+    onOpenChange: onDeleteModaOpenChange,
+  } = useDisclosure();
+
+  useEffect(() => {
+    const getCreator = async () => {
+      try {
+        const creator = await getUserById(currentGroup?.creatorId);
+        setCreator(creator);
+      } catch (error) {
+        console.error("Error fetching creator:", error);
+      }
+    };
+
+    if (currentGroup?.creatorId) {
+      getCreator();
+    }
+  }, [currentGroup]);
 
   // Format the createdAt value
   const formattedCreatedAt = currentGroup?.createdAt
     ? format(new Date(currentGroup.createdAt), "d MMM")
     : "Unknown date";
 
-  const handleGroupDetailsClick = () => {};
-
-  const handleUpdateNameAndDesc = async () => {};
-
-  const openDeleteModal = async () => {};
-
   return (
-    <div className="overflow-y-auto flex flex-col h-full w-full md:w-fit md:max-w-80">
+    <div className="overflow-y-auto overflow-x-hidden flex flex-col h-full w-full md:w-fit md:max-w-80">
       <div
-        onClick={() => {}}
-        className="pt-6 px-6 pb-4 w-full bg-[#F0f0f0] dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
+        onClick={onOpen}
+        className="cursor-pointer pt-6 px-6 pb-4 w-full bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
       >
         <div className="font-medium text-lg mb-2">
           {currentGroup?.name || "Group Name"}
         </div>
-        <div className="text-sm text-[#808080]">
+        <div className="text-sm text-[#808080] text-pretty truncate">
           {currentGroup?.description}
         </div>
       </div>
       <div className="p-6 flex flex-col gap-y-8">
-        <div className="flex items-center gap-x-4 hover:text-primary">
-          <CalendarDaysIcon className="size-5" />
+        <div className="flex items-center gap-x-4 hover:text-primary cursor-pointer">
+          <CalendarDaysIcon className="size-5 flex-shrink-0" />
           {`Created by ${
-            currentGroup?.creatorId || "Unknown"
+            creator?.username || "Unknown"
           } at ${formattedCreatedAt}`}
         </div>
 
         <div
+          onClick={() => {
+            if (currentGroup?.joinCode) {
+              navigator.clipboard.writeText(currentGroup.joinCode);
+              toast.success("Join code copied to clipboard!");
+            } else {
+              toast.error("No join code available to copy.");
+            }
+          }}
           className={`w-fit flex gap-x-4 items-center hover:text-primary cursor-pointer`}
         >
           <HashtagIcon className="size-5" />
+          {currentGroup?.joinCode || "No code"}
         </div>
 
         <div className="flex items-center gap-x-4 hover:text-primary">
@@ -52,7 +93,7 @@ const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
           {onlineCount} online participants
         </div>
 
-        <hr className="h-px bg-gray-neutre transform scale-y-50" />
+        <hr className="h-px border-gray-500  transform scale-y-50" />
 
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -62,9 +103,9 @@ const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
           <ThemeSwitcher />
         </div>
 
-        <hr className="h-px bg-gray-neutre transform scale-y-50" />
+        <hr className="h-px border-gray-500 transform scale-y-50" />
 
-        <div className="flex items-center">
+        <div className="flex items-center cursor-pointer">
           <LockClosedIcon className="size-5 ml-2 mr-5 flex-shrink-0" />
           <div>
             Encryption
@@ -74,7 +115,7 @@ const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
           </div>
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-center cursor-pointer">
           <ClockIcon className="size-5 ml-2 mr-5 flex-shrink-0" />
           <div>
             Temporary
@@ -85,23 +126,48 @@ const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
         </div>
 
         <div
-          onClick={openDeleteModal}
-          className={`!text-red-500 ${!isCreator && "hidden"}`}
+          onClick={onDeleteModaOpen}
+          className={`cursor-pointer !text-red-500 ${!isCreator && "hidden"}`}
         >
           Delete group
         </div>
 
         {!user && (
           <div className="w-full">
-            <button
-              onClick={() => window.open("/sign-up", "_blank")}
-              className="border-primary mt-4 hover:border-black hover:text-black border dark:hover:text-light-bg dark:hover:border-light-bg text-primary text-lg font-medium py-2 rounded-full w-full"
+            <Button
+              onClick={() => window.open("/register", "_blank")}
+              className="w-full"
+              size="lg"
+              variant="bordered"
+              color="primary"
             >
               Try ZIC for more
-            </button>
+            </Button>
           </div>
         )}
       </div>
+
+      <GroupModal
+        group={currentGroup}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+      />
+
+      <CustomModal
+        isOpen={isDeleteModalOpen}
+        onOpenChange={onDeleteModaOpenChange}
+        title="Delete Group"
+        body={`Are you sure you want to delete group "${currentGroup?.name}"? This action cannot be undone.`}
+        confirmButtonText="Delete"
+        confirmButtonColor="danger"
+        cancelButtonText="Cancel"
+        onConfirm={async () => {
+          // Perform deletion logic here
+          await deleteGroup(currentGroup?._id);
+          router.push("/");
+          toast.success("Group deleted successfully");
+        }}
+      />
     </div>
   );
 };

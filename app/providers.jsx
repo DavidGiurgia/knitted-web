@@ -1,6 +1,5 @@
 // app/providers.tsx
 "use client";
-
 import { NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { AuthProvider } from "./_context/AuthContext";
@@ -10,7 +9,10 @@ import { PanelProvider } from "./_context/PanelContext";
 export function Providers({ children }) {
   return (
     <NextUIProvider>
-      <NextThemesProvider attribute="class" defaultTheme="light">
+      <NextThemesProvider
+        attribute="class"
+        defaultTheme="system" 
+      >
         <AuthProvider>
           <PanelProvider>
             {children}

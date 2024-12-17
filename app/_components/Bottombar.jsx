@@ -18,6 +18,7 @@ import {
 import Image from "next/image";
 import { Avatar, Button } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../_context/AuthContext";
 
 const links = [
   { label: "Home", iconOutline: HomeOutline, iconSolid: HomeSolid },
@@ -29,7 +30,7 @@ const links = [
 
 const Bottombar = () => {
   const { activePanel, switchPanel } = usePanel();
-  const router = useRouter();
+  const {user} = useAuth();
   const handleLinkClick = (label) => {
     switchPanel(label);
   };
@@ -51,10 +52,10 @@ const Bottombar = () => {
           >
             {isAvatar ? (
               <Avatar
-                src="/assets/profile.jpg"
+              showFallback
+                src={user?.avatarUrl}
                 radius="full"
                 size="sm"
-                name="test"
                 className="w-8 h-8"
                 isBordered={activePanel === "Account"}
                 color="primary"

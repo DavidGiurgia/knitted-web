@@ -22,4 +22,23 @@ export const searchUser = async (searchText) => {
     }
 }
 
+export const updateUser = async (userId, fullname, username, bio, avatarUrl, deleteAvatarUrl) => {
+    try{
+        const response = await axios.post(`${API_BASE_URL}/update/${userId}`, { fullname, username, bio, avatarUrl, deleteAvatarUrl });
+        return response.data;
+    }
+    catch(error){
+        console.error("Error updating user:", error);
+    }
+}
+
+export const deleteUser = async (userId) => {
+    try{
+        await axios.delete(`${API_BASE_URL}/delete/${userId}`);
+    }
+    catch(error){
+        console.error("Error deleting user:", error);
+    }
+}
+
   

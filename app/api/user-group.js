@@ -31,3 +31,11 @@ export const fetchUserGroupsIds = async (userId) => {
         console.error("Error fetching user groups: " + error.message);
     }
 }
+
+export const deleteGroupDependencies = async (groupId) => {
+    try{
+        await axios.post(`${API_BASE_URL}/delete-group/${groupId}`);
+    } catch(error){
+        console.error("Error deleting group dependencies: " + error.message);
+    }
+}

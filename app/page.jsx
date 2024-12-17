@@ -16,22 +16,22 @@ import SearchPanel from "./_components/page-components/search/SearchPanel";
 const Landing = () => {
   const { activePanel } = usePanel();
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user) {
       router.push("/login");
     }
   }, [isAuthenticated, router]);
 
   return (
-    <div className="w-full h-screen flex flex-col md:flex-row">
+    <div className={`w-full h-screen flex flex-col md:flex-row ${!user && 'hidden'}`}>
       <LeftSidebar />
 
-      <div className="flex-1 flex overflow-y-auto">
+      <div className="flex-1 flex overflow-y-auto h-full">
         {/* Sectiunea activă */}
         <div
-          className={`flex dark:bg-gray-900 w-full md:w-[350px] lg:w-[450px] ${
+          className={`flex h-full dark:bg-gray-900 w-full md:w-[350px] lg:w-[450px] ${
             activePanel === "Home" && "hidden"
           }`}
         >

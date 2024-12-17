@@ -1,8 +1,9 @@
-'use client'
+"use client";
 
 import { useState } from "react";
 import MessageInput from "./MessageInput";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
+import { Button } from "@nextui-org/react";
 
 const ChatBox = () => {
   const [message, setMessage] = useState("");
@@ -13,7 +14,7 @@ const ChatBox = () => {
 
   return (
     <div className="flex p-2 flex-col items-center h-full w-full md:w-[600px]">
-      <div className="flex flex-1 overflow-y-auto">messages</div>
+      <div className="flex flex-1">messages</div>
 
       <div className="flex w-full items-end gap-x-2 ">
         <MessageInput
@@ -22,9 +23,9 @@ const ChatBox = () => {
           onEmojiSelect={handleEmojiSelect}
         />
 
-        <button className="!bg-primary hover:!bg-light-bg-2 size-12 flex-shrink-0 flex justify-center items-center rounded-xl">
-          <PaperAirplaneIcon className="size-6 " />
-        </button>
+        <Button isIconOnly color="primary" className="h-12 w-12 flex-shrink-0 ">
+          <PaperAirplaneIcon className="size-6 dark:text-black" />
+        </Button>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { create, deleteGr, getByCode, getById, update } from "../api/group";
-import { fetchUserGroupsIds, pair, removePair } from "../api/user-group";
+import { deleteGroupDependencies, fetchUserGroupsIds, pair, removePair } from "../api/user-group";
 
 export const createGroup = async (groupData) => {
     try{
@@ -17,15 +17,18 @@ export const updateGroup = async (groupId, groupData) => {
         console.error(err);
     }
 }
-export const deleteGroup = async (userId, groupId) => {
-    try{
-        await removePair(userId, groupId);
-        return await deleteGr(groupId);
+export const deleteGroup = async (groupId) => {
+    try {
+      await deleteGroupDependencies(groupId);
+  
+      // Șterge grupul propriu-zis
+      return await deleteGr(groupId);
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
-    catch(err){
-        console.error(err);
-    }
-}
+  };
+  
 export const getGroupById = async (groupId) => {
     try{
         return await getById(groupId);
@@ -54,22 +57,24 @@ export const pairUserGroup = async (userId, groupId) =>{
 
 export const getUserGroups = async (userId) => {
     try {
-      // 1. Obține ID-urile grupurilor asociate utilizatorului
       const ids = await fetchUserGroupsIds(userId);
   
       if (!ids || ids.length === 0) {
-        return []; // Dacă utilizatorul nu face parte din niciun grup
+        return [];
       }
   
-      // 2. Obține detaliile fiecărui grup folosind `getGroupById`
-      const groupPromises = ids.map((groupId) => getGroupById(groupId));
+      const groupPromises = ids.map((groupId) =>
+        getGroupById(groupId).catch(() => null) // Ignoră erorile la grupuri șterse
+      );
       const groups = await Promise.all(groupPromises);
   
-      return groups; // Returnează lista completă a grupurilor
+      // Filtrează grupurile valide
+      return groups.filter((group) => group !== null);
     } catch (err) {
       console.error("Error fetching user groups:", err);
-      throw err; // Re-aruncă eroarea pentru a putea fi gestionată în altă parte
+      throw err;
     }
   };
+  
 
   

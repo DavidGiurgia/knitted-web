@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../_context/AuthContext";
+import { useAuth } from "../../_context/AuthContext";
 import {
+  Alert,
   Button,
   Input,
   Modal,
@@ -10,14 +11,15 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Switch,
   Textarea,
 } from "@nextui-org/react";
-import { generateUniqueJoinCode } from "../services/utils";
+import { generateUniqueJoinCode } from "../../services/utils";
 import {
   createGroup,
   updateGroup,
   pairUserGroup,
-} from "../services/groupService"; // Adăugăm updateGroup
+} from "../../services/groupService";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
@@ -33,16 +35,16 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
   const isCreator = group?.creatorId === user?._id;
 
   const handleValidation = () => {
-    if (!groupName.trim()) {
-      setNameError("Group name is required.");
+    if (!groupName.trim() || groupName.length < 3) {
+      setNameError(
+        groupName.length < 3
+          ? "Group name must be at least 3 characters."
+          : "Group name is required."
+      );
       return false;
-    } else if (groupName.length < 3) {
-      setNameError("Group name must be at least 3 characters.");
-      return false;
-    } else {
-      setNameError("");
-      return true;
     }
+    setNameError("");
+    return true;
   };
 
   const handleCreateGroup = async () => {
@@ -63,7 +65,7 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
       await pairUserGroup(user._id, newGroup._id);
 
       toast.success("Group created successfully!");
-      onOpenChange(false); // Închide modalul
+      onOpenChange(false); // Close the modal
       router.push(`/group-room/${newGroup._id}`);
     } catch (error) {
       console.error("Error creating group:", error);
@@ -86,15 +88,15 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
         description: groupDescription,
       };
 
-      await updateGroup(group._id, updatedGroup); // Salvează modificările în backend
+      await updateGroup(group._id, updatedGroup); // Save changes to the backend
       toast.success("Group updated successfully!");
-      onOpenChange(false); // Închide modalul
+      group.name = groupName;
+      group.description = groupDescription;
+      onOpenChange(false); // Close the modal
     } catch (error) {
       console.error("Error updating group:", error);
       toast.error("An error occurred. Please try again.");
     } finally {
-      setGroupName("");
-      setGroupDescription("");
       setLoading(false);
     }
   };
@@ -103,6 +105,9 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
     if (group) {
       setGroupName(group.name || "");
       setGroupDescription(group.description || "");
+    } else {
+      setGroupName("");
+      setGroupDescription("");
     }
   }, [group]);
 
@@ -120,10 +125,11 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
             </ModalHeader>
             <ModalBody>
               <Input
+                maxLength={20}
                 color={nameError.length && "danger"}
                 isInvalid={nameError.length}
                 errorMessage={nameError}
-                isReadOnly={group && !isCreator} // Readonly dacă utilizatorul nu este creator
+                isReadOnly={group && !isCreator} // Readonly if the user is not the creator
                 label="Group Name"
                 value={groupName}
                 onChange={(e) => {
@@ -132,7 +138,8 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
                 }}
               />
               <Textarea
-                isReadOnly={group && !isCreator} // Readonly dacă utilizatorul nu este creator
+                maxLength={1000}
+                isReadOnly={group && !isCreator} // Readonly if the user is not the creator
                 value={groupDescription}
                 onChange={(e) => setGroupDescription(e.target.value)}
                 label="Description"
@@ -140,7 +147,7 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
             </ModalBody>
             <ModalFooter>
               <Button variant="light" onPress={onClose}>
-                Cancel
+                {group && !isCreator ? "Close" : "Cancel"}
               </Button>
               {isCreator || !group ? (
                 <Button

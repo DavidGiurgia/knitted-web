@@ -33,7 +33,7 @@ const links = [
 
 const LeftSidebar = () => {
   const { activePanel, switchPanel } = usePanel();
-  const { logout } = useAuth();
+  const { logout , user} = useAuth();
 
   const handleLinkClick = (label) => {
     switchPanel(label);
@@ -45,7 +45,7 @@ const LeftSidebar = () => {
 
   return (
     <div className="hidden md:flex h-screen">
-      <nav className="overflow-y-auto h-screen w-20 flex-shrink-0 flex flex-col items-center justify-between bg-white dark:bg-gray-900 border-r border-gray-300 dark:border-gray-700 py-6">
+      <nav className="overflow-y-auto h-screen w-20 flex-shrink-0 flex flex-col items-center justify-between bg-white dark:bg-gray-900 border-r border-gray-300 dark:border-gray-800 py-6">
         <div className="space-y-16">
           <div
             className="flex justify-center"
@@ -87,10 +87,10 @@ const LeftSidebar = () => {
                   >
                     {isAvatar ? (
                       <Avatar
-                        src="/assets/profile.jpg"
+                      showFallback
+                        src={user?.avatarUrl}
                         radius="full"
                         size="sm"
-                        name="GD"
                         className="w-8 h-8"
                         isBordered={activePanel === "Account"}
                         color={activePanel === "Account" && "primary"}
