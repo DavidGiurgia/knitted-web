@@ -1,7 +1,7 @@
 import { Switch } from "@nextui-org/react";
 import { useTheme } from "next-themes";
 
-export function ThemeSwitcher() {
+export function ThemeSwitcher({size = "sm"}) {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -9,7 +9,7 @@ export function ThemeSwitcher() {
       <Switch
         isSelected={theme === "dark"}
         onValueChange={() => setTheme(theme === "dark" ? "light" : "dark")}
-        size="sm"
+        size={size}
         aria-label="Toggle Theme"
       />
     </div>

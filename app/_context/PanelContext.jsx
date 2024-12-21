@@ -47,6 +47,14 @@ export const PanelProvider = ({ children }) => {
     }
   };
 
+  // Funcție pentru a reseta complet un panou principal la starea inițială
+  const resetPanel = () => {
+    setPanelData((prev) => ({
+      ...prev,
+      [activePanel]: [activePanel], // Resetăm la panoul principal activ
+    }));
+  };
+
   //const activeSubPanel = subPanelsStack[subPanelsStack.length - 1];
 
   return (
@@ -58,6 +66,7 @@ export const PanelProvider = ({ children }) => {
         activeSubPanel: subPanelsStack[subPanelsStack.length - 1],
         pushSubPanel,
         popSubPanel,
+        resetPanel,
       }}
     >
       {children}

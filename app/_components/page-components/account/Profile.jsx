@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Bars3Icon,
@@ -18,50 +18,66 @@ import {
 import React, { useEffect, useState } from "react";
 import ProfileModal from "../../modals/ProfileModal";
 import { getUserById } from "@/app/services/userService";
+import PictureModal from "../../modals/PictureModal";
+import { ThemeSwitcher } from "../../ThemeSwitcher";
 
-const Profile = ({ user, userRelations, logout, switchPanel, pushSubPanel }) => {
+const Profile = ({
+  user,
+  logout,
+  switchPanel,
+  pushSubPanel,
+}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isOpenProfilePhoto,
+    onOpen: onOpenProfilePhoto,
+    onOpenChange: onOpenChangeProfilePhoto,
+  } = useDisclosure();
+
   const [friends, setFriends] = useState([]);
 
   useEffect(() => {
     // Obține avatarurile prietenilor din relații
     const fetchFriendAvatars = async () => {
-      if (!userRelations?.friends || userRelations.friends.length === 0) return;
-
+      if (!user?.friendsIds || user.friendsIds.length === 0) return;
+  
       try {
-        const friendPromises = userRelations.friends.map(
-          (friendId) => getUserById(friendId) // Fetch fiecare prieten după ID
+        const friendPromises = user.friendsIds.map((friendId) =>
+          getUserById(friendId) // Fetch fiecare prieten după ID
         );
         const friendData = await Promise.all(friendPromises);
-        setFriends(
-          friendData
-        );
+  
+        // Filtrare pentru a exclude prietenii inexistenți
+        const validFriends = friendData.filter(Boolean);
+  
+        setFriends(validFriends);
       } catch (error) {
         console.error("Error fetching friend avatars:", error);
-        toast.error("Unable to load friend data.");
       }
     };
-
+  
     fetchFriendAvatars();
-  }, [userRelations]);
+  }, [user]);
+  
 
   return (
     <div className="p-4">
       <div className="justify-self-end">
         <Button
+          variant="light"
           isIconOnly
           onPress={() => {
             switchPanel("Notifications");
           }}
-          className=" rounded-lg bg-transparent"
+          className=" rounded-lg "
         >
-          <BellIcon className="w-6 h-6" />
+          <BellIcon className="size-6" />
         </Button>
 
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly className=" rounded-lg bg-transparent">
-              <Bars3Icon className="w-6 h-6 " />
+            <Button variant="light" isIconOnly className=" rounded-lg ">
+              <Bars3Icon className="size-6" />
             </Button>
           </DropdownTrigger>
           <DropdownMenu aria-label="Static Actions">
@@ -74,6 +90,11 @@ const Profile = ({ user, userRelations, logout, switchPanel, pushSubPanel }) => 
               }}
             >
               More
+            </DropdownItem>
+            <DropdownItem variant="bordered" key="dark mode">
+              <div className="flex items-center justify-between">
+                <span>Dark mode</span> <ThemeSwitcher size="sm"/>
+              </div>
             </DropdownItem>
             <DropdownItem
               //modal
@@ -97,14 +118,18 @@ const Profile = ({ user, userRelations, logout, switchPanel, pushSubPanel }) => 
           </DropdownMenu>
         </Dropdown>
       </div>
+      
 
-      <div className="flex flex-col gap-y-4">
+      <div className="flex flex-col gap-y-4 mt-2">
         <div className="flex gap-x-4">
           {/* Verifică dacă există avatarUrl și folosește-l */}
           {user?.avatarUrl ? (
-            <div className="w-24 h-24 flex-shrink-0 rounded-full overflow-hidden flex items-center justify-center">
+            <div
+              onClick={onOpenProfilePhoto}
+              className="w-24 h-24 flex-shrink-0 rounded-full overflow-hidden flex items-center justify-center"
+            >
               <Avatar
-              showFallback
+                showFallback
                 className="w-24 h-24 object-cover "
                 src={user?.avatarUrl}
               />
@@ -123,41 +148,62 @@ const Profile = ({ user, userRelations, logout, switchPanel, pushSubPanel }) => 
           </div>
         </div>
 
-        {user?.friendsIds.length > 0 ? (
-                  <AvatarGroup
-                    max={3}
-                    total={friends.length}
-                    renderCount={(count) => (
-                      <p className="text-small text-foreground font-medium ms-2">
-                        +{count} friends
-                      </p>
-                    )}
+        {friends.length > 0 ? (
+          <div>
+            <div className=" text-sm my-1">Your friends</div>
+            <AvatarGroup
+              max={3}
+              total={friends.length}
+              renderCount={() => {
+                const displayedCount = Math.min(3, friends.length); // Numărul de avatare afișate
+                const hiddenCount = friends.length - displayedCount; // Diferența pentru cei ascunși
+                return hiddenCount > 0 ? (
+                  <p
+                    onClick={() => pushSubPanel("FriendsSection")}
+                    className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
                   >
-                    {friends.map((friend) => (
-                      <Avatar onClick={()=>{}}  showFallback key={friend._id} src={friend.avatarUrl} />
-                    ))}
-                  </AvatarGroup>
-                ) : (
-                  <div className="text-gray-500 text-medium">No friends yet.</div>
-                )}
+                    +{hiddenCount} others
+                  </p>
+                ) : null;
+              }}
+            >
+              {friends.slice(0, 3).map((friend) => (
+                <Avatar
+                  onClick={() => {
+                    pushSubPanel("Profile", friend);
+                  }}
+                  showFallback
+                  key={friend._id}
+                  src={friend.avatarUrl}
+                />
+              ))}
+            </AvatarGroup>
+          </div>
+        ) : (
+          <div className="text-gray-500 text-medium">
+            You don't have friends yet.
+          </div>
+        )}
 
         <div className="flex gap-x-2 w-full">
           <Button
             variant="faded"
             color="primary"
-            size="sm"
+            //size="sm"
             className="flex-1 text-medium "
             onPress={onOpen}
           >
             Edit profile
           </Button>
-          <Button color="primary" isIconOnly variant="faded" size="sm">
-            <EllipsisHorizontalIcon />
-          </Button>
         </div>
       </div>
 
       <ProfileModal isOpen={isOpen} onOpenChange={onOpenChange} />
+      <PictureModal
+        isOpen={isOpenProfilePhoto}
+        onOpenChange={onOpenChangeProfilePhoto}
+        src={user?.avatarUrl}
+      />
     </div>
   );
 };

@@ -12,11 +12,11 @@ const DeleteAccountModal = ({ isOpen, onOpenChange, user }) => {
 
   const handleDelete = async () => {
     if (user?._id && confirmationText === user?.username) {
-      await deleteUserAccount(user?._id);
+      await deleteUserAccount(user._id);
       toast.success("Your account has been deleted successfully!");
       router.push('/login');
     } else {
-      alert('Please type DELETE to confirm.');
+      alert('Please type your username to confirm.');
     }
   };
 

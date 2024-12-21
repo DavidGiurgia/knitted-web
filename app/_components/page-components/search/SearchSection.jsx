@@ -9,9 +9,10 @@ import {
   removeRecentSearch,
 } from "@/app/api/recent-searches";
 import { searchUser } from "@/app/api/user";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Button } from "@nextui-org/react";
 
-const SearchSection = ({ pushSubPanel, switchPanel }) => {
+const SearchSection = ({ pushSubPanel }) => {
   const { user } = useAuth();
   const [value, setValue] = useState("");
   const [results, setResults] = useState([]);
@@ -48,7 +49,7 @@ const SearchSection = ({ pushSubPanel, switchPanel }) => {
 
       setLoading(true);
       try {
-        const result = await searchUser(value);
+        const result = await searchUser(value, user._id);
         setResults(result);
       } catch (error) {
         console.error("Error fetching search results:", error);
@@ -59,7 +60,7 @@ const SearchSection = ({ pushSubPanel, switchPanel }) => {
 
     const delayDebounceFn = setTimeout(() => {
       fetchResults();
-    }, 300); // Debounce pentru a evita apeluri frecvente
+    }, 500); // Debounce pentru a evita apeluri frecvente
 
     return () => clearTimeout(delayDebounceFn);
   }, [value]);
@@ -84,7 +85,7 @@ const SearchSection = ({ pushSubPanel, switchPanel }) => {
 
   return (
     <div className="w-full h-full flex-1 p-6 flex flex-col gap-y-4 ">
-      <div className="flex  items-center p-2 border border-light-gray dark:border-dark-gray rounded-md">
+      <div className="flex items-center p-2 border border-gray-200 dark:border-gray-800 rounded-md">
         <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2" />
         <input
           autoFocus
@@ -103,14 +104,12 @@ const SearchSection = ({ pushSubPanel, switchPanel }) => {
             <ul className="flex flex-col gap-y-2">
               {results.map((currUser) => (
                 <li
-                  className="flex items-center my-1 px-2 justify-between rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg cursor-pointer"
+                  className="flex items-center py-1 px-2 justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                   key={currUser._id}
                   onClick={() => {
                     handleAddToRecent(currUser);
                     {
-                      currUser._id === user._id
-                        ? switchPanel("Account")
-                        : pushSubPanel("Profile", currUser);
+                      pushSubPanel("Profile", currUser);
                     }
                   }} // Adaugă la recents
                 >
@@ -139,25 +138,15 @@ const SearchSection = ({ pushSubPanel, switchPanel }) => {
                 <ul className="mt-2">
                   {recent.map((currUser) => (
                     <li
-                      className="flex items-center my-1 px-2 justify-between rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg cursor-pointer"
+                      className="flex items-center  px-2 py-1 justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                       key={currUser._id}
+                      onClick={
+                        () => pushSubPanel("Profile", currUser)
+                      }
                     >
-                      <button
-                        onClick={
-                          () => {
-                            currUser._id === user._id
-                            ? switchPanel("Account")
-                            : pushSubPanel("Profile", currUser)
-                          }
-                        }
-                        className="flex-1  pr-2 flex text-start"
-                      >
-                        <UserListItem user={currUser} />
-                      </button>
-                      <div
-                        size="sm"
-                        onClick={() => handleRemoveSearch(currUser)}
-                      />
+                     <UserListItem user={currUser} />
+                     <Button size="sm" onPress={() => handleRemoveSearch(currUser)} variant="light" isIconOnly><XMarkIcon className="size-4"/></Button>
+                      
                     </li>
                   ))}
                 </ul>

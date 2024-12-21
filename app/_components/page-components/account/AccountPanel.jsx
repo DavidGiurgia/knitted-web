@@ -6,25 +6,42 @@ import Settings from "./settings/Settings";
 import Profile from "./Profile";
 import { useAuth } from "@/app/_context/AuthContext";
 import AccountSettings from "./settings/AccountSettings";
+import FriendsSection from "../../FriendsSection";
+import UserProfile from "../../UserProfile";
 
 const AccountPanel = () => {
-  const { switchPanel,  activeSubPanel , pushSubPanel, popSubPanel} = usePanel();
-  const { subPanel } = activeSubPanel || {};
-  const { user, userRelations, logout } = useAuth();
+  const { switchPanel, activeSubPanel, pushSubPanel, popSubPanel } = usePanel();
+  const { subPanel, param } = activeSubPanel || {};
+  const { user, logout } = useAuth();
 
-  return (
-    <div className="h-full">
-      <div className={`h-full ${activeSubPanel !== "Account" && "hidden"}`}>
-        <Profile userRelations={userRelations} user={user} logout={logout} pushSubPanel={pushSubPanel} switchPanel={switchPanel}/>
-      </div>
-      <div className={`${subPanel !== "Settings" && "hidden"}`}>
-        <Settings user={user} goBack={popSubPanel} goTo={pushSubPanel}/>
-      </div>
-      <div className={`${subPanel !== "AccountSettings" && "hidden"}`}>
-        <AccountSettings user={user} goBack={popSubPanel} />
-      </div>
-    </div>
-  );
+  // Condițional pentru randarea subpanoului activ
+  const renderSubPanel = () => {
+    switch (subPanel) {
+      case "Settings":
+        return (
+          <Settings user={user} goBack={popSubPanel} goTo={pushSubPanel} />
+        );
+      case "AccountSettings":
+        return <AccountSettings user={user} goBack={popSubPanel} />;
+      case "FriendsSection":
+        return (
+          <FriendsSection currUser={user} goBack={popSubPanel} />
+        );
+      case "Profile":
+        return <UserProfile currentUser={param} />;
+      default:
+        return (
+          <Profile
+            user={user}
+            logout={logout}
+            pushSubPanel={pushSubPanel}
+            switchPanel={switchPanel}
+          />
+        );
+    }
+  };
+
+  return <div className="h-full">{renderSubPanel()}</div>;
 };
 
 export default AccountPanel;

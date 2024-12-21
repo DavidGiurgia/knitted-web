@@ -1,73 +1,78 @@
-'use client';
+"use client";
 
 import { useAuth } from "@/app/_context/AuthContext";
-import {
-  getNotificationsForUser,
-  markNotificationAsReadById,
-  removeNotificationById,
-} from "@/app/services/notifications";
-import {
-  ArrowLeftIcon,
-  EllipsisVerticalIcon,
-} from "@heroicons/react/24/outline";
-import {
-  Avatar,
-  Button,
-} from "@nextui-org/react";
+import { getNotificationsForUser } from "@/app/services/notifications";
+import { ArrowLeftIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { Button } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Notification from "../../Notification";
 import { markAllNotificationsAsRead } from "@/app/api/notifications";
 import { acceptFriendRequest } from "@/app/api/friends";
+import { getUserById } from "@/app/services/userService";
 
 const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
-  const { user } = useAuth(); // Obține utilizatorul curent
+  const { user, fetchProfile } = useAuth(); // Obține utilizatorul curent
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
+  const fetchNotifications = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch notifications
+      const userNotifications = await getNotificationsForUser(user._id);
+
+      // Pre-fetch and validate sender/receiver data in bulk
+      const validNotifications = userNotifications.filter((notification) => {
+        if (
+          notification.type === "friend_request" ||
+          notification.type === "friend_request_accepted"
+        ) {
+          return (
+            notification.sender &&
+            !notification.sender.blockedUsers?.includes(user._id)
+          );
+        }
+        return true; // Other notification types are always valid
+      });
+
+      // Mark notifications as read in one go
+      await markAllNotificationsAsRead(user._id);
+
+      // Update state
+      setNotifications(validNotifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      if (user) {
-        try {
-          // Fetch notifications
-          const userNotifications = await getNotificationsForUser(user._id);
-          setNotifications(userNotifications);
-
-          // Mark all notifications as read
-          await markAllNotificationsAsRead(user._id);
-          setNotifications(
-            (prev) => prev.map((n) => ({ ...n, read: true })) // Update the state to reflect read status
-          );
-        } catch (error) {
-          console.error("Error fetching notifications:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
     fetchNotifications();
   }, [user]);
 
   // Handle Add back for friend requests
   const handleAddBack = async (notification) => {
-    try{
+    try {
       // Add back friend request notification
-      const response = await acceptFriendRequest(user?._id, notification.metadata.sender?._id);
-      await removeNotificationById(notification?._id);
-      setNotifications((prev) => prev.filter((n) => n._id !== notification._id));
-      toast.success(response?.message);
-    } 
-    catch(error){
+      const response = await acceptFriendRequest(
+        user?._id,
+        notification.sender?._id
+      );
+      await fetchProfile();
+      if (!response?.success) {
+        toast.error(response?.message);
+      }
+    } catch (error) {
       console.error("Error adding back friend request: ", error);
     }
   };
 
   return (
-    <div className="w-full h-full p-4">
-      <div className="flex items-center gap-x-6">
+    <div className="w-full h-full p-4 overflow-y-auto">
+      <div className="flex items-center justify-between gap-x-6">
         <Button
           className="md:hidden"
           onPress={() => switchPanel("Account")}
@@ -77,6 +82,10 @@ const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
           <ArrowLeftIcon className="size-5" />
         </Button>
         <div className="text-xl">Notifications</div>
+
+        <Button onPress={fetchNotifications} variant="light" isIconOnly>
+          <ArrowPathIcon className="size-5" />
+        </Button>
       </div>
 
       <div className="mt-4 w-full flex flex-col items-center justify-center">
@@ -86,25 +95,14 @@ const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
           <div className="text-center text-gray-500">No notifications yet!</div>
         ) : (
           notifications.map((notification) => (
-            <div
-            onClick={() =>{console.log("type: " + notification.type + ", sender: " + notification.metadata.sender);notification.type === "friend_request" && pushSubPanel("Profile", notification.metadata.sender)}}
+            <Notification
               key={notification._id}
-              className="flex flex-shrink-0 w-full items-start justify-between  p-4 mb-2 rounded-lg bg-white dark:bg-gray-900 shadow-md hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <Avatar showFallback className="flex-shrink-0 mr-2" src={notification.metadata.sender?.avatarUrl}/>
-              <Notification
-                notification={notification}
-              />
-              {notification.type === "friend_request" && (
-                <Button
-                  size="sm"
-                  color="primary"
-                  onPress={() => handleAddBack(notification)}
-                >
-                  Accept
-                </Button>
-              )}
-            </div>
+              user={user}
+              notification={notification}
+              onConfirm={() =>{ handleAddBack(notification); pushSubPanel("Profile", notification.sender)}}
+              onClick={() => pushSubPanel("Profile", notification.sender)}
+            
+            />
           ))
         )}
       </div>

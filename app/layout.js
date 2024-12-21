@@ -15,11 +15,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={poppins.variable} >
+    <html lang="en" suppressHydrationWarning>
       <head>
       <link rel="icon" href="/assets/Z-logo.svg" sizes="any" />
       </head>
-      <body className="font-sans">
+      <body className={`${poppins.variable} font-sans`}>
         <Providers>
           {children}
         </Providers>

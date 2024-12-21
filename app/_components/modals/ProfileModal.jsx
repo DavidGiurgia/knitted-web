@@ -15,7 +15,16 @@ import {
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { updateUser } from "../../api/user";
-import { uploadAvatarToImgBB, deleteAvatarFromImgBB } from "../../services/avatarService";
+import {
+  uploadAvatarToImgBB,
+  deleteAvatarFromImgBB,
+} from "../../services/avatarService";
+import {
+  CameraIcon,
+  PhotoIcon,
+  TrashIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 
 const ProfileModal = ({ isOpen, onOpenChange }) => {
   const { user, fetchProfile } = useAuth();
@@ -61,7 +70,14 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
       }
 
       // Actualizează datele utilizatorului
-      await updateUser(user._id, fullname, username, bio, avatarUrl, deleteAvatarUrl);
+      await updateUser(
+        user._id,
+        fullname,
+        username,
+        bio,
+        avatarUrl,
+        deleteAvatarUrl
+      );
 
       // Notificare de succes și reîmprospătarea profilului
       toast.success("Profile updated successfully");
@@ -86,39 +102,57 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="flex flex-col gap-1">Edit Profile</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">
+              Edit Profile
+            </ModalHeader>
             <ModalBody>
               {!user ? (
                 <div>Please log in!</div>
               ) : (
                 <>
-                  {/* Secțiunea pentru avatar */}
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center">
-                      <Avatar
-                      showFallback
-                        className="w-28 h-28"
-                        src={
-                          selectedAvatar && typeof selectedAvatar === "object"
-                            ? URL.createObjectURL(selectedAvatar)
-                            : selectedAvatar || ""
-                        }
-                      />
+                  <div className="flex items-start gap-x-4">
+                    {/* Secțiunea pentru avatar */}
+                    <div className="flex flex-shrink-0 w-fit items-center flex-col gap-2">
+                      <div className="w-24 h-24  rounded-full overflow-hidden flex">
+                        <Avatar
+                          showFallback
+                          className="w-24 h-24"
+                          src={
+                            selectedAvatar && typeof selectedAvatar === "object"
+                              ? URL.createObjectURL(selectedAvatar)
+                              : selectedAvatar || ""
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center">
+                        {/* Buton pentru a schimba avatarul */}
+                        <Button isIconOnly htmlFor="fileUpload" variant="light">
+                          <label htmlFor="fileUpload">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleAvatarChange}
+                              className="hidden"
+                              id="fileUpload"
+                            />
+                            <PhotoIcon className="size-5 text-gray-500" />
+                          </label>
+                        </Button>
+                        <Button  onPress={()=>setSelectedAvatar("")} isIconOnly variant="light">
+                          <XMarkIcon className="size-5 text-gray-500" />
+                        </Button>
+                      </div>
                     </div>
 
-                    {/* Buton pentru a schimba avatarul */}
-                    <Button htmlFor="fileUpload" variant="light">
-                      <label htmlFor="fileUpload">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleAvatarChange}
-                          className="hidden"
-                          id="fileUpload"
-                        />
-                        Change picture
-                      </label>
-                    </Button>
+                    <div>
+                      <div className="text-xl font-medium text-dark-bg dark:text-light-bg ">
+                        {fullname || username || "Add your name"}
+                      </div>
+                      <div className="text-gray-500 max-w-64 text-md">
+                        {bio || user?.email}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Câmpuri pentru nume, username și bio */}
@@ -152,10 +186,7 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
               )}
             </ModalBody>
             <ModalFooter>
-              <Button
-                variant="light"
-                onPress={onClose}
-              >
+              <Button variant="light" onPress={onClose}>
                 Cancel
               </Button>
               <Button

@@ -15,9 +15,7 @@ import {
   ChatBubbleLeftRightIcon as ChatSolid,
   UserGroupIcon as GroupSolid,
 } from "@heroicons/react/24/solid";
-import Image from "next/image";
 import { Avatar, Button } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "../_context/AuthContext";
 
 const links = [
@@ -29,9 +27,12 @@ const links = [
 ];
 
 const Bottombar = () => {
-  const { activePanel, switchPanel } = usePanel();
+  const { activePanel, switchPanel, resetPanel } = usePanel();
   const {user} = useAuth();
   const handleLinkClick = (label) => {
+    if(activePanel === label){
+      resetPanel();
+    }
     switchPanel(label);
   };
 
@@ -47,7 +48,7 @@ const Bottombar = () => {
           <Button
             isIconOnly
             key={label}
-            onClick={() => handleLinkClick(label)}
+            onPress={() => handleLinkClick(label)}
             className={`bg-transparent rounded-none w-full h-16`}
           >
             {isAvatar ? (
@@ -58,7 +59,7 @@ const Bottombar = () => {
                 size="sm"
                 className="w-8 h-8"
                 isBordered={activePanel === "Account"}
-                color="primary"
+                color={activePanel === "Account" && "primary"}
               />
             ) : activePanel === label ? (
               <IconSolid className="w-8 h-8 text-primary" />

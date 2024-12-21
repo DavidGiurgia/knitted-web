@@ -11,7 +11,8 @@ export function Providers({ children }) {
     <NextUIProvider>
       <NextThemesProvider
         attribute="class"
-        defaultTheme="system" 
+        defaultTheme="light" // Set a default theme
+        enableSystem={true} // Enable system preference detection
       >
         <AuthProvider>
           <PanelProvider>

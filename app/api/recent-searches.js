@@ -34,3 +34,12 @@ export const clearRecentSearch = async (userId) => {
       console.error("Error clearing recent searches:", error);
     }
 };
+
+export const deleteRecentList = async (userId) => {
+  try{
+    await axios.delete(`${API_BASE_URL}/delete-list/${userId}`);
+  }
+  catch(error){
+    console.error("Error deleting recent list:", error);
+  }
+}

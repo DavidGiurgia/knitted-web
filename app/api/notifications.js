@@ -3,13 +3,13 @@ import axios from "axios";
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000/notifications"; // URL-ul API-ului backend
 
 // Creează o notificare
-export const createNotification = async (userId, message, type, metadata) => {
+export const createNotification = async (userId, message, type, sender) => {
   try {
     const response = await axios.post(`${API_BASE_URL}`, {
       userId,
       message,
       type,        // Include the 'type' field in the request
-      metadata     // Include the 'metadata' field in the request
+      sender     // Include the 'metadata' field in the request
     });
     return response.data;
   } catch (error) {

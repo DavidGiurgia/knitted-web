@@ -12,15 +12,19 @@ export const fetchUserById = async (id) => {
     }
 }
 
-export const searchUser = async (searchText) => {
-    try{
-        const response = await axios.get(`${API_BASE_URL}/search/${searchText}`);
+export const searchUser = async (searchText, userId) => {
+    try {
+        // Trimite `userId` ca parametru query și `searchText` în URL
+        const response = await axios.get(`${API_BASE_URL}/search/${searchText}`, {
+            params: { userId }  // Adăugăm `userId` în query params
+        });
         return response.data;
-    }
-    catch(error){
+    } catch (error) {
         console.error("Error searching users:", error);
+        throw error;
     }
 }
+
 
 export const updateUser = async (userId, fullname, username, bio, avatarUrl, deleteAvatarUrl) => {
     try{

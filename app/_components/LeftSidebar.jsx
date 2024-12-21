@@ -32,10 +32,13 @@ const links = [
 ];
 
 const LeftSidebar = () => {
-  const { activePanel, switchPanel } = usePanel();
-  const { logout , user} = useAuth();
+  const { activePanel, switchPanel, resetPanel } = usePanel();
+  const { logout, user } = useAuth();
 
   const handleLinkClick = (label) => {
+    if(activePanel === label){
+      resetPanel(); 
+    }
     switchPanel(label);
   };
 
@@ -75,11 +78,12 @@ const LeftSidebar = () => {
                   showArrow
                   content={label}
                   key={label}
+                  delay={1000}
                 >
                   <Button
                     isIconOnly
                     variant="light"
-                    onClick={() => handleLinkClick(label)}
+                    onPress={() => handleLinkClick(label)}
                     className={`w-12 h-12 rounded-lg 
                  ${
                    activePanel === label ? "!bg-gray-100 dark:!bg-gray-800" : ""
@@ -87,7 +91,7 @@ const LeftSidebar = () => {
                   >
                     {isAvatar ? (
                       <Avatar
-                      showFallback
+                        showFallback
                         src={user?.avatarUrl}
                         radius="full"
                         size="sm"
@@ -109,9 +113,10 @@ const LeftSidebar = () => {
 
         <Tooltip placement="right" showArrow content="Logout">
           <Button
+            variant="light"
             isIconOnly
-            onClick={() => handleLogoutClick()}
-            className="w-12 h-12 rounded-lg bg-trnasparent"
+            onPress={() => handleLogoutClick()}
+            className="w-12 h-12 rounded-lg "
           >
             <ArrowRightStartOnRectangleIcon className="w-6 h-6 " />
           </Button>

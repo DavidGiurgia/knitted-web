@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -6,118 +6,143 @@ import {
   AvatarGroup,
   Badge,
   Button,
+  ButtonGroup,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  useDisclosure,
 } from "@nextui-org/react";
 import {
   ArrowLeftIcon,
+  Bars3Icon,
+  ChevronDownIcon,
   EllipsisHorizontalIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../_context/AuthContext";
-import { acceptFriendRequest, cancelFriendRequest, getFriendsAndRelations, request } from "../api/friends"; // Importă metoda getUserById
+import {
+  acceptFriendRequest,
+  blockUser,
+  cancelFriendRequest,
+  getFriendsAndRelations,
+  removeFriend,
+  request,
+  unblockUser,
+} from "../api/friends"; // Importă metoda getUserById
 import toast from "react-hot-toast";
 import { getUserById } from "../services/userService";
-
-const UserProfile = ({ currentUser, goBack}) => {
-  const { user, userRelations } = useAuth();
+import { usePanel } from "../_context/PanelContext";
+import ProfileModal from "./modals/ProfileModal";
+import PictureModal from "./modals/PictureModal";
+const UserProfile = ({ currentUser }) => {
+  const { pushSubPanel, popSubPanel } = usePanel();
+  const { user, fetchProfile } = useAuth();
+  const [friends, setFriends] = useState([]); 
+  const [loading, setLoading] = useState(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isOpenProfilePhoto,
+    onOpen: onOpenProfilePhoto,
+    onOpenChange: onOpenChangeProfilePhoto,
+  } = useDisclosure();
   const [relationshipStatus, setRelationshipStatus] = useState("none");
-  const [friends, setFriends] = useState([]); // Stochează avatarurile prietenilor
-  const [currentUserRelations, setCurrentUserRelations] = useState([]);
+
+  const getRelationshipStatus = () => {
+    if (user?.blockedUsers.includes(currentUser._id)) return "blocked";
+    if (user?.friendsIds.includes(currentUser._id)) return "friends";
+    if (user?.sentRequests.includes(currentUser._id)) return "pending";
+    if (user?.friendRequests.includes(currentUser._id)) return "incoming";
+    return "none";
+  };
 
   useEffect(() => {
-    console.log(userRelations);
-    // Setează statusul relației
-    if (userRelations?.blockedUsers.includes(currentUser?._id)) {
-      setRelationshipStatus("blocked");
-    } else if (userRelations?.friends.includes(currentUser?._id)) {
-      setRelationshipStatus("friends");
-    } else if (userRelations?.sentRequests.includes(currentUser?._id)) {
-      setRelationshipStatus("pending");
-    } else if (userRelations?.receivedRequests.includes(currentUser?._id)) {
-      setRelationshipStatus("incoming");
-    } else {
-      setRelationshipStatus("none");
+    if (!currentUser?._id) {
+      setFriends([]);
+      return;
     }
-  }, [userRelations, currentUser]);
 
-  useEffect(() => {
-    if (!currentUser || !currentUser._id) return; // Asigură-te că currentUser este definit
-  
-    const fetchFriendAvatars = async () => {
+    const fetchRelations = async () => {
       try {
-        const relations = await getFriendsAndRelations(currentUser._id);
-        setCurrentUserRelations(relations);
-  
-        if (!relations.friends || relations.friends.length === 0) return;
-  
-        const friendPromises = relations.friends.map(
-          (friendId) => getUserById(friendId)
-        );
-        const friendData = await Promise.all(friendPromises);
-        setFriends(friendData);
+
+        if (currentUser.friendsIds?.length > 0) {
+          if(currentUser?.blockedUsers.includes(user?._id)){
+            throw new Error("You don't have access to this user!");
+          }
+          const friendData = await Promise.all(
+            currentUser.friendsIds.map((friendId) => getUserById(friendId))
+          );
+          setFriends(friendData.filter(Boolean));
+        } else {
+          setFriends([]);
+        }
+
+        const initialStatus = getRelationshipStatus();
+        setRelationshipStatus(initialStatus);
       } catch (error) {
-        console.error("Error fetching friend avatars:", error);
-        toast.error("Unable to load friend data.");
+        console.error("Error fetching relations:", error);
+        popSubPanel();
       }
     };
-  
-    fetchFriendAvatars();
-  }, [currentUser]);
-  
 
-  const handleAddFriend = async (receiverId) => {
-    try {
-      const response = await request(user?._id, receiverId);
-      if (response?.message) {
-        setRelationshipStatus("pending");
-        toast.success(response.message);
-      } else {
-        toast.error("Something went wrong");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error sending friend request");
-    }
-  };
+    fetchRelations();
+  }, [currentUser, user]); // Asigură-te că useEffect se re-execută la schimbarea currentUser
 
-  const handleCancelRequest = async (receiverId) => {
+  const handleFriendRequest = async (type) => {
+    setLoading(true);
     try {
-      const response = await cancelFriendRequest(user?._id, receiverId);
-      if (response?.message) {
-        setRelationshipStatus("none");
-        toast.success(response.message);
-      } else {
-        toast.error("Something went wrong");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error cancelling friend request");
-    }
-  };
+      let response;
 
-  const handleAcceptRequest = async (receiverId) => {
-    try {
-      const response = await acceptFriendRequest(user?._id, receiverId);
-      if (response?.message) {
-        setRelationshipStatus("friends");
-        toast.success(response.message);
-      } else {
-        toast.error("Something went wrong");
+      if (type === "add") {
+        response = await request(user?._id, currentUser?._id);
+      } else if (type === "cancel") {
+        response = await cancelFriendRequest(user?._id, currentUser?._id);
+      } else if (type === "accept") {
+        response = await acceptFriendRequest(user?._id, currentUser?._id);
+      } else if (type === "remove") {
+        response = await removeFriend(user?._id, currentUser?._id);
+      } else if (type === "block") {
+        response = await blockUser(user?._id, currentUser?._id);
+      } else if (type === "unblock") {
+        response = await unblockUser(user?._id, currentUser?._id);
       }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error accepting friend request");
+
+      // Actualizează statusul relației imediat
+      if (!response?.success) {
+        toast.error(response?.message || "Failed to process the action.", {
+          id: "response",
+        });
+      }
+
+      await fetchProfile();
+    } catch (error) {
+      console.error("Error handling friend request:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="p-4 flex flex-col gap-y-4">
-      <div className="flex items-center gap-x-6">
-        <Button onPress={goBack} variant="light" isIconOnly>
+      <div className="flex items-center gap-x-6 justify-between">
+        <Button onPress={popSubPanel} variant="light" isIconOnly>
           <ArrowLeftIcon className="size-5" />
         </Button>
+        <Dropdown>
+          <DropdownTrigger>
+            <Button isIconOnly variant="light">
+              <Bars3Icon className="size-6" />
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu>
+            <DropdownItem className={`${!user.friendsIds.includes(currentUser._id) && "hidden"}`} onPress={() => handleFriendRequest("remove")}>
+              Remove
+            </DropdownItem>
+            <DropdownItem onPress={() => handleFriendRequest("block")}>
+              Block
+            </DropdownItem>
+            <DropdownItem>Report</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </div>
       <div className="flex flex-col gap-y-4">
         <div className="flex gap-x-4">
@@ -128,6 +153,9 @@ const UserProfile = ({ currentUser, goBack}) => {
             placement="bottom-right"
           >
             <Avatar
+              onClick={() => {
+                currentUser?.avatarUrl && onOpenProfilePhoto();
+              }}
               showFallback
               src={currentUser?.avatarUrl}
               className="w-24 h-24 text-large flex-shrink-0"
@@ -143,23 +171,44 @@ const UserProfile = ({ currentUser, goBack}) => {
           </div>
         </div>
 
-        {currentUser?.friendsIds.length > 0 ? (
-          <AvatarGroup
-          
-            max={3}
-            total={friends.length}
-            renderCount={(count) => (
-              <p className="text-small text-foreground font-medium ms-2">
-                +{count} friends
-              </p>
-            )}
-          >
-            {friends.map((friend) => (
-              <Avatar onClick={()=>{}}  showFallback key={friend._id} src={friend.avatarUrl} />
-            ))}
-          </AvatarGroup>
+        {friends.length > 0 ? (
+          <div>
+            <div className=" text-sm my-1">Friends</div>
+            <AvatarGroup
+              max={3}
+              total={friends.length}
+              renderCount={() => {
+                const displayedCount = Math.min(3, friends.length); // Numărul de avatare afișate
+                const hiddenCount = friends.length - displayedCount; // Diferența pentru cei ascunși
+                return hiddenCount > 0 ? (
+                  <p
+                    onClick={() =>
+                      pushSubPanel("FriendsSection", currentUser)
+                    }
+                    className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
+                  >
+                    +{" " + hiddenCount} others
+                  </p>
+                ) : null;
+              }}
+            >
+              {friends.slice(0, 3).map((friend) => (
+                <Avatar
+                  onClick={() => {
+                    pushSubPanel("Profile", friend);
+                  }}
+                  showFallback
+                  key={friend._id}
+                  src={friend.avatarUrl}
+                />
+              ))}
+            </AvatarGroup>
+          </div>
         ) : (
-          <div className="text-gray-500 text-medium">No friends yet.</div>
+          <div className="text-gray-500 text-medium">
+            <span className="font-medium ">{currentUser?.username + " "}</span>{" "}
+            has no friends yet.
+          </div>
         )}
 
         <div className="flex gap-x-2 w-full">
@@ -167,77 +216,75 @@ const UserProfile = ({ currentUser, goBack}) => {
             <Button
               color="primary"
               variant="faded"
-              size="sm"
               className="flex-1 text-medium"
+              onPress={onOpen}
             >
               Edit Profile
             </Button>
           ) : relationshipStatus === "none" ? (
             <Button
-              onPress={() => handleAddFriend(currentUser?._id)}
+              onPress={() => handleFriendRequest("add")}
               className="flex-1 text-medium"
-              size="sm"
               color="primary"
+              isLoading={loading}
             >
               Add Friend
             </Button>
           ) : relationshipStatus === "pending" ? (
             <Button
-              onPress={() => handleCancelRequest(currentUser?._id)}
+              onPress={() => handleFriendRequest("cancel")}
               className="flex-1 text-medium"
-              size="sm"
               color="primary"
               variant="faded"
+              isLoading={loading}
             >
-              Request Sent
+              Cancel request
             </Button>
           ) : relationshipStatus === "incoming" ? (
             <Button
-              onPress={() => handleAcceptRequest(currentUser?._id)}
+              onPress={() => handleFriendRequest("accept")}
               className="flex-1 text-medium"
-              size="sm"
               color="primary"
+              isLoading={loading}
             >
-              Accept Request
+              Accept request
             </Button>
           ) : relationshipStatus === "friends" ? (
-            <Button
-              className="flex-1 text-medium"
-              size="sm"
-              color="primary"
-              variant="faded"
-            >
-              Message
-            </Button>
+            <div className="w-full flex gap-x-1">
+              <Button
+                className="flex-1 text-medium"
+                color="danger"
+                variant="bordered"
+                onPress={() => handleFriendRequest("remove")}
+              >
+                Remove
+              </Button>
+              <Button
+                className="flex-1 text-medium"
+                variant="faded"
+                color="primary"
+              >
+                Message
+              </Button>
+            </div>
           ) : relationshipStatus === "blocked" ? (
             <Button
               className="flex-1 text-medium"
-              size="sm"
               color="error"
               variant="faded"
+              onPress={() => handleFriendRequest("unblock")}
             >
-              Blocked
+              Unblock
             </Button>
           ) : null}
-          <Dropdown>
-            <DropdownTrigger>
-              <Button
-                className={`${user?._id === currentUser?._id && "hidden"}`}
-                color="primary"
-                isIconOnly
-                variant="faded"
-                size="sm"
-              >
-                <EllipsisHorizontalIcon />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu>
-              <DropdownItem>Block</DropdownItem>
-              <DropdownItem>Report</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
         </div>
       </div>
+      <ProfileModal isOpen={isOpen} onOpenChange={onOpenChange} />
+      <PictureModal
+        isOpen={isOpenProfilePhoto}
+        onOpenChange={onOpenChangeProfilePhoto}
+        src={currentUser?.avatarUrl}
+      />
     </div>
   );
 };

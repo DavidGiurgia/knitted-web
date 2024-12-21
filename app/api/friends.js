@@ -5,7 +5,7 @@ const API_BASE_URL = "http://localhost:8000/friends";
 
 export const request = async (senderId, receiverId) => {
     try{
-        const response = await axios.post(`${API_BASE_URL}/request`, { senderId, receiverId });
+        const response =  await axios.post(`${API_BASE_URL}/request`, { senderId, receiverId });
         return response.data;
     }
     catch(error){
@@ -25,9 +25,10 @@ export const acceptFriendRequest = async (userId, senderId) => {
     }
 }
 
-export const cancelFriendRequest = async (userId, senderId) => {
+export const cancelFriendRequest = async (senderId, receiverId) => {
     try{
-        await axios.post(`${API_BASE_URL}/cancel`, { userId, senderId });
+        const response = await axios.post(`${API_BASE_URL}/cancel`, { senderId, receiverId });
+        return response.data;
     }
     catch(error){
         console.error("Error canceling friend request:", error);
@@ -36,19 +37,30 @@ export const cancelFriendRequest = async (userId, senderId) => {
 
 export const  blockUser = async (userId, blockedUserId) => {
     try{
-        await axios.post(`${API_BASE_URL}/block`, { userId, blockedUserId });
+        const response = await axios.post(`${API_BASE_URL}/block`, { userId, blockedUserId });
+        return response.data;
     }
     catch(error){
         console.error("Error blocking user:", error);
     }
 }
 
-export const getFriendsAndRelations = async (userId) => {
+export const unblockUser = async (userId, blockedUserId) => {
     try{
-        const response = await axios.get(`${API_BASE_URL}/${userId}`);
+        const response = await axios.post(`${API_BASE_URL}/unblock`, { userId, blockedUserId });
         return response.data;
     }
     catch(error){
-        console.error("Error fetching friends and relations:", error);
+        console.error("Error unblocking user:", error);
+    }
+}
+
+export const removeFriend = async (userId, friendId) => {
+    try{
+        const response = await axios.post(`${API_BASE_URL}/remove`, { userId, friendId });
+        return response.data;
+    }
+    catch(error){
+        console.error("Error removing friend:", error);
     }
 }

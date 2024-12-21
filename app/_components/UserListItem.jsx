@@ -2,7 +2,7 @@ import { Avatar } from "@nextui-org/react";
 
 const UserListItem = ({ user }) => {
   return (
-    <div className="py-2">
+    <div className="py-2 flex-1">
       <div className="flex items-center  gap-x-4">
         <Avatar showFallback src={user?.avatarUrl} />
         <div className="flex flex-col flex-1">
