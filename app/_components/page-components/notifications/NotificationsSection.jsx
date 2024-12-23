@@ -6,7 +6,7 @@ import { ArrowLeftIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import { Button } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import Notification from "../../Notification";
+import Notification from "../../notifications/Notification";
 import { markAllNotificationsAsRead } from "@/app/api/notifications";
 import { acceptFriendRequest } from "@/app/api/friends";
 import { getUserById } from "@/app/services/userService";
@@ -23,25 +23,11 @@ const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
       // Fetch notifications
       const userNotifications = await getNotificationsForUser(user._id);
 
-      // Pre-fetch and validate sender/receiver data in bulk
-      const validNotifications = userNotifications.filter((notification) => {
-        if (
-          notification.type === "friend_request" ||
-          notification.type === "friend_request_accepted"
-        ) {
-          return (
-            notification.sender &&
-            !notification.sender.blockedUsers?.includes(user._id)
-          );
-        }
-        return true; // Other notification types are always valid
-      });
-
       // Mark notifications as read in one go
       await markAllNotificationsAsRead(user._id);
 
       // Update state
-      setNotifications(validNotifications);
+      setNotifications(userNotifications);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     } finally {
@@ -59,7 +45,7 @@ const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
       // Add back friend request notification
       const response = await acceptFriendRequest(
         user?._id,
-        notification.sender?._id
+        notification.data.sender?._id
       );
       await fetchProfile();
       if (!response?.success) {
@@ -83,7 +69,14 @@ const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
         </Button>
         <div className="text-xl">Notifications</div>
 
-        <Button onPress={fetchNotifications} variant="light" isIconOnly>
+        <Button
+          onPress={() => {
+            fetchNotifications();
+            fetchProfile();
+          }}
+          variant="light"
+          isIconOnly
+        >
           <ArrowPathIcon className="size-5" />
         </Button>
       </div>
@@ -97,11 +90,8 @@ const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
           notifications.map((notification) => (
             <Notification
               key={notification._id}
-              user={user}
               notification={notification}
-              onConfirm={() =>{ handleAddBack(notification); pushSubPanel("Profile", notification.sender)}}
-              onClick={() => pushSubPanel("Profile", notification.sender)}
-            
+             
             />
           ))
         )}

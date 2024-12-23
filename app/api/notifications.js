@@ -3,13 +3,12 @@ import axios from "axios";
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000/notifications"; // URL-ul API-ului backend
 
 // Creează o notificare
-export const createNotification = async (userId, message, type, sender) => {
+export const createNotification = async (userId, type, data) => {
   try {
     const response = await axios.post(`${API_BASE_URL}`, {
       userId,
-      message,
-      type,        // Include the 'type' field in the request
-      sender     // Include the 'metadata' field in the request
+      type,  // Include tipul notificării
+      data   // Include datele flexibile pentru notificare
     });
     return response.data;
   } catch (error) {
@@ -57,8 +56,7 @@ export const deleteNotification = async (notificationId) => {
   }
 };
 
-// In services/notifications.js
-
+// Marchează toate notificările unui utilizator ca citite
 export const markAllNotificationsAsRead = async (userId) => {
   try {
     const response = await axios.patch(
@@ -70,4 +68,3 @@ export const markAllNotificationsAsRead = async (userId) => {
     throw error;
   }
 };
-

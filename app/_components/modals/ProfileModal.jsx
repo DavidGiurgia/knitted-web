@@ -20,9 +20,7 @@ import {
   deleteAvatarFromImgBB,
 } from "../../services/avatarService";
 import {
-  CameraIcon,
   PhotoIcon,
-  TrashIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 

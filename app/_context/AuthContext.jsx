@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
 
       if (profile) {
         setUser(profile);
+        console.log(profile);
         setIsAuthenticated(true);
 
         router.push("/"); 
@@ -92,7 +93,6 @@ export const AuthProvider = ({ children }) => {
     router.push("/login");
     removeToken(); // Șterge token-ul din localStorage
     setUser(null);
-    setUserRelations(null);
     setIsAuthenticated(false);
   };
 
