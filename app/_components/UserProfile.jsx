@@ -37,7 +37,7 @@ import PictureModal from "./modals/PictureModal";
 const UserProfile = ({ currentUser }) => {
   const { pushSubPanel, popSubPanel } = usePanel();
   const { user, fetchProfile } = useAuth();
-  const [friends, setFriends] = useState([]); 
+  const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const {
@@ -63,9 +63,8 @@ const UserProfile = ({ currentUser }) => {
 
     const fetchRelations = async () => {
       try {
-
         if (currentUser.friendsIds?.length > 0) {
-          if(currentUser?.blockedUsers.includes(user?._id)){
+          if (currentUser?.blockedUsers.includes(user?._id)) {
             throw new Error("You don't have access to this user!");
           }
           const friendData = await Promise.all(
@@ -134,7 +133,12 @@ const UserProfile = ({ currentUser }) => {
             </Button>
           </DropdownTrigger>
           <DropdownMenu>
-            <DropdownItem className={`${!user.friendsIds.includes(currentUser._id) && "hidden"}`} onPress={() => handleFriendRequest("remove")}>
+            <DropdownItem
+              className={`${
+                !user?.friendsIds.includes(currentUser._id) && "hidden"
+              }`}
+              onPress={() => handleFriendRequest("remove")}
+            >
               Remove
             </DropdownItem>
             <DropdownItem onPress={() => handleFriendRequest("block")}>
@@ -173,7 +177,12 @@ const UserProfile = ({ currentUser }) => {
 
         {friends.length > 0 ? (
           <div>
-            <div className=" text-sm my-1">Friends</div>
+            <div
+              className="cursor-pointer text-sm my-1"
+              onClick={() => pushSubPanel("FriendsSection", currentUser)}
+            >
+              Friends
+            </div>
             <AvatarGroup
               max={3}
               total={friends.length}
@@ -182,9 +191,7 @@ const UserProfile = ({ currentUser }) => {
                 const hiddenCount = friends.length - displayedCount; // Diferența pentru cei ascunși
                 return hiddenCount > 0 ? (
                   <p
-                    onClick={() =>
-                      pushSubPanel("FriendsSection", currentUser)
-                    }
+                    onClick={() => pushSubPanel("FriendsSection", currentUser)}
                     className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
                   >
                     +{" " + hiddenCount} others
@@ -235,7 +242,7 @@ const UserProfile = ({ currentUser }) => {
               onPress={() => handleFriendRequest("cancel")}
               className="flex-1 text-medium"
               color="primary"
-              variant="faded"
+              variant="bordered"
               isLoading={loading}
             >
               Cancel request
@@ -245,6 +252,7 @@ const UserProfile = ({ currentUser }) => {
               onPress={() => handleFriendRequest("accept")}
               className="flex-1 text-medium"
               color="primary"
+              variant="bordered"
               isLoading={loading}
             >
               Accept request
@@ -254,7 +262,7 @@ const UserProfile = ({ currentUser }) => {
               <Button
                 className="flex-1 text-medium"
                 color="danger"
-                variant="bordered"
+                variant="faded"
                 onPress={() => handleFriendRequest("remove")}
               >
                 Remove

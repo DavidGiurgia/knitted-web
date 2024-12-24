@@ -22,6 +22,7 @@ import {
 } from "../../services/groupService";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import SelectFriends from "../SelectFriends";
 
 const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
   const router = useRouter();
@@ -136,6 +137,7 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
                   setGroupName(e.target.value);
                   setNameError("");
                 }}
+                variant="bordered"
               />
               <Textarea
                 maxLength={1000}
@@ -143,7 +145,12 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
                 value={groupDescription}
                 onChange={(e) => setGroupDescription(e.target.value)}
                 label="Description"
+                variant="bordered"
+                className="mb-4"
               />
+              {!group && 
+                <SelectFriends placeholder="Invite your friends" onSelectionChange={()=>{}} />
+              }
             </ModalBody>
             <ModalFooter>
               <Button variant="light" onPress={onClose}>

@@ -73,6 +73,7 @@ const RegisterForm = () => {
         size="lg"
         type="text"
         label="Username"
+        variant="bordered"
         isInvalid={usernameError.length}
         errorMessage={usernameError}
         color={usernameError.length && "danger"}
@@ -92,6 +93,7 @@ const RegisterForm = () => {
         size="lg"
         type="email"
         label="Email"
+        variant="bordered"
         isInvalid={emailError.length}
         errorMessage={emailError}
         color={emailError.length && "danger"}
@@ -110,6 +112,7 @@ const RegisterForm = () => {
         label="Password"
         placeholder="Create a strong password"
         size="lg"
+        variant="bordered"
         isInvalid={passwordError.length}
         errorMessage={passwordError}
         color={passwordError.length && "danger"}
@@ -140,7 +143,7 @@ const RegisterForm = () => {
         type="submit"
         color="primary"
         size="lg"
-        onClick={handleRegister}
+        onPress={(event) => {handleRegister(event)}}
         isLoading={loading}
         className="w-full flex-shrink-0"
       >

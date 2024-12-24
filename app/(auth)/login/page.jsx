@@ -66,6 +66,7 @@ const LoginForm = () => {
         size="lg"
         type="email"
         label="Email"
+        variant="bordered"
         isInvalid={emailError.length}
         errorMessage={emailError}
         color={emailError.length && "danger"}
@@ -84,6 +85,7 @@ const LoginForm = () => {
         label="Password"
         placeholder="Enter your password"
         size="lg"
+        variant="bordered"
         isInvalid={passwordError.length}
         errorMessage={passwordError}
         color={passwordError.length && "danger"}

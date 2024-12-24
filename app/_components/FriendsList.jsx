@@ -1,9 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../_context/AuthContext";
-import { getUserById } from "../services/userService";
 import UserListItem from "./UserListItem";
 import { usePanel } from "../_context/PanelContext";
+import { fetchFriends } from "../services/friendsService";
 
 const FriendsList = ({ currUser }) => {
   //const { user } = useAuth();
@@ -13,13 +12,8 @@ const FriendsList = ({ currUser }) => {
   useEffect(() => {
     // Obține avatarurile prietenilor din relații
     const fetchFriendAvatars = async () => {
-      if (!currUser?.friendsIds || currUser.friendsIds.length === 0) return;
-
       try {
-        const friendPromises = currUser.friendsIds.map(
-          (friendId) => getUserById(friendId) // Fetch fiecare prieten după ID
-        );
-        const friendData = await Promise.all(friendPromises);
+        const friendData = await fetchFriends(currUser?._id);
         setFriends(friendData);
       } catch (error) {
         console.error("Error fetching friend avatars:", error);
@@ -36,7 +30,9 @@ const FriendsList = ({ currUser }) => {
         <div
           className="flex items-center px-2 py-1 justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
           key={friend._id}
-          onClick={()=>{pushSubPanel("Profile", friend)}}
+          onClick={() => {
+            pushSubPanel("Profile", friend);
+          }}
         >
           <UserListItem user={friend} />
         </div>

@@ -19,10 +19,7 @@ import {
   uploadAvatarToImgBB,
   deleteAvatarFromImgBB,
 } from "../../services/avatarService";
-import {
-  PhotoIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { PhotoIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const ProfileModal = ({ isOpen, onOpenChange }) => {
   const { user, fetchProfile } = useAuth();
@@ -137,7 +134,11 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
                             <PhotoIcon className="size-5 text-gray-500" />
                           </label>
                         </Button>
-                        <Button  onPress={()=>setSelectedAvatar("")} isIconOnly variant="light">
+                        <Button
+                          onPress={() => setSelectedAvatar("")}
+                          isIconOnly
+                          variant="light"
+                        >
                           <XMarkIcon className="size-5 text-gray-500" />
                         </Button>
                       </div>
@@ -155,12 +156,14 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
 
                   {/* Câmpuri pentru nume, username și bio */}
                   <Input
+                    variant="bordered"
                     maxLength={50}
                     label="Name"
                     value={fullname}
                     onChange={(e) => setFullname(e.target.value)}
                   />
                   <Input
+                    variant="bordered"
                     size="lg"
                     type="text"
                     label="Username"
@@ -174,6 +177,7 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
                     }}
                   />
                   <Textarea
+                    variant="bordered"
                     placeholder="Add a meaningful bio..."
                     maxLength={200}
                     value={bio}
