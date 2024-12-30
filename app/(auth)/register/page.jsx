@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/16/solid';
-import { Button, Image, Input } from '@nextui-org/react';
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/16/solid";
+import { Button, Image, Input } from "@nextui-org/react";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { useAuth } from '@/app/_context/AuthContext';
+import { useAuth } from "@/app/_context/AuthContext";
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,7 +14,7 @@ const RegisterForm = () => {
   const { register } = useAuth();
 
   const toggleVisibility = () => setShowPassword(!showPassword);
-  
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,9 +23,7 @@ const RegisterForm = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
+  const handleRegister = async () => {
     if (!username) {
       setUsernameError("Password is required");
       return false;
@@ -35,8 +33,7 @@ const RegisterForm = () => {
     if (!email.trim()) {
       setEmailError("Email is required");
       return false;
-    }else if(!emailRegex.test(email))
-    {
+    } else if (!emailRegex.test(email)) {
       setEmailError("Invalid email format");
       return false;
     }
@@ -143,7 +140,7 @@ const RegisterForm = () => {
         type="submit"
         color="primary"
         size="lg"
-        onPress={(event) => {handleRegister(event)}}
+        onPress={handleRegister}
         isLoading={loading}
         className="w-full flex-shrink-0"
       >
@@ -160,7 +157,7 @@ const RegisterForm = () => {
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RegisterForm
+export default RegisterForm;

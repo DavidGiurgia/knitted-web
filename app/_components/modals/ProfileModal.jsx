@@ -93,8 +93,8 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-      <ModalContent>
+    <Modal size="full" isOpen={isOpen} onOpenChange={onOpenChange}>
+      <ModalContent className="md:w-fit md:h-fit overflow-auto ">
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
@@ -105,11 +105,10 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
                 <div>Please log in!</div>
               ) : (
                 <>
-                  <div className="flex items-start gap-x-4">
+                  <div className="flex flex-wrap items-start gap-x-4">
                     {/* Secțiunea pentru avatar */}
                     <div className="flex flex-shrink-0 w-fit items-center flex-col gap-2">
-                      <div className="w-24 h-24  rounded-full overflow-hidden flex">
-                        <Avatar
+                    <Avatar
                           showFallback
                           className="w-24 h-24"
                           src={
@@ -118,7 +117,6 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
                               : selectedAvatar || ""
                           }
                         />
-                      </div>
 
                       <div className="flex items-center">
                         {/* Buton pentru a schimba avatarul */}
@@ -148,7 +146,7 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
                       <div className="text-xl font-medium text-dark-bg dark:text-light-bg ">
                         {fullname || username || "Add your name"}
                       </div>
-                      <div className="text-gray-500 max-w-64 text-md">
+                      <div className="text-gray-500 max-w-xl text-md">
                         {bio || user?.email}
                       </div>
                     </div>

@@ -1,6 +1,6 @@
 "use client";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/16/solid";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button, Image, Input } from "@nextui-org/react";
@@ -9,7 +9,14 @@ import { useAuth } from "@/app/_context/AuthContext";
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const {login} = useAuth();
+  const {login, user} = useAuth();
+
+  useEffect(() => {
+    if(user){
+      router.push("/");
+    }
+  }, [user])
+  
 
   const toggleVisibility = () => setShowPassword(!showPassword);
 
@@ -19,8 +26,7 @@ const LoginForm = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
@@ -116,7 +122,7 @@ const LoginForm = () => {
         type="submit"
         color="primary"
         size="lg"
-        onClick={handleLogin}
+        onPress={handleLogin}
         isLoading={loading}
         className="w-full flex-shrink-0"
       >
@@ -132,7 +138,7 @@ const LoginForm = () => {
           size="lg"
           color="primary"
           variant="bordered"
-          onClick={() => {router.push('/register');}}
+          onPress={() => {router.push('/register');}}
           className="mt-14 w-full"
         >
           Create new account

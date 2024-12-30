@@ -15,10 +15,19 @@ import { getUserById } from "../services/userService";
 import { useEffect, useState } from "react";
 import CustomModal from "./modals/CustomModal";
 import { deleteGroup } from "../services/groupService";
-import { Button, useDisclosure } from "@nextui-org/react";
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  useDisclosure,
+} from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import GroupModal from "./modals/GroupModal";
+import UserProfile from "./UserProfile";
+import ProfileCard from "./ProfileCard";
 
 const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
   const { user } = useAuth();
@@ -31,6 +40,11 @@ const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
     onOpen: onDeleteModaOpen,
     onOpenChange: onDeleteModaOpenChange,
   } = useDisclosure();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpanded = () => {
+    setIsExpanded((prev) => !prev);
+  };
 
   useEffect(() => {
     const getCreator = async () => {
@@ -55,38 +69,62 @@ const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
   return (
     <div className="overflow-y-auto overflow-x-hidden flex flex-col h-full w-full md:w-fit md:max-w-80">
       <div
-        onClick={onOpen}
-        className="cursor-pointer pt-6 px-6 pb-4 w-full bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
-      >
-        <div className="font-medium text-lg mb-2">
-          {currentGroup?.name || "Group Name"}
-        </div>
-        <div className="text-sm text-[#808080] text-pretty truncate">
-          {currentGroup?.description}
-        </div>
+      onClick={onOpen}
+      className="cursor-pointer pt-6 px-6 pb-4 w-full bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
+    >
+      <div className="font-medium text-lg mb-2">
+        {currentGroup?.name || "Group Name"}
       </div>
-      <div className="p-6 flex flex-col gap-y-8">
-        <div className="flex items-center gap-x-4 hover:text-primary cursor-pointer">
-          <CalendarDaysIcon className="size-5 flex-shrink-0" />
-          {`Created by ${
-            creator?.username || "Unknown"
-          } at ${formattedCreatedAt}`}
-        </div>
-
-        <div
-          onClick={() => {
-            if (currentGroup?.joinCode) {
-              navigator.clipboard.writeText(currentGroup.joinCode);
-              toast.success("Join code copied to clipboard!");
-            } else {
-              toast.error("No join code available to copy.");
-            }
+      <div
+        className={`text-sm text-[#808080] text-pretty ${
+          isExpanded ? "" : "line-clamp-3"
+        }`}
+      >
+        {currentGroup?.description || "No description available."}
+      </div>
+      {currentGroup?.description?.length > 200 && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleExpanded();
           }}
-          className={`w-fit flex gap-x-4 items-center hover:text-primary cursor-pointer`}
+          className="mt-2 text-primary hover:underline text-sm"
         >
-          <HashtagIcon className="size-5" />
-          {currentGroup?.joinCode || "No code"}
-        </div>
+          {isExpanded ? "Hide" : "Read more"}
+        </button>
+      )}
+    </div>
+      <div className="p-6 flex flex-col gap-y-8">
+        <Popover className="">
+          <PopoverTrigger>
+            <div className="flex items-center gap-x-4 hover:text-primary cursor-pointer">
+              <CalendarDaysIcon className="size-5 flex-shrink-0" />
+              {`Created by ${
+                creator?.username || "Unknown"
+              } at ${formattedCreatedAt}`}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className="">
+            <ProfileCard currentUser={creator}/>
+          </PopoverContent>
+        </Popover>
+
+        <Tooltip content="Copy" placement="right" showArrow>
+          <div
+            onClick={() => {
+              if (currentGroup?.joinCode) {
+                navigator.clipboard.writeText(currentGroup.joinCode);
+                toast.success("Join code copied to clipboard!");
+              } else {
+                toast.error("No join code available to copy.");
+              }
+            }}
+            className={`w-fit flex gap-x-4 items-center hover:text-primary cursor-pointer`}
+          >
+            <HashtagIcon className="size-5" />
+            {currentGroup?.joinCode || "No code"}
+          </div>
+        </Tooltip>
 
         <div className="flex items-center gap-x-4 hover:text-primary">
           <UsersIcon className="size-5" />

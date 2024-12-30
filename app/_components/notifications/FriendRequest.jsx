@@ -7,7 +7,7 @@ const FriendRequest = ({ user, sender, onAction, onClick }) => {
       <Avatar
         showFallback
         className="flex-shrink-0 mr-2"
-        src={sender.avatarUrl}
+        src={sender?.avatarUrl}
       />
       <p className="flex-1">
         <span className="font-semibold">{sender?.username + " "}</span>

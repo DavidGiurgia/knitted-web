@@ -2,14 +2,12 @@
 
 import React from "react";
 import SearchSection from "./SearchSection";
-import ProfileSection from "../../ProfileSection";
 import { usePanel } from "@/app/_context/PanelContext";
 import FriendsSection from "../../FriendsSection";
-import { useAuth } from "@/app/_context/AuthContext";
 import UserProfile from "../../UserProfile";
 
 const SearchPanel = () => {
-  const { activeSubPanel, pushSubPanel, popSubPanel, switchPanel } = usePanel();
+  const { activeSubPanel, pushSubPanel, popSubPanel } = usePanel();
   const { subPanel, param } = activeSubPanel || {};
   const renderSubPanel = () => {
     switch (subPanel) {

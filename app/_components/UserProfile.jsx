@@ -6,25 +6,21 @@ import {
   AvatarGroup,
   Badge,
   Button,
-  ButtonGroup,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   useDisclosure,
 } from "@nextui-org/react";
-import {
-  ArrowLeftIcon,
-  Bars3Icon,
-  ChevronDownIcon,
-  EllipsisHorizontalIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, Bars3Icon } from "@heroicons/react/24/outline";
 import { useAuth } from "../_context/AuthContext";
 import {
   acceptFriendRequest,
   blockUser,
   cancelFriendRequest,
-  getFriendsAndRelations,
   removeFriend,
   request,
   unblockUser,
@@ -34,6 +30,7 @@ import { getUserById } from "../services/userService";
 import { usePanel } from "../_context/PanelContext";
 import ProfileModal from "./modals/ProfileModal";
 import PictureModal from "./modals/PictureModal";
+import ProfileCard from "./ProfileCard";
 const UserProfile = ({ currentUser }) => {
   const { pushSubPanel, popSubPanel } = usePanel();
   const { user, fetchProfile } = useAuth();
@@ -87,6 +84,13 @@ const UserProfile = ({ currentUser }) => {
   }, [currentUser, user]); // Asigură-te că useEffect se re-execută la schimbarea currentUser
 
   const handleFriendRequest = async (type) => {
+    if (!user) {
+      alert("please login");
+      return;
+
+      ///create account alert
+    }
+
     setLoading(true);
     try {
       let response;
@@ -121,14 +125,18 @@ const UserProfile = ({ currentUser }) => {
   };
 
   return (
-    <div className="p-4 flex flex-col gap-y-4">
+    <div className="p-4 flex flex-col gap-y-4 w-full ">
       <div className="flex items-center gap-x-6 justify-between">
         <Button onPress={popSubPanel} variant="light" isIconOnly>
           <ArrowLeftIcon className="size-5" />
         </Button>
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly variant="light">
+            <Button
+              className={user?._id === currentUser?._id && "hidden"}
+              isIconOnly
+              variant="light"
+            >
               <Bars3Icon className="size-6" />
             </Button>
           </DropdownTrigger>
@@ -148,145 +156,158 @@ const UserProfile = ({ currentUser }) => {
           </DropdownMenu>
         </Dropdown>
       </div>
-      <div className="flex flex-col gap-y-4">
-        <div className="flex gap-x-4">
-          <Badge
-            color="primary"
-            content="You"
-            isInvisible={user?._id !== currentUser?._id}
-            placement="bottom-right"
-          >
-            <Avatar
-              onClick={() => {
-                currentUser?.avatarUrl && onOpenProfilePhoto();
-              }}
-              showFallback
-              src={currentUser?.avatarUrl}
-              className="w-24 h-24 text-large flex-shrink-0"
-            />
-          </Badge>
-          <div>
-            <div className="text-xl font-medium text-dark-bg dark:text-light-bg ">
-              {currentUser?.fullname || currentUser?.username || "Unknown"}
-            </div>
-            <div className="text-gray-500 max-w-64 text-md">
-              {currentUser?.bio || currentUser?.email}
-            </div>
+      <div className="flex gap-4 flex-wrap">
+        <Badge
+          color="primary"
+          content="You"
+          isInvisible={user?._id !== currentUser?._id}
+          className="rounded-lg border-white dark:border-gray-800 "
+          placement="bottom-right"
+        
+        >
+          <Avatar
+            onClick={() => {
+              currentUser?.avatarUrl && onOpenProfilePhoto();
+            }}
+            showFallback
+            src={currentUser?.avatarUrl}
+            className="w-24 h-24 text-large "
+          />
+        </Badge>
+        <div className="flex-1">
+          <div className="text-xl  font-medium text-dark-bg dark:text-light-bg ">
+            {currentUser?.fullname || currentUser?.username || "Unknown"}
           </div>
-        </div>
-
-        {friends.length > 0 ? (
-          <div>
-            <div
-              className="cursor-pointer text-sm my-1"
-              onClick={() => pushSubPanel("FriendsSection", currentUser)}
-            >
-              Friends
-            </div>
-            <AvatarGroup
-              max={3}
-              total={friends.length}
-              renderCount={() => {
-                const displayedCount = Math.min(3, friends.length); // Numărul de avatare afișate
-                const hiddenCount = friends.length - displayedCount; // Diferența pentru cei ascunși
-                return hiddenCount > 0 ? (
-                  <p
-                    onClick={() => pushSubPanel("FriendsSection", currentUser)}
-                    className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
-                  >
-                    +{" " + hiddenCount} others
-                  </p>
-                ) : null;
-              }}
-            >
-              {friends.slice(0, 3).map((friend) => (
-                <Avatar
-                  onClick={() => {
-                    pushSubPanel("Profile", friend);
-                  }}
-                  showFallback
-                  key={friend._id}
-                  src={friend.avatarUrl}
-                />
-              ))}
-            </AvatarGroup>
+          <div className="text-gray-500 text-medium max-w-xl">
+            {currentUser?.bio || currentUser?.email}
           </div>
-        ) : (
-          <div className="text-gray-500 text-medium">
-            <span className="font-medium ">{currentUser?.username + " "}</span>{" "}
-            has no friends yet.
-          </div>
-        )}
-
-        <div className="flex gap-x-2 w-full">
-          {user?._id === currentUser?._id ? (
-            <Button
-              color="primary"
-              variant="faded"
-              className="flex-1 text-medium"
-              onPress={onOpen}
-            >
-              Edit Profile
-            </Button>
-          ) : relationshipStatus === "none" ? (
-            <Button
-              onPress={() => handleFriendRequest("add")}
-              className="flex-1 text-medium"
-              color="primary"
-              isLoading={loading}
-            >
-              Add Friend
-            </Button>
-          ) : relationshipStatus === "pending" ? (
-            <Button
-              onPress={() => handleFriendRequest("cancel")}
-              className="flex-1 text-medium"
-              color="primary"
-              variant="bordered"
-              isLoading={loading}
-            >
-              Cancel request
-            </Button>
-          ) : relationshipStatus === "incoming" ? (
-            <Button
-              onPress={() => handleFriendRequest("accept")}
-              className="flex-1 text-medium"
-              color="primary"
-              variant="bordered"
-              isLoading={loading}
-            >
-              Accept request
-            </Button>
-          ) : relationshipStatus === "friends" ? (
-            <div className="w-full flex gap-x-1">
-              <Button
-                className="flex-1 text-medium"
-                color="danger"
-                variant="faded"
-                onPress={() => handleFriendRequest("remove")}
-              >
-                Remove
-              </Button>
-              <Button
-                className="flex-1 text-medium"
-                variant="faded"
-                color="primary"
-              >
-                Message
-              </Button>
-            </div>
-          ) : relationshipStatus === "blocked" ? (
-            <Button
-              className="flex-1 text-medium"
-              color="error"
-              variant="faded"
-              onPress={() => handleFriendRequest("unblock")}
-            >
-              Unblock
-            </Button>
-          ) : null}
         </div>
       </div>
+
+      {user?.friendsIds.includes(currentUser._id) || user?._id === currentUser?._id ? (friends.length > 0 ? (
+        <div>
+          <div
+            className="cursor-pointer text-sm my-1"
+            onClick={() => pushSubPanel("FriendsSection", currentUser)}
+          >
+            Friends
+          </div>
+          <AvatarGroup
+            max={3}
+            total={friends.length}
+            renderCount={() => {
+              const displayedCount = Math.min(3, friends.length);
+              const hiddenCount = friends.length - displayedCount;
+              return hiddenCount > 0 ? (
+                <p
+                  onClick={() => pushSubPanel("FriendsSection", currentUser)}
+                  className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
+                >
+                  +{" " + hiddenCount} others
+                </p>
+              ) : null;
+            }}
+          >
+            {friends.slice(0, 3).map((friend) => (
+              <Popover placement="bottom" key={friend._id}>
+                <PopoverTrigger>
+                  <Avatar showFallback src={friend.avatarUrl} />
+                </PopoverTrigger>
+                <PopoverContent>
+                  <ProfileCard currentUser={friend} />
+                </PopoverContent>
+              </Popover>
+            ))}
+          </AvatarGroup>
+        </div>
+      ) : (
+        <div className="text-gray-500 text-medium">
+          <span className="font-medium ">{currentUser?.username + " "}</span>{" "}
+          has no friends yet.
+        </div>
+      )) : (
+        <div className="flex gap-x-3">
+          <div className="flex items-center gap-1">
+            <p className="font-semibold text-gray-700 dark:text-gray-300 ">
+              4
+            </p>
+            <p className="text-gray-600 dark:text-gray-400">Friends</p>
+          </div>
+          <div className="flex items-center gap-1">
+            <p className="font-semibold text-gray-700 dark:text-gray-300 ">
+              97.1K
+            </p>
+            <p className="text-gray-600 dark:text-gray-400 ">Posts</p>
+          </div>
+        </div>
+      )}
+
+      {user?._id === currentUser?._id ? (
+        <Button
+          color="primary"
+          variant="faded"
+          className="w-full text-medium"
+          onPress={onOpen}
+        >
+          Edit Profile
+        </Button>
+      ) : relationshipStatus === "none" ? (
+        <Button
+          onPress={() => handleFriendRequest("add")}
+          className="w-full text-medium"
+          color="primary"
+          isLoading={loading}
+        >
+          Add Friend
+        </Button>
+      ) : relationshipStatus === "pending" ? (
+        <Button
+          onPress={() => handleFriendRequest("cancel")}
+          className="w-full text-medium"
+          color="primary"
+          variant="bordered"
+          isLoading={loading}
+        >
+          Cancel request
+        </Button>
+      ) : relationshipStatus === "incoming" ? (
+        <Button
+          onPress={() => handleFriendRequest("accept")}
+          className="w-full text-medium"
+          color="primary"
+          variant="bordered"
+          isLoading={loading}
+        >
+          Accept request
+        </Button>
+      ) : relationshipStatus === "friends" ? (
+        <div className="w-full flex gap-x-1">
+          <Button
+            className="w-full text-medium"
+            color="danger"
+            variant="faded"
+            onPress={() => handleFriendRequest("remove")}
+          >
+            Remove
+          </Button>
+          <Button
+            className="w-full text-medium"
+            variant="faded"
+            color="primary"
+          >
+            Message
+          </Button>
+        </div>
+      ) : relationshipStatus === "blocked" ? (
+        <Button
+          className="w-full text-medium"
+          color="error"
+          variant="faded"
+          onPress={() => handleFriendRequest("unblock")}
+        >
+          Unblock
+        </Button>
+      ) : null}
       <ProfileModal isOpen={isOpen} onOpenChange={onOpenChange} />
       <PictureModal
         isOpen={isOpenProfilePhoto}

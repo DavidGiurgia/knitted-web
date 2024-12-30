@@ -31,7 +31,7 @@ const Landing = () => {
       <div className="flex-1 flex overflow-y-auto h-full">
         {/* Sectiunea activă */}
         <div
-          className={`flex h-full dark:bg-gray-900 w-full md:w-[350px] lg:w-[450px] ${
+          className={`flex h-full dark:bg-gray-900 w-full md:max-w-[350px] lg:max-w-[450px] ${
             activePanel === "Home" && "hidden"
           }`}
         >

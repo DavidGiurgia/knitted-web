@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
         console.log(profile);
         setIsAuthenticated(true);
 
-        router.push("/"); 
+        
       } else {
         setIsAuthenticated(false);
         setUser(null);

@@ -21,12 +21,7 @@ import { getUserById } from "@/app/services/userService";
 import PictureModal from "../../modals/PictureModal";
 import { ThemeSwitcher } from "../../ThemeSwitcher";
 
-const Profile = ({
-  user,
-  logout,
-  switchPanel,
-  pushSubPanel,
-}) => {
+const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const {
     isOpen: isOpenProfilePhoto,
@@ -40,25 +35,24 @@ const Profile = ({
     // Obține avatarurile prietenilor din relații
     const fetchFriendAvatars = async () => {
       if (!user?.friendsIds || user.friendsIds.length === 0) return;
-  
+
       try {
-        const friendPromises = user.friendsIds.map((friendId) =>
-          getUserById(friendId) // Fetch fiecare prieten după ID
+        const friendPromises = user.friendsIds.map(
+          (friendId) => getUserById(friendId) // Fetch fiecare prieten după ID
         );
         const friendData = await Promise.all(friendPromises);
-  
+
         // Filtrare pentru a exclude prietenii inexistenți
         const validFriends = friendData.filter(Boolean);
-  
+
         setFriends(validFriends);
       } catch (error) {
         console.error("Error fetching friend avatars:", error);
       }
     };
-  
+
     fetchFriendAvatars();
   }, [user]);
-  
 
   return (
     <div className="p-4">
@@ -93,7 +87,7 @@ const Profile = ({
             </DropdownItem>
             <DropdownItem variant="bordered" key="dark mode">
               <div className="flex items-center justify-between">
-                <span>Dark mode</span> <ThemeSwitcher size="sm"/>
+                <span>Dark mode</span> <ThemeSwitcher size="sm" />
               </div>
             </DropdownItem>
             <DropdownItem
@@ -118,10 +112,9 @@ const Profile = ({
           </DropdownMenu>
         </Dropdown>
       </div>
-      
 
       <div className="flex flex-col gap-y-4 mt-2">
-        <div className="flex gap-x-4">
+        <div className="flex gap-4 flex-wrap">
           {/* Verifică dacă există avatarUrl și folosește-l */}
           {user?.avatarUrl ? (
             <div
@@ -138,11 +131,11 @@ const Profile = ({
             <Avatar className="w-24 h-24 text-large flex-shrink-0" />
           )}
 
-          <div>
+          <div className="">
             <div className="text-xl font-medium text-dark-bg dark:text-light-bg ">
               {user?.fullname || user?.username || "Unknown"}
             </div>
-            <div className="text-gray-500 max-w-64 text-md">
+            <div className="text-gray-500 line-clamp-3 text-md">
               {user?.bio || user?.email}
             </div>
           </div>
