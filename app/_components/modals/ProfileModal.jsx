@@ -93,8 +93,8 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
   };
 
   return (
-    <Modal size="full" isOpen={isOpen} onOpenChange={onOpenChange}>
-      <ModalContent className="md:w-fit md:h-fit overflow-auto ">
+    <Modal  isOpen={isOpen} onOpenChange={onOpenChange}>
+      <ModalContent className=" max-h-full overflow-y-auto ">
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">

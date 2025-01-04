@@ -1,24 +1,22 @@
 'use client';
 
-import { useAuth } from "@/app/_context/AuthContext";
 import { usePanel } from "@/app/_context/PanelContext";
 import React from "react";
 import UserProfile from "../../UserProfile";
-import FriendsSection from "../../FriendsSection";
 import ChatsList from "./ChatsList";
+import ChatRoom from "./ChatRoom";
 
 const ChatsPanel = () => {
   const { switchPanel, activeSubPanel, pushSubPanel, popSubPanel } = usePanel();
     const { subPanel, param } = activeSubPanel || {};
-    const { user, logout } = useAuth();
 
     const renderSubPanel = () => {
       switch (subPanel) {
         case "Profile":
           return <UserProfile currentUser={param} />;
-        case "FriendsSection":
+        case "ChatRoom":
           return (
-            <FriendsSection currUser={param} goBack={popSubPanel} />
+            <ChatRoom currUser={param} goBack={popSubPanel} />
           );
         default:
           return (

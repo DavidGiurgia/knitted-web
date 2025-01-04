@@ -27,7 +27,7 @@ const links = [
 ];
 
 const Bottombar = () => {
-  const { activePanel, switchPanel, resetPanel } = usePanel();
+  const { activePanel, switchPanel, resetPanel, bottombar } = usePanel();
   const {user} = useAuth();
   const handleLinkClick = (label) => {
     if(activePanel === label){
@@ -37,7 +37,7 @@ const Bottombar = () => {
   };
 
   return (
-    <div className="md:hidden flex w-full flex-shrink-0 bg-white dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 ">
+    <div className={`${!bottombar && "hidden"} md:hidden flex w-full flex-shrink-0 bg-white dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 `}>
       {links.map(
         ({
           label,

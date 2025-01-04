@@ -14,7 +14,7 @@ const SearchPanel = () => {
       case "Profile":
         return <UserProfile currentUser={param} />;
       case "FriendsSection":
-        return <FriendsSection currUser={param} goBack={popSubPanel} />;
+        return <FriendsSection currUser={param} goBack={popSubPanel} onSelect={(friend) => pushSubPanel("Profile", friend)}/>;
       default:
         return (
           <SearchSection

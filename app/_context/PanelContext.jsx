@@ -1,10 +1,13 @@
 'use client';
 
+import { useDisclosure } from "@nextui-org/react";
 import { createContext, useContext, useState } from "react";
+import PanelDrawer from "../_components/drawers/PanelDrawer";
 
 const PanelContext = createContext();
 
 export const PanelProvider = ({ children }) => {
+  const [bottombar, setBottombar] = useState(true);
   // Stocăm istoricul subpanourilor pentru fiecare panou principal
   const [panelData, setPanelData] = useState({
     Home: ["Home"], // Home are doar Home în istoricul său
@@ -55,6 +58,12 @@ export const PanelProvider = ({ children }) => {
     }));
   };
 
+   const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  
+    const openDrawer = () => {
+        onOpen();
+    }
+
   //const activeSubPanel = subPanelsStack[subPanelsStack.length - 1];
 
   return (
@@ -67,9 +76,13 @@ export const PanelProvider = ({ children }) => {
         pushSubPanel,
         popSubPanel,
         resetPanel,
+        bottombar,
+        setBottombar,
+        openDrawer
       }}
     >
       {children}
+      <PanelDrawer isOpen={isOpen} onOpenChange={onOpenChange}/>
     </PanelContext.Provider>
   );
 };

@@ -163,7 +163,6 @@ const UserProfile = ({ currentUser }) => {
           isInvisible={user?._id !== currentUser?._id}
           className="rounded-lg border-white dark:border-gray-800 "
           placement="bottom-right"
-        
         >
           <Avatar
             onClick={() => {
@@ -184,63 +183,54 @@ const UserProfile = ({ currentUser }) => {
         </div>
       </div>
 
-      {user?.friendsIds.includes(currentUser._id) || user?._id === currentUser?._id ? (friends.length > 0 ? (
-        <div>
-          <div
-            className="cursor-pointer text-sm my-1"
-            onClick={() => pushSubPanel("FriendsSection", currentUser)}
-          >
-            Friends
-          </div>
-          <AvatarGroup
-            max={3}
-            total={friends.length}
-            renderCount={() => {
-              const displayedCount = Math.min(3, friends.length);
-              const hiddenCount = friends.length - displayedCount;
-              return hiddenCount > 0 ? (
-                <p
-                  onClick={() => pushSubPanel("FriendsSection", currentUser)}
-                  className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
-                >
-                  +{" " + hiddenCount} others
-                </p>
-              ) : null;
-            }}
-          >
-            {friends.slice(0, 3).map((friend) => (
-              <Popover placement="bottom" key={friend._id}>
-                <PopoverTrigger>
-                  <Avatar showFallback src={friend.avatarUrl} />
-                </PopoverTrigger>
-                <PopoverContent>
-                  <ProfileCard currentUser={friend} />
-                </PopoverContent>
-              </Popover>
-            ))}
-          </AvatarGroup>
-        </div>
-      ) : (
-        <div className="text-gray-500 text-medium">
-          <span className="font-medium ">{currentUser?.username + " "}</span>{" "}
-          has no friends yet.
-        </div>
-      )) : (
-        <div className="flex gap-x-3">
-          <div className="flex items-center gap-1">
-            <p className="font-semibold text-gray-700 dark:text-gray-300 ">
-              4
-            </p>
-            <p className="text-gray-600 dark:text-gray-400">Friends</p>
-          </div>
-          <div className="flex items-center gap-1">
-            <p className="font-semibold text-gray-700 dark:text-gray-300 ">
-              97.1K
-            </p>
-            <p className="text-gray-600 dark:text-gray-400 ">Posts</p>
-          </div>
-        </div>
-      )}
+      <div className="flex flex-col gap-y-2">
+        {user?.friendsIds.includes(currentUser._id) && (
+          friends.length > 0 ? (
+            <div>
+              <AvatarGroup
+                max={3}
+                total={friends.length}
+                renderCount={() => {
+                  const displayedCount = Math.min(3, friends.length);
+                  const hiddenCount = friends.length - displayedCount;
+                  return hiddenCount > 0 ? (
+                    <p
+                      onClick={() =>
+                        pushSubPanel("FriendsSection", currentUser)
+                      }
+                      className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
+                    >
+                      beni, filip and others
+                    </p>
+                  ) : null;
+                }}
+              >
+                {friends.slice(0, 3).map((friend) => (
+                  <Popover
+                    shouldCloseOnBlur
+                    placement="bottom"
+                    key={friend._id}
+                  >
+                    <PopoverTrigger>
+                      <Avatar showFallback src={friend.avatarUrl} />
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <ProfileCard currentUser={friend} />
+                    </PopoverContent>
+                  </Popover>
+                ))}
+              </AvatarGroup>
+            </div>
+          ) : (
+            <div className="text-gray-500 text-medium">
+              <span className="font-medium ">
+                {currentUser?.username + " "}
+              </span>{" "}
+              has no friends yet.
+            </div>
+          )
+        ) }
+      </div>
 
       {user?._id === currentUser?._id ? (
         <Button
@@ -282,32 +272,60 @@ const UserProfile = ({ currentUser }) => {
         </Button>
       ) : relationshipStatus === "friends" ? (
         <div className="w-full flex gap-x-1">
+          <Dropdown>
+          <DropdownTrigger>
           <Button
             className="w-full text-medium"
-            color="danger"
-            variant="faded"
+            variant="bordered"
+            color="default"
             onPress={() => handleFriendRequest("remove")}
           >
-            Remove
+            Friends
           </Button>
-          <Button
-            className="w-full text-medium"
-            variant="faded"
-            color="primary"
-          >
+          </DropdownTrigger>
+          <DropdownMenu>
+            <DropdownItem
+              className={`${
+                !user?.friendsIds.includes(currentUser._id) && "hidden"
+              }`}
+              onPress={() => handleFriendRequest("remove")}
+            >
+              Remove
+            </DropdownItem>
+            <DropdownItem onPress={() => handleFriendRequest("block")}>
+              Block
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+          
+          <Button className="w-full text-medium" color="primary">
             Message
           </Button>
         </div>
       ) : relationshipStatus === "blocked" ? (
         <Button
           className="w-full text-medium"
-          color="error"
+          //color="danger"
           variant="faded"
           onPress={() => handleFriendRequest("unblock")}
         >
           Unblock
         </Button>
       ) : null}
+
+      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg flex flex-col ">
+        <h1 className="text-lg font-semibold">Friends</h1>
+        <div
+          onClick={() => pushSubPanel("FriendsSection", currentUser)}
+          className="flex w-fit items-center text-sm gap-1 cursor-pointer hover:underline"
+        >
+          <p className=" font-semibold text-gray-700  dark:text-gray-300 ">
+            {friends?.length}
+          </p>
+          <p className="text-gray-600 dark:text-gray-400">friends </p>
+        </div>
+      </div>
+
       <ProfileModal isOpen={isOpen} onOpenChange={onOpenChange} />
       <PictureModal
         isOpen={isOpenProfilePhoto}

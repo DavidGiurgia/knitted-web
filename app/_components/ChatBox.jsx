@@ -13,8 +13,8 @@ const ChatBox = () => {
   };
 
   return (
-    <div className="flex p-2 flex-col items-center h-full w-full md:w-[600px]">
-      <div className="flex flex-1">messages</div>
+    <div className="flex flex-col p-2 h-full items-center w-full max-w-[600px]">
+      <div className=" flex-1">messages</div>
 
       <div className="flex w-full items-end gap-x-2 ">
         <MessageInput

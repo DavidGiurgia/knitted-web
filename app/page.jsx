@@ -17,6 +17,7 @@ const Landing = () => {
   const { activePanel } = usePanel();
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
+ 
 
   useEffect(() => {
     if (!isAuthenticated || !user) {

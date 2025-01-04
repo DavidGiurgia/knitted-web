@@ -3,11 +3,10 @@
 import {
   Bars3Icon,
   BellIcon,
-  EllipsisHorizontalIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import {
   Avatar,
-  AvatarGroup,
   Button,
   Dropdown,
   DropdownItem,
@@ -55,8 +54,14 @@ const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
   }, [user]);
 
   return (
-    <div className="p-4">
-      <div className="justify-self-end">
+    <div className="p-4 flex flex-col gap-y-4">
+      <div className="flex items-center justify-between">
+        <div onClick={()=>{
+          pushSubPanel("AccountSettings");
+        }} className="ml-2 flex items-center gap-x-1 cursor-pointer hover:underline font-semibold  text-gray-500"> 
+        {user?.username}
+        </div>
+        <div>
         <Button
           variant="light"
           isIconOnly
@@ -111,10 +116,11 @@ const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
+        </div>
       </div>
 
       <div className="flex flex-col gap-y-4 mt-2">
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex gap-4 flex-wrap mb-4">
           {/* Verifică dacă există avatarUrl și folosește-l */}
           {user?.avatarUrl ? (
             <div
@@ -141,42 +147,7 @@ const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
           </div>
         </div>
 
-        {friends.length > 0 ? (
-          <div>
-            <div className=" text-sm my-1">Your friends</div>
-            <AvatarGroup
-              max={3}
-              total={friends.length}
-              renderCount={() => {
-                const displayedCount = Math.min(3, friends.length); // Numărul de avatare afișate
-                const hiddenCount = friends.length - displayedCount; // Diferența pentru cei ascunși
-                return hiddenCount > 0 ? (
-                  <p
-                    onClick={() => pushSubPanel("FriendsSection")}
-                    className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
-                  >
-                    +{hiddenCount} others
-                  </p>
-                ) : null;
-              }}
-            >
-              {friends.slice(0, 3).map((friend) => (
-                <Avatar
-                  onClick={() => {
-                    pushSubPanel("Profile", friend);
-                  }}
-                  showFallback
-                  key={friend._id}
-                  src={friend.avatarUrl}
-                />
-              ))}
-            </AvatarGroup>
-          </div>
-        ) : (
-          <div className="text-gray-500 text-medium">
-            You don't have friends yet.
-          </div>
-        )}
+        
 
         <div className="flex gap-x-2 w-full">
           <Button
@@ -188,6 +159,19 @@ const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
           >
             Edit profile
           </Button>
+        </div>
+      </div>
+
+      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg flex flex-col ">
+        <h1 className="text-lg font-semibold">Friends</h1>
+        <div
+          onClick={() => pushSubPanel("FriendsSection", user)}
+          className="flex w-fit items-center text-sm gap-1 cursor-pointer hover:underline"
+        >
+          <p className=" font-semibold text-gray-700  dark:text-gray-300 ">
+            {friends?.length}
+          </p>
+          <p className="text-gray-600 dark:text-gray-400">friends </p>
         </div>
       </div>
 

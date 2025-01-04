@@ -58,9 +58,7 @@ const GroupsSection = () => {
     }
   }, [user?._id, isOpen, isDeleteModalOpen]);
 
-  const handleJoin = async (e) => {
-    e.preventDefault();
-
+  const handleJoin = async () => {
     if (code.length !== 7) {
       toast.error("Please enter a valid join code", {
         position: "bottom-center",
@@ -76,7 +74,7 @@ const GroupsSection = () => {
           await pairUserGroup(user?._id, group._id);
           setGroups((prevGroups) => [...prevGroups, group]);
         }
-        router.push(`/groupRoom/${group._id}`);
+        router.push(`/group-room/${group._id}`);
       } else {
         toast.error("Sorry, there is no such group active right now");
       }
@@ -105,7 +103,7 @@ const GroupsSection = () => {
     <div className="flex flex-1 flex-col h-full md:w-[350px] lg:w-[450px] dark:text-white bg-white dark:bg-gray-900">
       {/* Join Group Input */}
       <div className="flex flex-col gap-y-4 justify-center items-center py-6 px-4 bg-primary">
-        <form
+        <div
           aria-label="Join group form"
           className="flex items-center p-2 bg-gray-100 dark:bg-gray-900 rounded-xl drop-shadow-md w-full max-w-xs"
         >
@@ -119,17 +117,15 @@ const GroupsSection = () => {
             placeholder="Enter code here"
             value={code}
             onChange={(e) => setCode(e.target.value)} // Setează codul
-            required
           />
           <Button
             aria-label="Join group"
-            type="submit"
-            onClick={(e) => handleJoin(e)} // Apelează funcția handleJoin când se apasă butonul
+            onPress={handleJoin} // Apelează funcția handleJoin când se apasă butonul
             className=" bg-primary rounded-lg text-xl font-semibold ml-2 text-white dark:text-black"
           >
             Join
           </Button>
-        </form>
+        </div>
       </div>
 
       {/* Group List Section */}
