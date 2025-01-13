@@ -5,13 +5,11 @@ import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 
-const MessageInput = () => {
+const MessageInput = ({message, setMessage}) => {
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const pickerRef = useRef(null);
   const buttonRef = useRef(null);
   const textareaRef = useRef(null);
-
-  const [message, setMessage] = useState("");
 
   // Funcție pentru a verifica dacă click-ul a fost în afacerea picker-ului sau pe butonul de emoji
   const handleClickOutside = (e) => {
@@ -71,7 +69,7 @@ const MessageInput = () => {
       )}
 
       {/* Input pentru mesaj și butonul de emoji */}
-      <div className="flex min-h-12 items-center w-full rounded-xl bg-gray-200 dark:bg-gray-800 pl-1">
+      <div className="flex min-h-12 items-center w-full rounded-[20px] border border-gray-200 dark:border-gray-800 pl-1">
         <button
           ref={buttonRef}
           onClick={toggleEmojiPicker}

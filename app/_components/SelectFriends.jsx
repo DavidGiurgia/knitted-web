@@ -5,7 +5,7 @@ import { useAuth } from "../_context/AuthContext";
 import { fetchFriends } from "../services/friendsService";
 import { Avatar, Chip, Select, SelectItem } from "@nextui-org/react";
 
-export default function SelectFriends({ variant, placeholder = "Select friends", onSelectionChange }) {
+export default function SelectFriends({ variant, placeholder = "Select friends", setSelectedFriends }) {
     const { user } = useAuth();
     const [friends, setFriends] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ export default function SelectFriends({ variant, placeholder = "Select friends",
         getFriends();
       }
     }, [user]);
-  
+
     return (
       <Select
         classNames={{
@@ -49,7 +49,7 @@ export default function SelectFriends({ variant, placeholder = "Select friends",
         )}
         selectionMode="multiple"
         variant={variant || "bordered"}
-        onSelectionChange={onSelectionChange}
+        onSelectionChange={(selectedKeys) => setSelectedFriends(selectedKeys)}
       >
         {(friend) => (
           <SelectItem key={friend._id} textValue={friend.username}>
@@ -59,7 +59,7 @@ export default function SelectFriends({ variant, placeholder = "Select friends",
                 className="flex-shrink-0"
                 size="sm"
                 showFallback
-                src={friend.avatarUrl || "/default-avatar.png"}
+                src={friend.avatarUrl}
               />
               <div className="flex flex-col">
                 <span className="text-small">{friend.fullname || friend.username}</span>

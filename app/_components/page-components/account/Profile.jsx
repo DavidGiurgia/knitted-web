@@ -58,7 +58,7 @@ const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
       <div className="flex items-center justify-between">
         <div onClick={()=>{
           pushSubPanel("AccountSettings");
-        }} className="ml-2 flex items-center gap-x-1 cursor-pointer hover:underline font-semibold  text-gray-500"> 
+        }} className="ml-2 flex items-center gap-x-1 cursor-pointer hover:underline   text-gray-500"> 
         {user?.username}
         </div>
         <div>
@@ -151,9 +151,8 @@ const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
 
         <div className="flex gap-x-2 w-full">
           <Button
-            variant="faded"
-            color="primary"
-            //size="sm"
+            variant="bordered"
+           
             className="flex-1 text-medium "
             onPress={onOpen}
           >
@@ -162,7 +161,7 @@ const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
         </div>
       </div>
 
-      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg flex flex-col ">
+      <div className="p-2 border border-gray-200 dark:border-gray-800 rounded-lg flex flex-col ">
         <h1 className="text-lg font-semibold">Friends</h1>
         <div
           onClick={() => pushSubPanel("FriendsSection", user)}

@@ -30,7 +30,7 @@ const GroupRoom = () => {
   const [anonymous, setIdentity] = useState(false);
   const [groupDetails, setGroupDetails] = useState(null); // To store group data
   const [onlineUsers, setOnlineUsers] = useState(0);
-  const [alias, setAlias] = useState("");
+  const [alias, setAlias] = useState(user?.username || "");
 
   useEffect(() => {
     const fetchGroupDetails = async () => {
@@ -66,34 +66,28 @@ const GroupRoom = () => {
         </div>
 
         <div className="flex items-center justify-center gap-x-4">
-          {!isAuthenticated ? (
-            <Popover>
-              <PopoverTrigger className="cursor-pointer">
-                {alias || <PencilIcon className="size-4"/>}
-              </PopoverTrigger>
-              <PopoverContent className="max-w-[240px]">
-                {() => (
-                  <div className="px-1 py-2 w-full">
-                    <div className="mt-2 flex flex-col gap-2 w-full ">
-                      <Input
-                        maxLength={30}
-                        autoFocus
-                        value={alias}
-                        onChange={(e) => setAlias(e.target.value)}
-                        label="Alias"
-                        size="sm"
-                        variant="default"
-                      />
-                    </div>
+          <Popover>
+            <PopoverTrigger className="cursor-pointer">
+              {alias || <PencilIcon className="size-4" />}
+            </PopoverTrigger>
+            <PopoverContent className="max-w-[240px]">
+              {() => (
+                <div className="px-1 py-2 w-full">
+                  <div className="mt-2 flex flex-col gap-2 w-full ">
+                    <Input
+                      maxLength={30}
+                      autoFocus
+                      value={alias}
+                      onChange={(e) => setAlias(e.target.value)}
+                      label="Alias"
+                      size="sm"
+                      variant="default"
+                    />
                   </div>
-                )}
-              </PopoverContent>
-            </Popover>
-          ) : (
-            <div>
-              {!anonymous && user?.username}
-            </div>
-          )}
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
 
           {anonymous ? (
             <div
@@ -112,7 +106,7 @@ const GroupRoom = () => {
               }}
             >
               <Avatar
-              showFallback
+                showFallback
                 src={isAuthenticated ? user?.avatarUrl : null}
                 className="w-full h-full"
               />
@@ -133,7 +127,7 @@ const GroupRoom = () => {
           className={`flex justify-center h-full flex-1 
             ${sidebar && "hidden md:flex md:w-1/2 xl:justify-start xl:ml-48"}`}
         >
-          <ChatBox />
+          <ChatBox room={null} />
         </div>
       </div>
     </div>

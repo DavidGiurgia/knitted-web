@@ -14,13 +14,19 @@ const SearchPanel = () => {
       case "Profile":
         return <UserProfile currentUser={param} />;
       case "FriendsSection":
-        return <FriendsSection currUser={param} goBack={popSubPanel} onSelect={(friend) => pushSubPanel("Profile", friend)}/>;
-      default:
         return (
-          <SearchSection
-            pushSubPanel={pushSubPanel}
+          <FriendsSection
+            currUser={param}
+            goBack={popSubPanel}
+            onSelect={(friend) => pushSubPanel("Profile", friend)}
           />
         );
+      case "MutualFriendsSection":
+        return (
+          <FriendsSection currUser={param} goBack={popSubPanel} mutualOnly={true} />
+        );
+      default:
+        return <SearchSection pushSubPanel={pushSubPanel} />;
     } // End switch subPanel
   };
   return <div className="h-full">{renderSubPanel()}</div>;

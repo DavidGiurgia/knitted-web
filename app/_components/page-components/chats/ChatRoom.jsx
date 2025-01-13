@@ -1,29 +1,63 @@
 "use client";
 
-import { ArrowLeftIcon } from '@heroicons/react/24/outline'
-import { Button } from '@nextui-org/react'
-import React, { useEffect } from 'react'
-import ChatBox from '../../ChatBox'
-import { usePanel } from '@/app/_context/PanelContext'
+import { ArrowLeftIcon, Bars3Icon } from "@heroicons/react/24/outline";
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@nextui-org/react";
+import React, { useEffect, useState } from "react";
+import ChatBox from "../../ChatBox";
+import { usePanel } from "@/app/_context/PanelContext";
+import UserListItem from "../../UserListItem";
 
-const ChatRoom = ({currUser, goBack}) => {
-  const { setBottombar } = usePanel();
+const ChatRoom = ({ room, goBack }) => {
+  const { setBottombar, pushSubPanel } = usePanel();
 
   useEffect(() => {
     setBottombar(false);
-  }, [])
-  
+  }, []);
+
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex gap-x-4 items-center px-4 py-2 border-b border-gray-300 dark:border-gray-800 md:border-none">
-        <Button onPress={() => {setBottombar(true); goBack();}} variant="light" isIconOnly>
+      <div className="flex w-full justify-between items-center px-4 py-2 border-b border-gray-300 dark:border-gray-800 md:border-none">
+        <Button
+          onPress={() => {
+            setBottombar(true);
+            goBack();
+          }}
+          variant="light"
+          isIconOnly
+        >
           <ArrowLeftIcon className="size-5" />
         </Button>
-        <h1 className="text-lg">{currUser?.username}</h1>
+        <div
+          className="hover:bg-gray-800 flex-1 cursor-pointer rounded-lg px-2"
+          onClick={() => {
+            pushSubPanel("Profile", null);
+          }}
+        >
+          <UserListItem user={null} />
+        </div>
+        <Dropdown>
+          <DropdownTrigger>
+            <Button isIconOnly variant="light">
+              <Bars3Icon className="size-6" />
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu>
+            <DropdownItem>Remove</DropdownItem>
+            <DropdownItem>Block</DropdownItem>
+            <DropdownItem>Report</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </div>
-      <ChatBox />
-      </div>
-  )
-}
+      <ChatBox room={room} />
+    </div>
+  );
+};
 
-export default ChatRoom
+export default ChatRoom;

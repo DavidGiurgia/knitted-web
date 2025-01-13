@@ -14,18 +14,15 @@ const AcceptedFriendRequest = ({user, acceptedBy, onAction, onClick }) => {
         accepted your friend request.
       </p>
 
-      {!user?.blockedUsers.includes(acceptedBy?._id) ? (
+      {user?.friendsIds.includes(acceptedBy?._id) && (
         <Button
           className="px-4"
           size="sm"
-          color="primary"
-          variant="faded"
+          variant="bordered"
           onPress={onAction}
         >
           Message
         </Button>
-      ) : (
-        <i className="text-gray-500 text-sm">Blocked</i>
       )}
     </div>
   );

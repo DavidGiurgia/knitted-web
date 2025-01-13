@@ -16,7 +16,7 @@ const ChatsPanel = () => {
           return <UserProfile currentUser={param} />;
         case "ChatRoom":
           return (
-            <ChatRoom currUser={param} goBack={popSubPanel} />
+            <ChatRoom room={param} goBack={popSubPanel} />
           );
         default:
           return (

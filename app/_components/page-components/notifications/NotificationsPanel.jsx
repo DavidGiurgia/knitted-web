@@ -17,9 +17,9 @@ const NotificationsPanel = () => {
       case "Profile":
         return <UserProfile currentUser={param} />;
       case "FriendsSection":
-        return (
-          <FriendsSection currUser={user} goBack={popSubPanel} />
-        );
+        return <FriendsSection currUser={param} goBack={popSubPanel} />;
+      case "MutualFriendsSection":
+        return <FriendsSection currUser={param} goBack={popSubPanel} mutualOnly/>;
       default:
         return (
           <NotificationsSection

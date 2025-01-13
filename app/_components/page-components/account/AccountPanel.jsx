@@ -25,7 +25,15 @@ const AccountPanel = () => {
         return <AccountSettings user={user} goBack={popSubPanel} />;
       case "FriendsSection":
         return (
-          <FriendsSection currUser={param} goBack={popSubPanel} onSelect={(friend) => pushSubPanel("Profile", friend)}/>
+          <FriendsSection
+            currUser={param}
+            goBack={popSubPanel}
+            onSelect={(friend) => pushSubPanel("Profile", friend)}
+          />
+        );
+      case "MutualFriendsSection":
+        return (
+          <FriendsSection currUser={param} goBack={popSubPanel} mutualOnly />
         );
       case "Profile":
         return <UserProfile currentUser={param} />;

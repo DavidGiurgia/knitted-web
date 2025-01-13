@@ -31,9 +31,7 @@ const ProfileCard = ({ currentUser }) => {
     const fetchRelations = async () => {
       try {
         if (currentUser.friendsIds?.length > 0) {
-          if (currentUser?.blockedUsers.includes(user?._id)) {
-            throw new Error("You don't have access to this user!");
-          }
+          
           const friendData = await Promise.all(
             currentUser.friendsIds.map((friendId) => getUserById(friendId))
           );

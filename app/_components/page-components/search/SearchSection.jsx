@@ -60,7 +60,7 @@ const SearchSection = ({ pushSubPanel }) => {
 
     const delayDebounceFn = setTimeout(() => {
       fetchResults();
-    }, 500); // Debounce pentru a evita apeluri frecvente
+    }, 300); // Debounce pentru a evita apeluri frecvente
 
     return () => clearTimeout(delayDebounceFn);
   }, [value]);

@@ -21,6 +21,7 @@ import {
   acceptFriendRequest,
   blockUser,
   cancelFriendRequest,
+  getMutualFriends,
   removeFriend,
   request,
   unblockUser,
@@ -35,6 +36,8 @@ const UserProfile = ({ currentUser }) => {
   const { pushSubPanel, popSubPanel } = usePanel();
   const { user, fetchProfile } = useAuth();
   const [friends, setFriends] = useState([]);
+  const [mutualFriends, setMutualFriends] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const {
@@ -60,23 +63,40 @@ const UserProfile = ({ currentUser }) => {
 
     const fetchRelations = async () => {
       try {
-        if (currentUser.friendsIds?.length > 0) {
-          if (currentUser?.blockedUsers.includes(user?._id)) {
-            throw new Error("You don't have access to this user!");
-          }
+        if (currentUser?.friendsIds?.length > 0) {
+          // Fetch all friends of the current user
           const friendData = await Promise.all(
-            currentUser.friendsIds.map((friendId) => getUserById(friendId))
+            currentUser.friendsIds.map((friendId) =>
+              getUserById(friendId).catch((err) => {
+                console.error(
+                  `Error fetching friend with ID ${friendId}:`,
+                  err
+                );
+                return null; // Handle errors gracefully
+              })
+            )
           );
-          setFriends(friendData.filter(Boolean));
+
+          // Filter out any null responses
+          const validFriends = friendData.filter(Boolean);
+          setFriends(validFriends);
+
+          // Determine mutual friends
+          const mutualFriends = validFriends.filter((friend) =>
+            user?.friendsIds.includes(friend._id)
+          );
+          setMutualFriends(mutualFriends || []);
         } else {
           setFriends([]);
+          setMutualFriends([]);
         }
 
+        // Set the initial relationship status
         const initialStatus = getRelationshipStatus();
         setRelationshipStatus(initialStatus);
       } catch (error) {
         console.error("Error fetching relations:", error);
-        popSubPanel();
+        popSubPanel(); // Fallback action on error
       }
     };
 
@@ -124,7 +144,18 @@ const UserProfile = ({ currentUser }) => {
     }
   };
 
-  return (
+  return !currentUser ? (
+    <div className="p-4 flex flex-col w-full h-full">
+      <div className="">
+        <Button onPress={popSubPanel} variant="light" isIconOnly>
+          <ArrowLeftIcon className="size-5" />
+        </Button>
+      </div>
+      <div className=" flex  w-full h-full items-center justify-center">
+        This user no longer exists
+      </div>
+    </div>
+  ) : (
     <div className="p-4 flex flex-col gap-y-4 w-full ">
       <div className="flex items-center gap-x-6 justify-between">
         <Button onPress={popSubPanel} variant="light" isIconOnly>
@@ -143,7 +174,7 @@ const UserProfile = ({ currentUser }) => {
           <DropdownMenu>
             <DropdownItem
               className={`${
-                !user?.friendsIds.includes(currentUser._id) && "hidden"
+                !user?.friendsIds.includes(currentUser?._id) && "hidden"
               }`}
               onPress={() => handleFriendRequest("remove")}
             >
@@ -183,34 +214,32 @@ const UserProfile = ({ currentUser }) => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-y-2">
-        {user?.friendsIds.includes(currentUser._id) && (
-          friends.length > 0 ? (
-            <div>
+      {currentUser?._id !== user?._id &&
+        (mutualFriends.length > 0 ? (
+          <div className="flex items-center gap-x-2">
               <AvatarGroup
                 max={3}
-                total={friends.length}
+                total={mutualFriends.length}
                 renderCount={() => {
-                  const displayedCount = Math.min(3, friends.length);
-                  const hiddenCount = friends.length - displayedCount;
+                  const displayedCount = Math.min(3, mutualFriends.length);
+                  const hiddenCount = mutualFriends.length - displayedCount;
                   return hiddenCount > 0 ? (
                     <p
                       onClick={() =>
-                        pushSubPanel("FriendsSection", currentUser)
+                        pushSubPanel("MutualFriendsSection", currentUser)
                       }
                       className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
                     >
-                      beni, filip and others
+                      {mutualFriends[0].username +
+                        " and " +
+                        hiddenCount +
+                        " others"}
                     </p>
                   ) : null;
                 }}
               >
-                {friends.slice(0, 3).map((friend) => (
-                  <Popover
-                    shouldCloseOnBlur
-                    placement="bottom"
-                    key={friend._id}
-                  >
+                {mutualFriends.slice(0, 3).map((friend) => (
+                  <Popover placement="bottom" key={friend._id}>
                     <PopoverTrigger>
                       <Avatar showFallback src={friend.avatarUrl} />
                     </PopoverTrigger>
@@ -220,22 +249,39 @@ const UserProfile = ({ currentUser }) => {
                   </Popover>
                 ))}
               </AvatarGroup>
+
+              <p
+                className="cursor-pointer hover:underline"
+                onClick={() => pushSubPanel("MutualFriendsSection", currentUser)}
+              >
+                {mutualFriends.length === 1
+                  ? mutualFriends[0].username
+                  : mutualFriends.length === 2
+                  ? mutualFriends[0].username + " and " + mutualFriends[1].username
+                  : mutualFriends.length === 3
+                  ? mutualFriends[0].username +
+                    ", " +
+                    mutualFriends[1].username +
+                    " and " +
+                    mutualFriends[2].username
+                  : 
+                    mutualFriends.length > 3 ? 
+                    mutualFriends[0].username +
+                    ", " +
+                    mutualFriends[1].username +
+                    ", " +
+                    mutualFriends[2].username + 
+                    " and " + (mutualFriends.length - 3) + " others"
+                  : null}
+              </p>
             </div>
-          ) : (
-            <div className="text-gray-500 text-medium">
-              <span className="font-medium ">
-                {currentUser?.username + " "}
-              </span>{" "}
-              has no friends yet.
-            </div>
-          )
-        ) }
-      </div>
+        ) : (
+          <div className="text-gray-500 text-medium">No mutual friends.</div>
+        ))}
 
       {user?._id === currentUser?._id ? (
         <Button
-          color="primary"
-          variant="faded"
+          variant="bordered"
           className="w-full text-medium"
           onPress={onOpen}
         >
@@ -273,32 +319,32 @@ const UserProfile = ({ currentUser }) => {
       ) : relationshipStatus === "friends" ? (
         <div className="w-full flex gap-x-1">
           <Dropdown>
-          <DropdownTrigger>
-          <Button
-            className="w-full text-medium"
-            variant="bordered"
-            color="default"
-            onPress={() => handleFriendRequest("remove")}
-          >
-            Friends
-          </Button>
-          </DropdownTrigger>
-          <DropdownMenu>
-            <DropdownItem
-              className={`${
-                !user?.friendsIds.includes(currentUser._id) && "hidden"
-              }`}
-              onPress={() => handleFriendRequest("remove")}
-            >
-              Remove
-            </DropdownItem>
-            <DropdownItem onPress={() => handleFriendRequest("block")}>
-              Block
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-          
-          <Button className="w-full text-medium" color="primary">
+            <DropdownTrigger>
+              <Button
+                className="w-full text-medium"
+                variant="bordered"
+                color="default"
+                onPress={() => handleFriendRequest("remove")}
+              >
+                Friends
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu>
+              <DropdownItem
+                className={`${
+                  !user?.friendsIds.includes(currentUser._id) && "hidden"
+                }`}
+                onPress={() => handleFriendRequest("remove")}
+              >
+                Remove
+              </DropdownItem>
+              <DropdownItem onPress={() => handleFriendRequest("block")}>
+                Block
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+
+          <Button variant="bordered" className="w-full text-medium">
             Message
           </Button>
         </div>
@@ -313,10 +359,14 @@ const UserProfile = ({ currentUser }) => {
         </Button>
       ) : null}
 
-      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg flex flex-col ">
+      <div className="p-2 border border-gray-200 dark:border-gray-800 rounded-lg flex flex-col ">
         <h1 className="text-lg font-semibold">Friends</h1>
         <div
-          onClick={() => pushSubPanel("FriendsSection", currentUser)}
+          onClick={() => {
+            (currentUser?._id === user?._id ||
+            currentUser?.friendsIds?.includes(user?._id)) &&
+              pushSubPanel("FriendsSection", currentUser);
+          }}
           className="flex w-fit items-center text-sm gap-1 cursor-pointer hover:underline"
         >
           <p className=" font-semibold text-gray-700  dark:text-gray-300 ">

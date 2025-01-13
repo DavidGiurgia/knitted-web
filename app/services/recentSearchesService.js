@@ -13,7 +13,7 @@ export const getRecentSearches = async (userId) => {
         const recentSearches = [];
         for (const id of ids) {
             const user = await getUserById(id);
-            if (user && !user.blockedUsers.includes(userId)) {
+            if (user) {
                 recentSearches.push(user);
             } else {
                 // If user no longer exists, remove the ID from recent searches
