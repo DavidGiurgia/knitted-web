@@ -24,6 +24,7 @@ import { PhotoIcon, XMarkIcon } from "@heroicons/react/24/outline";
 const ProfileModal = ({ isOpen, onOpenChange }) => {
   const { user, fetchProfile } = useAuth();
   const [fullname, setFullname] = useState("");
+  const [fullnameError, setFullnameError] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,9 +41,12 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
   }, [user, isOpen]);
 
   const handleSaveProfile = async () => {
-    if (!username) {
+    if (!fullname) {
+      setFullnameError("Name is required");
+      return false;
+    } else if (!username) {
       setUsernameError("Username is required");
-      return;
+      return false;
     }
 
     setLoading(true);
@@ -82,6 +86,7 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
       toast.error("Failed to update profile");
     } finally {
       setLoading(false);
+      return true;
     }
   };
 
@@ -93,7 +98,7 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
   };
 
   return (
-    <Modal  isOpen={isOpen} onOpenChange={onOpenChange}>
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent className=" max-h-full overflow-y-auto ">
         {(onClose) => (
           <>
@@ -108,15 +113,15 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
                   <div className="flex flex-wrap items-start gap-x-4">
                     {/* Secțiunea pentru avatar */}
                     <div className="flex flex-shrink-0 w-fit items-center flex-col gap-2">
-                    <Avatar
-                          showFallback
-                          className="w-24 h-24"
-                          src={
-                            selectedAvatar && typeof selectedAvatar === "object"
-                              ? URL.createObjectURL(selectedAvatar)
-                              : selectedAvatar || ""
-                          }
-                        />
+                      <Avatar
+                        showFallback
+                        className="w-24 h-24"
+                        src={
+                          selectedAvatar && typeof selectedAvatar === "object"
+                            ? URL.createObjectURL(selectedAvatar)
+                            : selectedAvatar || ""
+                        }
+                      />
 
                       <div className="flex items-center">
                         {/* Buton pentru a schimba avatarul */}
@@ -158,7 +163,14 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
                     maxLength={50}
                     label="Name"
                     value={fullname}
-                    onChange={(e) => setFullname(e.target.value)}
+                    isInvalid={!!fullnameError.length}
+                    errorMessage={fullnameError}
+                    onChange={(e) => {
+                      setFullname(e.target.value);
+                      setFullnameError("");
+                    }}
+                    onClear={() => setFullname("")}
+                    isClearable
                   />
                   <Input
                     variant="bordered"
@@ -173,6 +185,8 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
                       setUsername(e.target.value);
                       setUsernameError("");
                     }}
+                    onClear={() => setUsername("")}
+                    isClearable
                   />
                   <Textarea
                     variant="bordered"
@@ -192,9 +206,11 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
               <Button
                 color="primary"
                 isLoading={loading}
-                onPress={() => {
-                  handleSaveProfile();
-                  onClose();
+                onPress={async () => {
+                  const isSaved = await handleSaveProfile();
+                  if (isSaved) {
+                    onClose();
+                  }
                 }}
               >
                 Save

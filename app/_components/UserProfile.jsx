@@ -158,9 +158,13 @@ const UserProfile = ({ currentUser }) => {
   ) : (
     <div className="p-4 flex flex-col gap-y-4 w-full ">
       <div className="flex items-center gap-x-6 justify-between">
-        <Button onPress={popSubPanel} variant="light" isIconOnly>
-          <ArrowLeftIcon className="size-5" />
-        </Button>
+        <div className="flex items-center gap-x-4">
+          <Button onPress={popSubPanel} variant="light" isIconOnly>
+            <ArrowLeftIcon className="size-5" />
+          </Button>
+
+          <div>{currentUser.username}</div>
+        </div>
         <Dropdown>
           <DropdownTrigger>
             <Button
@@ -217,64 +221,67 @@ const UserProfile = ({ currentUser }) => {
       {currentUser?._id !== user?._id &&
         (mutualFriends.length > 0 ? (
           <div className="flex items-center gap-x-2">
-              <AvatarGroup
-                max={3}
-                total={mutualFriends.length}
-                renderCount={() => {
-                  const displayedCount = Math.min(3, mutualFriends.length);
-                  const hiddenCount = mutualFriends.length - displayedCount;
-                  return hiddenCount > 0 ? (
-                    <p
-                      onClick={() =>
-                        pushSubPanel("MutualFriendsSection", currentUser)
-                      }
-                      className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
-                    >
-                      {mutualFriends[0].username +
-                        " and " +
-                        hiddenCount +
-                        " others"}
-                    </p>
-                  ) : null;
-                }}
-              >
-                {mutualFriends.slice(0, 3).map((friend) => (
-                  <Popover placement="bottom" key={friend._id}>
-                    <PopoverTrigger>
-                      <Avatar showFallback src={friend.avatarUrl} />
-                    </PopoverTrigger>
-                    <PopoverContent>
-                      <ProfileCard currentUser={friend} />
-                    </PopoverContent>
-                  </Popover>
-                ))}
-              </AvatarGroup>
+            <AvatarGroup
+              max={3}
+              total={mutualFriends.length}
+              renderCount={() => {
+                const displayedCount = Math.min(3, mutualFriends.length);
+                const hiddenCount = mutualFriends.length - displayedCount;
+                return hiddenCount > 0 ? (
+                  <p
+                    onClick={() =>
+                      pushSubPanel("MutualFriendsSection", currentUser)
+                    }
+                    className="cursor-pointer hover:underline text-small text-foreground font-medium ms-2"
+                  >
+                    {mutualFriends[0].username +
+                      " and " +
+                      hiddenCount +
+                      " others"}
+                  </p>
+                ) : null;
+              }}
+            >
+              {mutualFriends.slice(0, 3).map((friend) => (
+                <Popover placement="bottom" key={friend._id}>
+                  <PopoverTrigger>
+                    <Avatar showFallback src={friend.avatarUrl} />
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <ProfileCard currentUser={friend} />
+                  </PopoverContent>
+                </Popover>
+              ))}
+            </AvatarGroup>
 
-              <p
-                className="cursor-pointer hover:underline"
-                onClick={() => pushSubPanel("MutualFriendsSection", currentUser)}
-              >
-                {mutualFriends.length === 1
-                  ? mutualFriends[0].username
-                  : mutualFriends.length === 2
-                  ? mutualFriends[0].username + " and " + mutualFriends[1].username
-                  : mutualFriends.length === 3
-                  ? mutualFriends[0].username +
-                    ", " +
-                    mutualFriends[1].username +
-                    " and " +
-                    mutualFriends[2].username
-                  : 
-                    mutualFriends.length > 3 ? 
-                    mutualFriends[0].username +
-                    ", " +
-                    mutualFriends[1].username +
-                    ", " +
-                    mutualFriends[2].username + 
-                    " and " + (mutualFriends.length - 3) + " others"
-                  : null}
-              </p>
-            </div>
+            <p
+              className="cursor-pointer hover:underline"
+              onClick={() => pushSubPanel("MutualFriendsSection", currentUser)}
+            >
+              {mutualFriends.length === 1
+                ? mutualFriends[0].username
+                : mutualFriends.length === 2
+                ? mutualFriends[0].username +
+                  " and " +
+                  mutualFriends[1].username
+                : mutualFriends.length === 3
+                ? mutualFriends[0].username +
+                  ", " +
+                  mutualFriends[1].username +
+                  " and " +
+                  mutualFriends[2].username
+                : mutualFriends.length > 3
+                ? mutualFriends[0].username +
+                  ", " +
+                  mutualFriends[1].username +
+                  ", " +
+                  mutualFriends[2].username +
+                  " and " +
+                  (mutualFriends.length - 3) +
+                  " others"
+                : null}
+            </p>
+          </div>
         ) : (
           <div className="text-gray-500 text-medium">No mutual friends.</div>
         ))}
@@ -364,7 +371,7 @@ const UserProfile = ({ currentUser }) => {
         <div
           onClick={() => {
             (currentUser?._id === user?._id ||
-            currentUser?.friendsIds?.includes(user?._id)) &&
+              currentUser?.friendsIds?.includes(user?._id)) &&
               pushSubPanel("FriendsSection", currentUser);
           }}
           className="flex w-fit items-center text-sm gap-1 cursor-pointer hover:underline"

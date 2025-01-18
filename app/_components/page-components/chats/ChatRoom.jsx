@@ -12,7 +12,7 @@ import {
 import React, { useEffect, useState } from "react";
 import ChatBox from "../../ChatBox";
 import { usePanel } from "@/app/_context/PanelContext";
-import UserListItem from "../../UserListItem";
+import ChatLinkItem from "./ChatLinkItem";
 
 const ChatRoom = ({ room, goBack }) => {
   const { setBottombar, pushSubPanel } = usePanel();
@@ -21,7 +21,7 @@ const ChatRoom = ({ room, goBack }) => {
     setBottombar(false);
   }, []);
 
-  return (
+  return ( 
     <div className="flex flex-col w-full h-full">
       <div className="flex w-full justify-between items-center px-4 py-2 border-b border-gray-300 dark:border-gray-800 md:border-none">
         <Button
@@ -37,10 +37,10 @@ const ChatRoom = ({ room, goBack }) => {
         <div
           className="hover:bg-gray-800 flex-1 cursor-pointer rounded-lg px-2"
           onClick={() => {
-            pushSubPanel("Profile", null);
+            pushSubPanel("Profile", null);  ////// to implement      !!!!!
           }}
         >
-          <UserListItem user={null} />
+          <ChatLinkItem room={room} />
         </div>
         <Dropdown>
           <DropdownTrigger>

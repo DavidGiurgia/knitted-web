@@ -52,9 +52,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Funcție pentru înregistrare
-  const register = async (username, email, password) => {
+  const register = async (fullname, username, email, password) => {
     try {
-      const token = await registerUser(username, email, password);
+      const token = await registerUser(fullname, username, email, password);
 
       if (token) {
         setToken(token); // Salvează token-ul în localStorage

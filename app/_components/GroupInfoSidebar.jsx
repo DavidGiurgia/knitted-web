@@ -29,7 +29,7 @@ import GroupModal from "./modals/GroupModal";
 import UserProfile from "./UserProfile";
 import ProfileCard from "./ProfileCard";
 
-const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
+const GroupInfoSidebar = ({ currentGroup, participants }) => {
   const { user } = useAuth();
   const router = useRouter();
   const [creator, setCreator] = useState(null);
@@ -69,31 +69,33 @@ const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
   return (
     <div className="overflow-y-auto overflow-x-hidden flex flex-col h-full w-full md:w-fit md:max-w-80">
       <div
-      onClick={onOpen}
-      className="cursor-pointer pt-6 px-6 pb-4 w-full bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
-    >
-      <div className="font-medium text-lg mb-2">
-        {currentGroup?.name || "Group Name"}
-      </div>
-      <div
-        className={`text-sm text-[#808080] text-pretty ${
-          isExpanded ? "" : "line-clamp-3"
-        }`}
+        onClick={onOpen}
+        className="cursor-pointer pt-6 px-6 pb-4 w-full bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
       >
-        {currentGroup?.description || "No description available."}
-      </div>
-      {currentGroup?.description?.length > 200 && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleExpanded();
-          }}
-          className="mt-2 text-primary hover:underline text-sm"
+        <div className="font-medium text-lg mb-2">
+          {currentGroup?.name || "Group Name"}
+        </div>
+        <div
+          className={`text-sm text-[#808080] text-pretty ${
+            isExpanded ? "" : "line-clamp-3"
+          }`}
         >
-          {isExpanded ? "Hide" : "Read more"}
-        </button>
-      )}
-    </div>
+          {currentGroup?.description || (<i>Tap to add a description</i>)}
+
+          
+        </div>
+        {currentGroup?.description?.length > 200 && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleExpanded();
+            }}
+            className="mt-2 text-primary hover:underline text-sm"
+          >
+            {isExpanded ? "Hide" : "Read more"}
+          </button>
+        )}
+      </div>
       <div className="p-6 flex flex-col gap-y-8">
         <Popover className="">
           <PopoverTrigger>
@@ -105,7 +107,7 @@ const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
             </div>
           </PopoverTrigger>
           <PopoverContent className="">
-            <ProfileCard currentUser={creator}/>
+            <ProfileCard currentUser={creator} />
           </PopoverContent>
         </Popover>
 
@@ -128,7 +130,25 @@ const GroupInfoSidebar = ({ currentGroup, onlineCount }) => {
 
         <div className="flex items-center gap-x-4 hover:text-primary">
           <UsersIcon className="size-5" />
-          {onlineCount} online participants
+          {participants.length || 0} online participants
+        </div>
+
+        <div className="participant-list bg-white dark:bg-gray-800 p-4 rounded-lg">
+          <h3 className="text-lg font-bold">Participants</h3>
+          <ul>
+            {participants && participants.length > 0 ? (
+              participants?.map((participant) => (
+                <li
+                  key={participant.id}
+                  className="py-1 px-2 rounded hover:bg-gray-200"
+                >
+                  {participant.username}
+                </li>
+              ))
+            ) : (
+              <p>No participants yet</p>
+            )}
+          </ul>
         </div>
 
         <hr className="h-px border-gray-500  transform scale-y-50" />

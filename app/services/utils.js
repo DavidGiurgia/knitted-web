@@ -49,6 +49,12 @@ export const multiFormatDateString = (timestamp = "") => {
   }
 };
 
+export function formatTimeFromTimestamp(createdAt) {
+  const date = new Date(createdAt);
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+
 export const checkIsLiked = (likeList, userId) => {
   return likeList.includes(userId);
 };

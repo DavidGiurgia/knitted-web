@@ -15,38 +15,49 @@ const RegisterForm = () => {
 
   const toggleVisibility = () => setShowPassword(!showPassword);
 
+  const [fullname, setFullname] = useState("");
+  const [fullnameError, setFullnameError] = useState("");
+
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [usernameError, setUsernameError] = useState("");
+
+  const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
+
+  const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
     if (!username) {
-      setUsernameError("Password is required");
-      return false;
+      setUsernameError("Username is required");
+      return;
+    }
+
+    if (!fullname) {
+      setFullnameError("Full Name is required");
+      return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
       setEmailError("Email is required");
-      return false;
+      return;
     } else if (!emailRegex.test(email)) {
       setEmailError("Invalid email format");
-      return false;
+      return;
     }
 
     if (!password) {
       setPasswordError("Password is required");
-      return false;
+      return;
     }
 
     setLoading(true);
 
     try {
-      await register(username, email, password);
+      await register(fullname, username, email, password);
       toast("👋 Welcome " + username);
     } catch (error) {
       console.error(error.message);
@@ -68,33 +79,13 @@ const RegisterForm = () => {
       <Input
         isClearable
         size="lg"
-        type="text"
-        label="Username"
-        variant="bordered"
-        isInvalid={usernameError.length}
-        errorMessage={usernameError}
-        color={usernameError.length && "danger"}
-        //placeholder="Enter your email"
-        className="w-full"
-        value={username}
-        onChange={(e) => {
-          setUsername(e.target.value);
-          setUsernameError("");
-        }}
-        onClear={() => setUsername("")}
-        required
-      />
-
-      <Input
-        isClearable
-        size="lg"
         type="email"
         label="Email"
         variant="bordered"
         isInvalid={emailError.length}
         errorMessage={emailError}
         color={emailError.length && "danger"}
-        placeholder="Enter your email"
+        //placeholder="Enter your email"
         className="w-full"
         value={email}
         onChange={(e) => {
@@ -107,7 +98,7 @@ const RegisterForm = () => {
 
       <Input
         label="Password"
-        placeholder="Create a strong password"
+        //placeholder="Create a strong password"
         size="lg"
         variant="bordered"
         isInvalid={passwordError.length}
@@ -134,6 +125,44 @@ const RegisterForm = () => {
           setPassword(e.target.value);
           setPasswordError("");
         }}
+      />
+
+      <Input
+        isClearable
+        size="lg"
+        type="text"
+        label="Full Name"
+        variant="bordered"
+        isInvalid={fullnameError.length}
+        errorMessage={fullnameError}
+        color={fullnameError.length && "danger"}
+        className="w-full"
+        value={fullname}
+        onChange={(e) => {
+          setFullname(e.target.value);
+          setFullnameError("");
+        }}
+        onClear={() => setFullname("")}
+        required
+      />
+
+      <Input
+        isClearable
+        size="lg"
+        type="text"
+        label="Username"
+        variant="bordered"
+        isInvalid={usernameError.length}
+        errorMessage={usernameError}
+        color={usernameError.length && "danger"}
+        className="w-full"
+        value={username}
+        onChange={(e) => {
+          setUsername(e.target.value);
+          setUsernameError("");
+        }}
+        onClear={() => setUsername("")}
+        required
       />
 
       <Button

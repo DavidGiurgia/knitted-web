@@ -3,9 +3,10 @@ import { getToken } from "../../../zic-web/src/services/tokenService";
 
 const API_BASE_URL = "http://localhost:8000/auth"; // Înlocuiește cu URL-ul API-ului tău
 
-export const registerUser = async (username, email, password) => {
+export const registerUser = async (fullname, username, email, password) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/register`, {
+      fullname,
       username,
       email,
       password,

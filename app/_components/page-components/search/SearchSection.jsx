@@ -85,7 +85,7 @@ const SearchSection = ({ pushSubPanel }) => {
 
   return (
     <div className="w-full h-full flex-1 p-6 flex flex-col gap-y-4 ">
-      <div className="flex items-center p-2 border border-gray-200 dark:border-gray-800 rounded-md">
+      <div className="flex items-center p-2 border border-gray-200 dark:border-gray-800 rounded-lg">
         <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2" />
         <input
           autoFocus

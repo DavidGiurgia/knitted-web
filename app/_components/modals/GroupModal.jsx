@@ -56,6 +56,7 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
 
       const groupData = {
         creatorId: user._id,
+        participants: user._id,
         name: groupName,
         description: groupDescription,
         joinCode: await generateUniqueJoinCode(),
@@ -149,7 +150,7 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
                 className="mb-4"
               />
               {!group && 
-                <SelectFriends placeholder="Invite your friends" onSelectionChange={()=>{}} />
+                <SelectFriends label="Send an invitation to:" placeholder="Invite your friends" setSelectedFriends={()=>{}} />
               }
             </ModalBody>
             <ModalFooter>

@@ -5,7 +5,7 @@ import { useAuth } from "../_context/AuthContext";
 import { fetchFriends } from "../services/friendsService";
 import { Avatar, Chip, Select, SelectItem } from "@nextui-org/react";
 
-export default function SelectFriends({ variant, placeholder = "Select friends", setSelectedFriends }) {
+export default function SelectFriends({label = "" , variant, placeholder = "Select friends", setSelectedFriends }) {
     const { user } = useAuth();
     const [friends, setFriends] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -41,7 +41,10 @@ export default function SelectFriends({ variant, placeholder = "Select friends",
         labelPlacement="outside"
         placeholder={loading ? "Loading friends..." : placeholder}
         renderValue={(selectedItems) => (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
+            <div className={`${label.length > 8  && "w-full"}`}>
+            {label}
+            </div>
             {selectedItems.map((item) => (
               <Chip key={item.key}>{item.data.username}</Chip>
             ))}

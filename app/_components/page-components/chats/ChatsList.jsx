@@ -1,42 +1,35 @@
 import {
   ChatBubbleLeftEllipsisIcon,
+  MagnifyingGlassIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import { Button, useDisclosure } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/app/_context/AuthContext";
 import NewChatModal from "../../modals/NewChatModal";
-import { fetchRoomsForUser } from "@/app/api/rooms";
-import UserListItem from "../../UserListItem";
-import { getUserById } from "@/app/services/userService";
-import UsersGroupItem from "../../UsersGroupItem";
+import { createRoom, fetchRoomsForUser } from "@/app/api/rooms";
 import ChatLinkItem from "./ChatLinkItem";
+import { searchUser } from "@/app/api/user";
+import UserListItem from "../../UserListItem";
 
 const ChatsList = ({ pushSubPanel }) => {
   const { user } = useAuth();
+  const [value, setValue] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [chats, setChats] = useState([]);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleCreateRoom = (room) => {
-    setChats((prevChats) => [room, ...prevChats]);
-    pushSubPanel("ChatRoom", room);
-  };
-
-  const fetchParticipantDetails = async (participants) => {
-    const participantDetails = await Promise.all(
-      participants.map(async (participantId) => {
-        try {
-          //ignore current user
-          if (participantId === user._id) return null;
-           
-          return await getUserById(participantId); // Extragerea detaliilor utilizatorului
-        } catch (error) {
-          console.error("Error fetching participant:", error);
-          return null;
-        }
-      })
-    );
-    return participantDetails.filter(Boolean); // Elimină utilizatorii null (dacă există erori)
+  const handleCreateRoom = async (groupName, participantsArray) => {
+    try {
+      const participants = Array.from(new Set([...participantsArray, user._id]));
+      // Creăm camera folosind numele calculat
+      const room = await createRoom(groupName, participants);
+      setChats((prevChats) => [room, ...prevChats]);
+      pushSubPanel("ChatRoom", room);
+    } catch (error) {
+      console.error("Error creating room:", error);
+    }
   };
 
   useEffect(() => {
@@ -45,18 +38,7 @@ const ChatsList = ({ pushSubPanel }) => {
         // Fetch chats
         const userChats = await fetchRoomsForUser(user._id);
 
-         // Map room data to include participant details
-         const chatsWithDetails = await Promise.all(
-          userChats.map(async (chat) => {
-            const participantDetails = await fetchParticipantDetails(chat.participants);
-            return {
-              ...chat,
-              participantDetails, // Adăugăm detaliile participanților
-            };
-          })
-        );
-
-        setChats(chatsWithDetails);
+        setChats(userChats);
       } catch (error) {
         console.error("Error fetching user chats:", error);
       }
@@ -67,8 +49,33 @@ const ChatsList = ({ pushSubPanel }) => {
     }
   }, [user?._id]);
 
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (value.trim() === "") {
+        setResults([]);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const result = await searchUser(value, user._id);
+        setResults(result);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const delayDebounceFn = setTimeout(() => {
+      fetchResults();
+    }, 300); // Debounce pentru a evita apeluri frecvente
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [value]);
+
   return (
-    <div className="h-full p-6 flex flex-col gap-y-4">
+    <div className="h-full p-6 flex flex-col gap-y-4 overflow-y-auto">
       <div className="flex items-center justify-between gap-x-6">
         <div className="text-xl">Chats</div>
 
@@ -81,35 +88,77 @@ const ChatsList = ({ pushSubPanel }) => {
         />
       </div>
 
-      <div className="flex flex-col space-y-2 items-center h-full w-full">
-        {chats.length === 0 ? (
-          <div className="flex flex-col justify-center items-center ">
-            <ChatBubbleLeftEllipsisIcon className="size-32 text-primary " />
-            <div className="text-center max-w-sm">
-              <h1 className="font-semibold text-lg">No messages</h1>
-              <p className="text-gray-500"> New messages will appear here.</p>
-            </div>
-          </div>
+      <div className="flex items-center p-2 border border-gray-200 dark:border-gray-800 rounded-lg">
+        <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2" />
+        <input
+          autoFocus
+          onChange={(event) => setValue(event.currentTarget.value)}
+          value={value}
+          placeholder="Search"
+          className="flex-1 outline-none bg-transparent"
+        />
+      </div>
+
+      {loading ? (
+        <div className="text-center text-gray-500">Loading...</div>
+      ) : value ? (
+        results?.length > 0 ? (
+          <ul className="flex flex-col gap-y-2">
+            {results.map((currUser) => (
+              <li
+                className="flex items-center py-1 px-2 justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                key={currUser._id}
+                onClick={async () => {
+                  const participants = [currUser._id];
+                  const groupName = currUser.fullname; // Utilizator unic
+                  await handleCreateRoom(groupName, participants);
+                }}
+              >
+                <UserListItem user={currUser} />
+              </li>
+            ))}
+          </ul>
         ) : (
-          chats.map((chat) => (
-            <div
-              key={chat._id}
-              onClick={() => pushSubPanel("ChatRoom", chat)}
-              className="flex w-full items-center text-sm gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 py-4 px-2 rounded-lg"
-            >
-              <div className="flex flex-wrap gap-1">
-                <ChatLinkItem participants={chat.participantDetails} />
+          <div className="text-center text-gray-500">No results found</div>
+        )
+      ) : (
+        <div
+          className={`flex flex-col space-y-2 items-center h-full w-full ${
+            chats.length === 0 ? "justify-center" : ""
+          }`}
+        >
+          {chats.length === 0 ? (
+            <div className="flex flex-col justify-center items-center ">
+              <ChatBubbleLeftEllipsisIcon className="size-32 text-primary " />
+              <div className="text-center max-w-sm">
+                <h1 className="font-semibold text-lg">No messages</h1>
+                <p className="text-gray-500"> New messages will appear here.</p>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ) : (
+            chats.map((chat) => (
+              <div
+                key={chat._id}
+                onClick={() => pushSubPanel("ChatRoom", chat)}
+                className="flex w-full items-center text-sm gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg"
+              >
+                <div className="flex flex-wrap gap-1">
+                  <ChatLinkItem
+                    room={chat}
+                    participants={chat.participantDetails}
+                  />
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       {/* New Chat Modal */}
       <NewChatModal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        onCreate={(room) => handleCreateRoom(room)}
+        onCreate={handleCreateRoom}
       />
     </div>
   );

@@ -164,7 +164,7 @@ const GroupsSection = () => {
                   aria-label={`Open group ${group.name}`}
                   variant="light"
                   className=" h-12 text-lg text-start flex items-center justify-start flex-1 font-semibold text-primary truncate"
-                  onClick={() => router.push(`/group-room/${group._id}`)}
+                  onPress={() => router.push(`/group-room/${group._id}`)}
                 >
                   <HashtagIcon className="w-6 h-6 text-primary mr-2" />
                   {group.name}

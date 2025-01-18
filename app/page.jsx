@@ -39,7 +39,7 @@ const Landing = () => {
           <div className={`flex-1 ${activePanel !== "Search" && "hidden"}`}>
             <SearchPanel />
           </div>
-          <div className={`flex-1 ${activePanel !== "Chats" && "hidden"}`}>
+          <div className={`flex-1 h-full ${activePanel !== "Chats" && "hidden"}`}>
             <ChatsPanel />
           </div>
           <div className={`flex-1 ${activePanel !== "Groups" && "hidden"}`}>
@@ -57,7 +57,7 @@ const Landing = () => {
 
         {/* Home (activ implicit pe MD+) */}
         <div
-          className={`flex-1 ${
+          className={`flex-1 overflow-y-auto ${
             activePanel === "Home" ? "block" : "hidden md:block"
           }`}
         >

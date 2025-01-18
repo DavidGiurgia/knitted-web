@@ -1,36 +1,46 @@
-import { createContext, useContext, useEffect, useRef } from "react";
-import { io } from "socket.io-client";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
 
 const WebSocketContext = createContext(null);
 
 export const WebSocketProvider = ({ children }) => {
-  const socket = useRef(null);
+  const [chatSocket, setChatSocket] = useState(null);
+  const [groupSocket, setGroupSocket] = useState(null);
 
   useEffect(() => {
-    socket.current = io("http://localhost:8000", {
-      transports: ["websocket"],
+    const chatWs = io("http://localhost:8000/chat");
+    const groupWs = io("http://localhost:8000/group");
+
+    chatWs.on("connect", () => {
+      console.log("Connected to Chat WebSocket");
     });
 
-    socket.current.on("connect", () => {
-      console.log("Connected to WebSocket");
+    groupWs.on("connect", () => {
+      console.log("Connected to Group WebSocket");
     });
 
-    socket.current.on("disconnect", () => {
-      console.log("WebSocket disconnected");
+    chatWs.on("disconnect", () => {
+      console.log("Connected to Chat WebSocket");
     });
+
+    groupWs.on("disconnect", () => {
+      console.log("Connected to Group WebSocket");
+    });
+
+    setChatSocket(chatWs);
+    setGroupSocket(groupWs);
 
     return () => {
-      socket.current.disconnect();
+      chatWs.disconnect();
+      groupWs.disconnect();
     };
   }, []);
 
-  const sendMessage = (event, data) => {
-    socket.current.emit(event, data);
-  };
-
-  const value = { socket: socket.current, sendMessage };
-
-  return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>;
+  return (
+    <WebSocketContext.Provider value={{ chatSocket, groupSocket }}>
+      {children}
+    </WebSocketContext.Provider>
+  );
 };
 
 export const useWebSocket = () => useContext(WebSocketContext);

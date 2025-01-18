@@ -1,5 +1,5 @@
 import { create, deleteGr, getByCode, getById, update } from "../api/group";
-import { deleteGroupDependencies, fetchUserGroupsIds, pair, removePair } from "../api/user-group";
+import { deleteGroupDependencies, fetchUserGroupsIds, pair } from "../api/user-group";
 
 export const createGroup = async (groupData) => {
     try{

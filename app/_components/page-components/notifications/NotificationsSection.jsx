@@ -11,7 +11,7 @@ import { markAllNotificationsAsRead } from "@/app/api/notifications";
 import { acceptFriendRequest } from "@/app/api/friends";
 import { getUserById } from "@/app/services/userService";
 
-const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
+const NotificationsSection = ({switchPanel, resetPanel }) => {
   const { user, fetchProfile } = useAuth(); // Obține utilizatorul curent
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,11 +57,11 @@ const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
   };
 
   return (
-    <div className="w-full h-full p-4 overflow-y-auto">
+    <div className="w-full h-full p-4 overflow-y-auto flex flex-col">
       <div className="flex items-center justify-between gap-x-6">
         <Button
           className="md:hidden"
-          onPress={() => switchPanel("Account")}
+          onPress={() => {switchPanel("Account"); resetPanel();}}
           variant="light"
           isIconOnly
         >
@@ -69,19 +69,10 @@ const NotificationsSection = ({ pushSubPanel, switchPanel }) => {
         </Button>
         <div className="text-xl">Notifications</div>
 
-        <Button
-          onPress={() => {
-            fetchNotifications();
-            fetchProfile();
-          }}
-          variant="light"
-          isIconOnly
-        >
-          <ArrowPathIcon className="size-5" />
-        </Button>
+        
       </div>
 
-      <div className="mt-4 w-full flex flex-col items-center justify-center">
+      <div className={`mt-4 w-full flex-1 flex flex-col items-center ${loading || notifications.length === 0 ? "justify-center" : ""}`}>
         {loading ? (
           <div className="text-center text-gray-500">Loading...</div>
         ) : notifications.length === 0 ? (

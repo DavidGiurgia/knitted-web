@@ -8,7 +8,7 @@ import { useAuth } from "@/app/_context/AuthContext";
 import UserProfile from "../../UserProfile";
 
 const NotificationsPanel = () => {
-  const { activeSubPanel, pushSubPanel, popSubPanel, switchPanel } = usePanel();
+  const { activeSubPanel, pushSubPanel, popSubPanel, switchPanel, resetPanel } = usePanel();
   const { subPanel, param } = activeSubPanel || {};
   const { user } = useAuth();
 
@@ -25,6 +25,7 @@ const NotificationsPanel = () => {
           <NotificationsSection
             pushSubPanel={pushSubPanel}
             switchPanel={switchPanel}
+            resetPanel={resetPanel}
           />
         );
     } // End switch subPanel

@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 /* Stilizare scrollbar generală */
 .overflow-y-auto::-webkit-scrollbar {
     width: 8px; /* Dimensiunea scrollbarului */

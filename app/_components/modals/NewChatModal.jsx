@@ -1,37 +1,46 @@
 import {
   Button,
+  Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Textarea,
 } from "@nextui-org/react";
 import React, { useState } from "react";
 import SelectFriends from "../SelectFriends";
-import { useAuth } from "@/app/_context/AuthContext";
-import { createRoom } from "@/app/api/rooms";
+import { getUserById } from "@/app/services/userService";
 
 const NewChatModal = ({ isOpen, onOpenChange, onCreate }) => {
-  const { user } = useAuth();
   const [participants, setParticipants] = useState([]);
-  const [message, setMessage] = useState("");
+  const [name, setName] = useState("");
 
   const handleSend = async () => {
-    console.log("Send message to:", participants);
-
     // Convertim Set în Array
     const participantsArray = Array.from(participants);
+  
+    if (participantsArray.length === 0) {
+      console.error("No participants selected");
+      return;
+    }
+  
+    let groupName = name;
+  
+    // Obținem primul participant
+    const firstParticipant = await getUserById(participantsArray[0]);
+  
+    if (participantsArray.length === 1) {
+      groupName = firstParticipant.fullname; // Utilizator unic
+    } else if (participantsArray.length > 1 && !groupName) {
+      groupName = `${firstParticipant.fullname} and ${
+        participantsArray.length - 1
+      } others`;
+    }
 
-    // Adăugăm și pe utilizatorul curent
-    participantsArray.push(user._id);
-
-    const room = await createRoom(participantsArray);
-
-    console.log("Created room:", room);
-
-    onCreate(room);
+  
+    await onCreate(groupName, participantsArray);
   };
+  
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
@@ -41,15 +50,17 @@ const NewChatModal = ({ isOpen, onOpenChange, onCreate }) => {
               Start a new conversation
             </ModalHeader>
             <ModalBody>
-              <Textarea
-                placeholder="Type a message"
-                className="w-full"
-                variant="bordered"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              />
+              {Array.from(participants).length > 1 && (
+                <Input
+                  label="Group Name (optional)"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  variant="bordered"
+                />
+              )}
               <SelectFriends
-                placeholder="To"
+              label="To:"
+                placeholder="Select participants"
                 setSelectedFriends={setParticipants}
               />
             </ModalBody>
@@ -58,11 +69,11 @@ const NewChatModal = ({ isOpen, onOpenChange, onCreate }) => {
                 Cancel
               </Button>
               <Button
-                isDisabled={participants.size === 0 || !message}
+                isDisabled={Array.from(participants).length < 1}
                 color="primary"
                 onPress={handleSend}
               >
-                Send
+                Chat
               </Button>
             </ModalFooter>
           </>
