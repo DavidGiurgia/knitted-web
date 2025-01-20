@@ -1,9 +1,9 @@
 import { create, deleteGr, getByCode, getById, update } from "../api/group";
 import { deleteGroupDependencies, fetchUserGroupsIds, pair } from "../api/user-group";
 
-export const createGroup = async (groupData) => {
+export const createGroup = async (groupData, invitedUserIds) => {
     try{
-        return await create(groupData);
+        return await create(groupData, invitedUserIds);
     }
     catch(err){
         console.error(err);
@@ -75,6 +75,7 @@ export const getUserGroups = async (userId) => {
       throw err;
     }
   };
+
   
 
   

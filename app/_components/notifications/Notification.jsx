@@ -10,6 +10,7 @@ import { useAuth } from "../../_context/AuthContext";
 import { acceptFriendRequest } from "@/app/api/friends";
 import { useEffect, useState } from "react";
 import { getUserById } from "@/app/services/userService";
+import GroupInvitation from "./GroupInvitation";
 
 const Notification = ({ notification }) => {
   const { pushSubPanel, switchPanel } = usePanel();
@@ -23,9 +24,10 @@ const Notification = ({ notification }) => {
         setNotificationMetadata(sender);
       } else if (notification.type === "friend_request_accepted") {
         const acceptedBy = await getUserById(notification.data.acceptedBy);
-        setNotificationMetadata(acceptedBy);  
+        setNotificationMetadata(acceptedBy);
+      } else if (notification.type === "group_invitation") {
       }
-    }
+    };
 
     getNotificationMetadata();
   }, [notification]);
@@ -72,8 +74,10 @@ const Notification = ({ notification }) => {
             switchPanel("Chats");
           }}
         />
+      ) : notification.type === "group_invitation" ? (
+        <GroupInvitation user={user} notification={notification}/>
       ) : (
-        <div>Unknown Notification Type</div>
+        <div> Unknown Notification Type </div>
       )}
 
       <div className="text-xs text-gray-400">

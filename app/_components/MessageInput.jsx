@@ -5,7 +5,7 @@ import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 
-const MessageInput = ({message, setMessage}) => {
+const MessageInput = ({message, setMessage }) => {
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const pickerRef = useRef(null);
   const buttonRef = useRef(null);
@@ -81,7 +81,7 @@ const MessageInput = ({message, setMessage}) => {
           ref={textareaRef} // Referința către textarea
           rows={1}
           maxLength={1000}
-          placeholder="Type your message"
+          placeholder={`Type your message`}
           className="w-full py-1 resize-none bg-transparent border-none outline-none focus:ring-0 text-gray-800 dark:text-gray-100 overflow-y-auto"
           value={message}
           onChange={(event) => setMessage(event.target.value)}

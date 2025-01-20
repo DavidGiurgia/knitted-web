@@ -1,83 +1,96 @@
 "use client";
 
 import GroupInfoSidebar from "@/app/_components/GroupInfoSidebar";
+import GroupProfileModal from "@/app/_components/modals/GroupProfileModal";
 import GroupChatBox from "@/app/_components/page-components/groups/GroupChatBox";
 import { useAuth } from "@/app/_context/AuthContext";
 import { useWebSocket } from "@/app/_context/WebSoketContext";
 import { getGroupById } from "@/app/services/groupService";
-import { getProfile, updateGuestAlias } from "@/app/services/guestService";
+import { getProfile, updateProfile } from "@/app/services/guestService";
 
-import { Bars3Icon, PencilIcon, UserIcon } from "@heroicons/react/24/outline";
-import {
-  Avatar,
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@nextui-org/react";
-import { useParams, useRouter } from "next/navigation";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+import { Avatar, useDisclosure } from "@nextui-org/react";
+import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const GroupRoom = () => {
   const { user } = useAuth();
+  const { groupSocket } = useWebSocket();
   const params = useParams();
-  const router = useRouter();
   const [sidebar, setSidebar] = useState(false);
-  const [anonymous, setIdentity] = useState(false);
   const [groupDetails, setGroupDetails] = useState(null); // To store group data
   const [participants, setParticipants] = useState([]);
-  const [alias, setAlias] = useState(user?.fullname || "Guest-unknown");
-  const { groupSocket } = useWebSocket();
   const [profile, setProfile] = useState(null);
-
-  // Function to update alias and save to localStorage
-  const handleAliasChange = (newAlias) => {
-    if (newAlias) {
-      updateGuestAlias(newAlias);
-      setAlias(newAlias);
-    } else {
-      console.error("Alias cannot be empty");
-    }
-  };
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
-    const fetchGroupDetails = async () => {
-      if (!params?.id) {
-        router.push("/");
-        return;
-      }
-      const data = await getGroupById(params.id);
-      setGroupDetails(data);
+    const fetchInitialData = async () => {
+      try {
+        const currentProfile = getProfile(user, params?.id);
+        if (!currentProfile) {
+          toast.error("Failed to fetch profile");
+          return;
+        }
 
-      
+        setProfile(currentProfile);
+        console.log("profile created: " + profile);
 
-      if (groupSocket) {
-        groupSocket.emit("joinRoom", { groupId: data._id, username: alias });
+        emitUpdateProfile(currentProfile);
 
-        groupSocket.on("updateParticipants", (participants) => {
-          setParticipants(participants);
-        });
+        if (!params?.id) {
+          toast.error("Invalid group ID");
+          return;
+        }
+
+        const data = await getGroupById(params.id);
+        setGroupDetails(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Something went wrong. Please try again.");
       }
     };
 
-    const profile = getProfile(user); // Preluăm profilul din localStorage
-    if (profile && groupSocket) {
-      const payload = { groupId: params.id, profile }; // Trimitem profilul complet (id și username)
-      groupSocket.emit("joinRoom", payload); // Alăturăm utilizatorul la grup
-      setProfile(profile);
+    fetchInitialData();
+  }, [user, params?.id]);
+
+  const handleSaveProfile = (newProfile) => {
+    updateProfile(newProfile, params?.id);
+    setProfile(newProfile);
+
+    emitUpdateProfile(newProfile);
+  };
+
+  const emitUpdateProfile = (newProfile) => {
+
+    if(!newProfile || !groupSocket) {
+      console.log("profile or group socket is null");
+      return;
     }
 
-    fetchGroupDetails();
-    return () => {
-      if (groupSocket && params?.id) {
-        groupSocket.emit("leaveRoom", { groupId: params.id });
-      }
-    };
-  }, [params?.id, router, groupSocket, alias]);
+     //log 
+     console.log("Profile updated to be saved: ", newProfile);
+     console.log("groupID: ", params.id);
 
-  return (
+    groupSocket.emit("updateProfile", {
+      groupId: params.id,
+      profile: {
+        id: newProfile.id,
+        username: newProfile.username,
+        avatarUrl: newProfile.avatarUrl,
+      },
+    });
+
+   
+  };
+
+  return !params?.id ? (
+    <div className="flex items-center justify-center text-gray-500 h-full w-full">
+      This group is unavailable
+    </div>
+  ) : (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
-      <div className="flex bg-white dark:bg-gray-900 items-center justify-between py-3 px-6 border-b border-gray-300 dark:border-gray-800">
+      <div className="flex bg-white dark:bg-gray-900 items-center justify-between py-2 px-6 border-b border-gray-300 dark:border-gray-800">
         <div className="flex justify-between items-center">
           <div onClick={() => setSidebar(!sidebar)}>
             <Bars3Icon className="size-6" />
@@ -88,54 +101,16 @@ const GroupRoom = () => {
           </div>
         </div>
 
-        <div className="">
-          {anonymous ? (
-            <div
-              className="w-8 h-8"
-              onClick={() => {
-                setIdentity(false);
-              }}
-            >
-              <UserIcon className="p-1" />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-x-4">
-              <Popover>
-                <PopoverTrigger className="cursor-pointer">
-                  {alias || <PencilIcon className="size-4" />}
-                </PopoverTrigger>
-                <PopoverContent className="max-w-[240px]">
-                  {() => (
-                    <div className="px-1 py-2 w-full">
-                      <div className="mt-2 flex flex-col gap-2 w-full ">
-                        <Input
-                          maxLength={30}
-                          autoFocus
-                          value={alias}
-                          onChange={(e) => handleAliasChange(e.target.value)}
-                          label="Alias"
-                          size="sm"
-                          variant="default"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </PopoverContent>
-              </Popover>
-              <div
-                className="w-8 h-8"
-                onClick={() => {
-                  setIdentity(true);
-                }}
-              >
-                <Avatar
-                  showFallback
-                  src={user?.avatarUrl || null}
-                  className="w-full h-full"
-                />
-              </div>
-            </div>
-          )}
+        <div
+          onClick={onOpen}
+          className="flex items-center justify-center gap-x-4 px-2 py-1 rounded-xl cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+        >
+          <div>{profile?.username}</div>
+          <Avatar
+            showFallback
+            src={profile?.avatarUrl || null}
+            className="w-8 h-8"
+          />
         </div>
       </div>
 
@@ -144,6 +119,7 @@ const GroupRoom = () => {
           <GroupInfoSidebar
             currentGroup={groupDetails}
             participants={participants}
+            profile={profile}
           />
         )}
 
@@ -152,7 +128,6 @@ const GroupRoom = () => {
             ${sidebar && "hidden md:flex md:w-1/2 xl:justify-start xl:ml-48"}`}
         >
           <GroupChatBox
-            anonymous={anonymous}
             profile={profile}
             currentGroup={groupDetails}
             participants={participants}
@@ -160,6 +135,14 @@ const GroupRoom = () => {
           />
         </div>
       </div>
+
+      <GroupProfileModal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        profile={profile}
+        setProfile={setProfile}
+        onConfirm={(newProfile) => handleSaveProfile(newProfile)}
+      />
     </div>
   );
 };

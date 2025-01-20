@@ -11,6 +11,7 @@ import { createRoom, fetchRoomsForUser } from "@/app/api/rooms";
 import ChatLinkItem from "./ChatLinkItem";
 import { searchUser } from "@/app/api/user";
 import UserListItem from "../../UserListItem";
+import { fetchFriends } from "@/app/services/friendsService";
 
 const ChatsList = ({ pushSubPanel }) => {
   const { user } = useAuth();
@@ -22,7 +23,9 @@ const ChatsList = ({ pushSubPanel }) => {
 
   const handleCreateRoom = async (groupName, participantsArray) => {
     try {
-      const participants = Array.from(new Set([...participantsArray, user._id]));
+      const participants = Array.from(
+        new Set([...participantsArray, user._id])
+      );
       // Creăm camera folosind numele calculat
       const room = await createRoom(groupName, participants);
       setChats((prevChats) => [room, ...prevChats]);
@@ -35,9 +38,7 @@ const ChatsList = ({ pushSubPanel }) => {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        // Fetch chats
-        const userChats = await fetchRoomsForUser(user._id);
-
+        const userChats = await fetchRoomsForUser(user?._id);
         setChats(userChats);
       } catch (error) {
         console.error("Error fetching user chats:", error);
@@ -48,31 +49,10 @@ const ChatsList = ({ pushSubPanel }) => {
       fetchChats();
     }
   }, [user?._id]);
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      if (value.trim() === "") {
-        setResults([]);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const result = await searchUser(value, user._id);
-        setResults(result);
-      } catch (error) {
-        console.error("Error fetching search results:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const delayDebounceFn = setTimeout(() => {
-      fetchResults();
-    }, 300); // Debounce pentru a evita apeluri frecvente
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [value]);
+  // Filter chats based on the search input
+  const filteredChats = chats.filter((chat) =>
+    chat.name.toLowerCase().includes(value.toLowerCase())
+  );
 
   return (
     <div className="h-full p-6 flex flex-col gap-y-4 overflow-y-auto">
@@ -102,19 +82,20 @@ const ChatsList = ({ pushSubPanel }) => {
       {loading ? (
         <div className="text-center text-gray-500">Loading...</div>
       ) : value ? (
-        results?.length > 0 ? (
+        filteredChats.length > 0 ? (
           <ul className="flex flex-col gap-y-2">
-            {results.map((currUser) => (
+            {filteredChats.map((chat) => (
               <li
                 className="flex items-center py-1 px-2 justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-                key={currUser._id}
-                onClick={async () => {
-                  const participants = [currUser._id];
-                  const groupName = currUser.fullname; // Utilizator unic
-                  await handleCreateRoom(groupName, participants);
-                }}
+                key={chat._id}
+                onClick={() => pushSubPanel("ChatRoom", chat)}
               >
-                <UserListItem user={currUser} />
+                <div className="flex flex-wrap gap-1">
+                  <ChatLinkItem
+                    room={chat}
+                    participants={chat.participantDetails}
+                  />
+                </div>
               </li>
             ))}
           </ul>

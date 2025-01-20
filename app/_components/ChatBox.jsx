@@ -16,13 +16,11 @@ const ChatBox = ({ room }) => {
   const { chatSocket } = useWebSocket();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  let roomId = room?._id;
 
   useEffect(() => {
     const loadMessagesAndParticipants = async () => {
       try {
-        roomId = room._id; // Asigură-te că room este definit înainte de accesare
-        const data = await fetchMessagesByRoom(roomId);
+        const data = await fetchMessagesByRoom(room._id);
         setMessages(data);
 
         // Transformă participant IDs în obiecte folosind getUserById
@@ -39,30 +37,32 @@ const ChatBox = ({ room }) => {
       } catch (error) {
         console.error("Failed to fetch messages or participants:", error);
       }
+
+      chatSocket.emit("joinRoom", { roomId: room._id });
+      console.log("Joined room", room._id);
     };
 
-    console.log("room id here -> ", roomId);
     // Apelează o singură dată la montarea componentului
     if (room) {
       loadMessagesAndParticipants();
     }
-  }, [roomId]); // Atenție la dependințe
+    return () => {
+      chatSocket.emit("leaveRoom", { roomId: room._id });
+      console.log("left room", room._id);
+    };
+  }, [room?._id]); // Atenție la dependințe
 
   useEffect(() => {
-    if (!chatSocket || !roomId) {
+    if (!chatSocket) {
       console.log(
         "Failed to connect. chatSocket is null or empty.",
-        chatSocket,
-        roomId
+        chatSocket
       );
       return;
     }
 
-    chatSocket.emit("joinRoom", { roomId });
-
     // Ascultă mesaje
     const handleMessageReceived = (newMessage) => {
-      console.log("Received message:", newMessage);
       setMessages((prev) => [...prev, newMessage]);
     };
 
@@ -72,9 +72,8 @@ const ChatBox = ({ room }) => {
     // Curăță evenimentul la demontare
     return () => {
       chatSocket.off("receiveMessage", handleMessageReceived);
-      chatSocket.emit("leaveRoom", { roomId });
     };
-  }, [chatSocket, roomId]); // Atenție la dependințe
+  }, [chatSocket]); // Atenție la dependințe
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
@@ -82,13 +81,11 @@ const ChatBox = ({ room }) => {
     const messageData = {
       content: message,
       senderId: user._id,
-      roomId: roomId,
+      roomId: room._id,
       isAnonymous: false,
     };
 
     chatSocket.emit("sendMessage", messageData);
-
-    console.log("message sent", messageData);
 
     setMessage("");
   };
@@ -134,12 +131,12 @@ const ChatBox = ({ room }) => {
                   : ""}
               </div>
               <div className="flex  flex-col  ">
-              <div className="max-w-52 break-words overflow-hidden">
-                {msg.content}
-              </div>
-              <span className="text-xs text-gray-500 self-end">
-                {formatTimeFromTimestamp(msg.createdAt)}
-              </span>
+                <div className="max-w-52 break-words overflow-hidden">
+                  {msg.content}
+                </div>
+                <span className="text-xs text-gray-500 self-end">
+                  {formatTimeFromTimestamp(msg.createdAt)}
+                </span>
               </div>
             </div>
           </div>

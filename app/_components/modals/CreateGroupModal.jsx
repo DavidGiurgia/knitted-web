@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../../_context/AuthContext";
+import { useAuth } from "@/app/_context/AuthContext";
+import { createGroup, pairUserGroup } from "@/app/services/groupService";
+import { generateUniqueJoinCode } from "@/app/services/utils";
 import {
-  Button,
+    Button,
   Input,
   Modal,
   ModalBody,
@@ -12,27 +13,20 @@ import {
   ModalHeader,
   Textarea,
 } from "@nextui-org/react";
-import { generateUniqueJoinCode } from "../../services/utils";
-import {
-  createGroup,
-  updateGroup,
-  pairUserGroup,
-} from "../../services/groupService";
-import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 import SelectFriends from "../SelectFriends";
 
-const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
-  const router = useRouter();
+const CreateGroupModal = ({ isOpen, onOpenChange }) => {
   const { user } = useAuth();
+  const router = useRouter();
 
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [nameError, setNameError] = useState("");
   const [selectedFriends, setSelectedFriends] = useState([]);
-
-  const isCreator = group?.creatorId === user?._id;
 
   const handleValidation = () => {
     if (!groupName.trim() || groupName.length < 3) {
@@ -82,52 +76,13 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
       setLoading(false);
     }
   };
-
-  const handleUpdateGroup = async () => {
-    if (!handleValidation()) return;
-
-    try {
-      setLoading(true);
-
-      const updatedGroup = {
-        name: groupName,
-        description: groupDescription,
-      };
-
-      await updateGroup(group._id, updatedGroup); // Save changes to the backend
-      toast.success("Group updated successfully!");
-      group.name = groupName;
-      group.description = groupDescription;
-      onOpenChange(false); // Close the modal
-    } catch (error) {
-      console.error("Error updating group:", error);
-      toast.error("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (group) {
-      setGroupName(group.name || "");
-      setGroupDescription(group.description || "");
-    } else {
-      setGroupName("");
-      setGroupDescription("");
-    }
-  }, [group]);
-
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              {group
-                ? isCreator
-                  ? "Edit Group"
-                  : "Group Details"
-                : "Create a New Group"}
+              Create a New Group
             </ModalHeader>
             <ModalBody>
               <Input
@@ -135,7 +90,6 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
                 color={nameError.length && "danger"}
                 isInvalid={nameError.length}
                 errorMessage={nameError}
-                isReadOnly={group && !isCreator} // Readonly if the user is not the creator
                 label="Group Name"
                 value={groupName}
                 onChange={(e) => {
@@ -143,38 +97,32 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
                   setNameError("");
                 }}
                 variant="bordered"
-                autofocus
               />
               <Textarea
                 maxLength={1000}
-                isReadOnly={group && !isCreator} // Readonly if the user is not the creator
                 value={groupDescription}
                 onChange={(e) => setGroupDescription(e.target.value)}
                 label="Description"
                 variant="bordered"
                 className="mb-4"
               />
-              {!group && (
-                <SelectFriends
-                  label="Send an invitation to:"
-                  placeholder="Invite your friends"
-                  setSelectedFriends={setSelectedFriends}
-                />
-              )}
+              <SelectFriends
+                label="Send an invitation to:"
+                placeholder="Invite your friends"
+                setSelectedFriends={setSelectedFriends}
+              />
             </ModalBody>
             <ModalFooter>
               <Button variant="light" onPress={onClose}>
-                {group && !isCreator ? "Close" : "Cancel"}
+                Cancel
               </Button>
-              {isCreator || !group ? (
-                <Button
-                  color="primary"
-                  isLoading={loading}
-                  onPress={group ? handleUpdateGroup : handleCreateGroup}
-                >
-                  {group ? "Save" : "Create"}
-                </Button>
-              ) : null}
+              <Button
+                color="primary"
+                isLoading={loading}
+                onPress={handleCreateGroup}
+              >
+                Create
+              </Button>
             </ModalFooter>
           </>
         )}
@@ -183,4 +131,4 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
   );
 };
 
-export default GroupModal;
+export default CreateGroupModal;

@@ -2,9 +2,9 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8000/group";
 
-export const create = async (groupData) => {
+export const create = async (groupData, invitedUserIds) => {
     try{
-        const response = await axios.post(`${API_BASE_URL}`, groupData);
+        const response = await axios.post(`${API_BASE_URL}`, {groupData, invitedUserIds});
         return await response.data;
     }
     catch(error){

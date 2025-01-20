@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import CustomModal from "./modals/CustomModal";
 import { deleteGroup } from "../services/groupService";
 import {
+  Avatar,
   Button,
   Popover,
   PopoverContent,
@@ -29,7 +30,7 @@ import GroupModal from "./modals/GroupModal";
 import UserProfile from "./UserProfile";
 import ProfileCard from "./ProfileCard";
 
-const GroupInfoSidebar = ({ currentGroup, participants }) => {
+const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
   const { user } = useAuth();
   const router = useRouter();
   const [creator, setCreator] = useState(null);
@@ -41,6 +42,7 @@ const GroupInfoSidebar = ({ currentGroup, participants }) => {
     onOpenChange: onDeleteModaOpenChange,
   } = useDisclosure();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showParticipants, setShowParticipants] = useState(true);
 
   const toggleExpanded = () => {
     setIsExpanded((prev) => !prev);
@@ -80,9 +82,7 @@ const GroupInfoSidebar = ({ currentGroup, participants }) => {
             isExpanded ? "" : "line-clamp-3"
           }`}
         >
-          {currentGroup?.description || (<i>Tap to add a description</i>)}
-
-          
+          {currentGroup?.description || <i>Tap to add a description</i>}
         </div>
         {currentGroup?.description?.length > 200 && (
           <button
@@ -128,28 +128,41 @@ const GroupInfoSidebar = ({ currentGroup, participants }) => {
           </div>
         </Tooltip>
 
-        <div className="flex items-center gap-x-4 hover:text-primary">
+        <div
+          onClick={() => setShowParticipants(!showParticipants)}
+          className="flex items-center gap-x-4 hover:text-primary cursor-pointer"
+        >
           <UsersIcon className="size-5" />
           {participants.length || 0} online participants
         </div>
 
-        <div className="participant-list bg-white dark:bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-bold">Participants</h3>
-          <ul>
-            {participants && participants.length > 0 ? (
-              participants?.map((participant) => (
-                <li
-                  key={participant.id}
-                  className="py-1 px-2 rounded hover:bg-gray-200"
-                >
-                  {participant.username}
-                </li>
-              ))
-            ) : (
-              <p>No participants yet</p>
-            )}
-          </ul>
-        </div>
+        {showParticipants && (
+          <div className="flex flex-col bg-white dark:bg-gray-800 p-4 rounded-lg gap-y-2">
+            <h3 className="text-lg font-semibold">Participants</h3>
+            <ul className="flex flex-col gap-y-1">
+              {participants && participants.length > 0 ? (
+                participants?.map((participant) => (
+                  <li
+                    key={participant.id}
+                    className="text-sm flex gap-x-2 items-center py-1 px-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                  >
+                    <Avatar
+                    size="sm"
+                      src={participant.avatarUrl}
+                      className="flex-shrink-0"
+                    />
+                    <div>
+                      {participant.username}
+                      {participant.id === profile.id && <div>(You)</div>}
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <p>No participants yet</p>
+              )}
+            </ul>
+          </div>
+        )}
 
         <hr className="h-px border-gray-500  transform scale-y-50" />
 

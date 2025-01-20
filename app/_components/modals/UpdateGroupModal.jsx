@@ -1,36 +1,34 @@
 "use client";
 
+import { useAuth } from "@/app/_context/AuthContext";
+import { updateGroup } from "@/app/services/groupService";
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../../_context/AuthContext";
-import {
-  Button,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Textarea,
-} from "@nextui-org/react";
-import { generateUniqueJoinCode } from "../../services/utils";
-import {
-  createGroup,
-  updateGroup,
-  pairUserGroup,
-} from "../../services/groupService";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import SelectFriends from "../SelectFriends";
+import {
+    Button,
+    Input,
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    Textarea,
+  } from "@nextui-org/react";
 
-const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
-  const router = useRouter();
+const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
   const { user } = useAuth();
 
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [nameError, setNameError] = useState("");
-  const [selectedFriends, setSelectedFriends] = useState([]);
+
+  useEffect(() => {
+    if (group) {
+      setGroupName(group.name || "");
+      setGroupDescription(group.description || "");
+    }
+  }, [group]);
 
   const isCreator = group?.creatorId === user?._id;
 
@@ -45,42 +43,6 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
     }
     setNameError("");
     return true;
-  };
-
-  const handleCreateGroup = async () => {
-    if (!handleValidation()) return;
-
-    try {
-      setLoading(true);
-
-      const groupData = {
-        creatorId: user._id,
-        participants: user._id,
-        name: groupName,
-        description: groupDescription,
-        joinCode: await generateUniqueJoinCode(),
-      };
-
-      console.log("invited frinds ids: ", selectedFriends);
-
-      const newGroup = await createGroup(
-        groupData,
-        Array.from(selectedFriends)
-      );
-
-      await pairUserGroup(user._id, newGroup._id);
-
-      toast.success("Group created successfully!");
-      onOpenChange(false); // Close the modal
-      router.push(`/group-room/${newGroup._id}`);
-    } catch (error) {
-      console.error("Error creating group:", error);
-      toast.error("An error occurred. Please try again.");
-    } finally {
-      setGroupName("");
-      setGroupDescription("");
-      setLoading(false);
-    }
   };
 
   const handleUpdateGroup = async () => {
@@ -107,27 +69,13 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
     }
   };
 
-  useEffect(() => {
-    if (group) {
-      setGroupName(group.name || "");
-      setGroupDescription(group.description || "");
-    } else {
-      setGroupName("");
-      setGroupDescription("");
-    }
-  }, [group]);
-
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              {group
-                ? isCreator
-                  ? "Edit Group"
-                  : "Group Details"
-                : "Create a New Group"}
+              {isCreator ? "Edit Group" : "Group Details"}
             </ModalHeader>
             <ModalBody>
               <Input
@@ -135,7 +83,7 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
                 color={nameError.length && "danger"}
                 isInvalid={nameError.length}
                 errorMessage={nameError}
-                isReadOnly={group && !isCreator} // Readonly if the user is not the creator
+                isReadOnly={!isCreator} // Readonly if the user is not the creator
                 label="Group Name"
                 value={groupName}
                 onChange={(e) => {
@@ -147,32 +95,25 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
               />
               <Textarea
                 maxLength={1000}
-                isReadOnly={group && !isCreator} // Readonly if the user is not the creator
+                isReadOnly={!isCreator} // Readonly if the user is not the creator
                 value={groupDescription}
                 onChange={(e) => setGroupDescription(e.target.value)}
                 label="Description"
                 variant="bordered"
                 className="mb-4"
               />
-              {!group && (
-                <SelectFriends
-                  label="Send an invitation to:"
-                  placeholder="Invite your friends"
-                  setSelectedFriends={setSelectedFriends}
-                />
-              )}
             </ModalBody>
             <ModalFooter>
               <Button variant="light" onPress={onClose}>
-                {group && !isCreator ? "Close" : "Cancel"}
+                {!isCreator ? "Close" : "Cancel"}
               </Button>
-              {isCreator || !group ? (
+              {isCreator ? (
                 <Button
                   color="primary"
                   isLoading={loading}
-                  onPress={group ? handleUpdateGroup : handleCreateGroup}
+                  onPress={handleUpdateGroup}
                 >
-                  {group ? "Save" : "Create"}
+                  Save
                 </Button>
               ) : null}
             </ModalFooter>
@@ -183,4 +124,4 @@ const GroupModal = ({ isOpen, onOpenChange, group = null }) => {
   );
 };
 
-export default GroupModal;
+export default UpdateGroupModal;

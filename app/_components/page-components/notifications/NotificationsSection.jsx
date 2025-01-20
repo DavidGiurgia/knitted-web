@@ -82,7 +82,6 @@ const NotificationsSection = ({switchPanel, resetPanel }) => {
             <Notification
               key={notification._id}
               notification={notification}
-             
             />
           ))
         )}
