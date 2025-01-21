@@ -14,6 +14,9 @@ import {
   MagnifyingGlassIcon,
   PencilIcon,
   PlusIcon,
+  TrashIcon,
+  UserPlusIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
   Button,
@@ -198,7 +201,7 @@ const GroupsSection = () => {
       {/* Groups Grid */}
       {filteredGroups.length > 0 ? (
         <div
-          className={`grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 overflow-y-auto`}
+          className={`grid grid-cols-1 sm:grid-cols-1 gap-4 p-4 overflow-y-auto`}
         >
           {filteredGroups.map((group) => (
             <div
@@ -217,9 +220,7 @@ const GroupsSection = () => {
                   </div>
                   <div className="flex text-start w-full gap-x-2">
                     <p className="text-sm flex-1 text-gray-500 text-wrap">
-                      {group.description || (
-                        <i className=" ">{`# ${group.joinCode}`}</i>
-                      )}
+                      {group.description || formattedGroupLifetime(group)}
                     </p>
                   </div>
                 </Button>
@@ -227,13 +228,17 @@ const GroupsSection = () => {
                 <div className="flex items-center gap-x-1">
                   <Button
                     onPress={() => {
-                      onOpen();
-                      setSelectedGroup(group);
+                      if (group?.joinCode) {
+                        navigator.clipboard.writeText(group.joinCode);
+                        toast.success("Join code copied to clipboard!");
+                      } else {
+                        toast.error("No join code available to copy.");
+                      }
                     }}
                     variant="light"
                     className="flex-1 text-sm flex  justify-start text-gray-700 dark:text-gray-300"
                   >
-                    {formattedGroupLifetime(group)}
+                    {`# ${group.joinCode}`}
                   </Button>
                   <Button
                     aria-label={`Options for group ${group.name}`}
@@ -244,7 +249,42 @@ const GroupsSection = () => {
                       onUpdateGroupModaOpen();
                     }}
                   >
-                    <PencilIcon
+                    <UserPlusIcon
+                      aria-hidden="true"
+                      className="w-6 h-6 p-1 text-gray-700 dark:text-gray-300"
+                    />
+                  </Button>
+                  {group.creatorId === user?._id ? (
+                    <Button
+                      aria-label={`Options for group ${group.name}`}
+                      isIconOnly
+                      variant="light"
+                      onPress={() => {
+                        setSelectedGroup(group);
+                        onUpdateGroupModaOpen();
+                      }}
+                    >
+                      <PencilIcon
+                        aria-hidden="true"
+                        className="w-6 h-6 p-1 text-gray-700 dark:text-gray-300"
+                      />
+                    </Button>
+                  ) : null}
+                  <Button
+                    aria-label={`Delete group ${group.name}`}
+                    isIconOnly
+                    color="danger"
+                    variant="light"
+                    onPress={() => {
+                      setSelectedGroup(group);
+                      {
+                        group.creatorId === user?._id
+                          ? onDeleteGroupModaOpen()
+                          : handleRemoveGroup(group);
+                      }
+                    }}
+                  >
+                    <TrashIcon
                       aria-hidden="true"
                       className="w-6 h-6 p-1 text-gray-700 dark:text-gray-300"
                     />

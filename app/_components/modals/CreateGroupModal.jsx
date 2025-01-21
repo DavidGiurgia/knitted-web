@@ -4,13 +4,17 @@ import { useAuth } from "@/app/_context/AuthContext";
 import { createGroup, pairUserGroup } from "@/app/services/groupService";
 import { generateUniqueJoinCode } from "@/app/services/utils";
 import {
-    Button,
+  Button,
+  Calendar,
   Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Textarea,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
@@ -27,6 +31,8 @@ const CreateGroupModal = ({ isOpen, onOpenChange }) => {
   const [loading, setLoading] = useState(false);
   const [nameError, setNameError] = useState("");
   const [selectedFriends, setSelectedFriends] = useState([]);
+  const [endDate, setEndDate] = useState(); // Default to today
+
 
   const handleValidation = () => {
     if (!groupName.trim() || groupName.length < 3) {
@@ -52,10 +58,10 @@ const CreateGroupModal = ({ isOpen, onOpenChange }) => {
         participants: user._id,
         name: groupName,
         description: groupDescription,
-        joinCode: await generateUniqueJoinCode(),
+        joinCode: await generateUniqueJoinCode()
       };
 
-      console.log("invited frinds ids: ", selectedFriends);
+      console.log("invited friends ids: ", selectedFriends);
 
       const newGroup = await createGroup(
         groupData,
@@ -76,6 +82,7 @@ const CreateGroupModal = ({ isOpen, onOpenChange }) => {
       setLoading(false);
     }
   };
+
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
@@ -88,7 +95,7 @@ const CreateGroupModal = ({ isOpen, onOpenChange }) => {
               <Input
                 maxLength={20}
                 color={nameError.length && "danger"}
-                isInvalid={nameError.length}
+                isInvalid={!!nameError}
                 errorMessage={nameError}
                 label="Group Name"
                 value={groupName}

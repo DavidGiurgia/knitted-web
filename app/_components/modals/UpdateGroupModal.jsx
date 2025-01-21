@@ -5,15 +5,15 @@ import { updateGroup } from "@/app/services/groupService";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
-    Button,
-    Input,
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    Textarea,
-  } from "@nextui-org/react";
+  Button,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Textarea,
+} from "@nextui-org/react";
 
 const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
   const { user } = useAuth();
@@ -22,15 +22,25 @@ const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
   const [groupDescription, setGroupDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [nameError, setNameError] = useState("");
+  const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [isModified, setIsModified] = useState(false);
 
   useEffect(() => {
     if (group) {
       setGroupName(group.name || "");
       setGroupDescription(group.description || "");
+      setCode(group.joinCode || "");
     }
-  }, [group]);
+  }, [group, onOpenChange]);
 
-  const isCreator = group?.creatorId === user?._id;
+  useEffect(() => {
+    const hasChanges =
+      groupName !== (group?.name || "") ||
+      groupDescription !== (group?.description || "") ||
+      code !== (group?.joinCode || "");
+    setIsModified(hasChanges);
+  }, [groupName, groupDescription, code, group]);
 
   const handleValidation = () => {
     if (!groupName.trim() || groupName.length < 3) {
@@ -42,6 +52,13 @@ const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
       return false;
     }
     setNameError("");
+
+    if (code.length < 5) {
+      setCodeError("Code must be at least 5 characters long.");
+      return false;
+    }
+    setCodeError("");
+
     return true;
   };
 
@@ -54,12 +71,14 @@ const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
       const updatedGroup = {
         name: groupName,
         description: groupDescription,
+        joinCode: code,
       };
 
       await updateGroup(group._id, updatedGroup); // Save changes to the backend
       toast.success("Group updated successfully!");
       group.name = groupName;
       group.description = groupDescription;
+      group.joinCode = code;
       onOpenChange(false); // Close the modal
     } catch (error) {
       console.error("Error updating group:", error);
@@ -75,47 +94,55 @@ const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              {isCreator ? "Edit Group" : "Group Details"}
+              Edit Group
             </ModalHeader>
             <ModalBody>
-              <Input
-                maxLength={20}
-                color={nameError.length && "danger"}
-                isInvalid={nameError.length}
-                errorMessage={nameError}
-                isReadOnly={!isCreator} // Readonly if the user is not the creator
-                label="Group Name"
-                value={groupName}
-                onChange={(e) => {
-                  setGroupName(e.target.value);
-                  setNameError("");
-                }}
-                variant="bordered"
-                autofocus
-              />
-              <Textarea
-                maxLength={1000}
-                isReadOnly={!isCreator} // Readonly if the user is not the creator
-                value={groupDescription}
-                onChange={(e) => setGroupDescription(e.target.value)}
-                label="Description"
-                variant="bordered"
-                className="mb-4"
-              />
+              <div className="flex flex-col gap-y-2">
+                <Input
+                  maxLength={10}
+                  color={codeError.length && "danger"}
+                  isInvalid={codeError.length}
+                  errorMessage={codeError}
+                  label="Join code"
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value);
+                    setCodeError("");
+                  }}
+                  variant="faded"
+                  className="text-primary mb-4"
+                />
+                <Input
+                  maxLength={20}
+                  color={nameError.length && "danger"}
+                  isInvalid={nameError.length}
+                  errorMessage={nameError}
+                  label="Group name"
+                  value={groupName}
+                  onChange={(e) => {
+                    setGroupName(e.target.value);
+                    setNameError("");
+                  }}
+                  variant="bordered"
+                />
+                <Textarea
+                  maxLength={1000}
+                  value={groupDescription}
+                  onChange={(e) => setGroupDescription(e.target.value)}
+                  label="Description"
+                  variant="bordered"
+                />
+              </div>
             </ModalBody>
             <ModalFooter>
-              <Button variant="light" onPress={onClose}>
-                {!isCreator ? "Close" : "Cancel"}
+              <Button
+                color="primary"
+                isLoading={loading}
+                isDisabled={!isModified}
+                onPress={handleUpdateGroup}
+              >
+                Save
               </Button>
-              {isCreator ? (
-                <Button
-                  color="primary"
-                  isLoading={loading}
-                  onPress={handleUpdateGroup}
-                >
-                  Save
-                </Button>
-              ) : null}
             </ModalFooter>
           </>
         )}

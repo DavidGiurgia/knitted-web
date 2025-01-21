@@ -147,9 +147,9 @@ const GroupChatBox = ({
                 <div className="max-w-52 break-words overflow-hidden">
                   {msg.content}
                 </div>
-                <span className="text-xs text-gray-500 self-end">
+                {/* <span className="text-xs text-gray-500 self-end">
                   {formatTimeFromTimestamp(msg.createdAt)}
-                </span>
+                </span> */}
               </div>
             </div>
           </div>

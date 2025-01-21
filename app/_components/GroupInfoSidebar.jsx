@@ -26,9 +26,8 @@ import {
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import GroupModal from "./modals/GroupModal";
-import UserProfile from "./UserProfile";
 import ProfileCard from "./ProfileCard";
+import UpdateGroupModal from "./modals/UpdateGroupModal";
 
 const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
   const { user } = useAuth();
@@ -71,7 +70,7 @@ const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
   return (
     <div className="overflow-y-auto overflow-x-hidden flex flex-col h-full w-full md:w-fit md:max-w-80">
       <div
-        onClick={onOpen}
+        onClick={isCreator ? onOpen : null}
         className="cursor-pointer pt-6 px-6 pb-4 w-full bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
       >
         <div className="font-medium text-lg mb-2">
@@ -82,7 +81,7 @@ const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
             isExpanded ? "" : "line-clamp-3"
           }`}
         >
-          {currentGroup?.description || <i>Tap to add a description</i>}
+          {currentGroup?.description || <i className={`${!isCreator && "hidden"}`}>Tap to add a description</i>}
         </div>
         {currentGroup?.description?.length > 200 && (
           <button
@@ -218,7 +217,7 @@ const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
         )}
       </div>
 
-      <GroupModal
+      <UpdateGroupModal
         group={currentGroup}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
