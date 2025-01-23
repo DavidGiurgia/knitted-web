@@ -11,7 +11,6 @@ import {
 import { useAuth } from "../_context/AuthContext";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { format } from "date-fns";
-import { getUserById } from "../services/userService";
 import { useEffect, useState } from "react";
 import CustomModal from "./modals/CustomModal";
 import { deleteGroup } from "../services/groupService";
@@ -26,13 +25,11 @@ import {
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import ProfileCard from "./ProfileCard";
 import UpdateGroupModal from "./modals/UpdateGroupModal";
 
-const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
+const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) => {
   const { user } = useAuth();
   const router = useRouter();
-  const [creator, setCreator] = useState(null);
   const isCreator = currentGroup?.creatorId === user?._id;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const {
@@ -47,25 +44,25 @@ const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
     setIsExpanded((prev) => !prev);
   };
 
-  useEffect(() => {
-    const getCreator = async () => {
-      try {
-        const creator = await getUserById(currentGroup?.creatorId);
-        setCreator(creator);
-      } catch (error) {
-        console.error("Error fetching creator:", error);
-      }
-    };
-
-    if (currentGroup?.creatorId) {
-      getCreator();
+  const formattedGroupLifetime = () => {
+    if (!currentGroup?.createdAt || !currentGroup?.expiresAt) {
+      return "Unknown range date";
     }
-  }, [currentGroup]);
 
-  // Format the createdAt value
-  const formattedCreatedAt = currentGroup?.createdAt
-    ? format(new Date(currentGroup.createdAt), "d MMM")
-    : "Unknown date";
+    const createdAt = new Date(currentGroup.createdAt);
+    const expiresAt = new Date(currentGroup.expiresAt);
+
+    // Check if both dates are in the same month and year
+    if (format(createdAt, "MMM yyyy") === format(expiresAt, "MMM yyyy")) {
+      return `${format(createdAt, "MMM d")} - ${format(expiresAt, "d, yyyy")}`;
+    }
+
+    // If they are not in the same month/year
+    return `${format(createdAt, "MMM d, yyyy")} - ${format(
+      expiresAt,
+      "MMM d, yyyy"
+    )}`;
+  };
 
   return (
     <div className="overflow-y-auto overflow-x-hidden flex flex-col h-full w-full md:w-fit md:max-w-80">
@@ -81,7 +78,11 @@ const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
             isExpanded ? "" : "line-clamp-3"
           }`}
         >
-          {currentGroup?.description || <i className={`${!isCreator && "hidden"}`}>Tap to add a description</i>}
+          {currentGroup?.description || (
+            <i className={`${!isCreator && "hidden"}`}>
+              Tap to add a description
+            </i>
+          )}
         </div>
         {currentGroup?.description?.length > 200 && (
           <button
@@ -100,13 +101,11 @@ const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
           <PopoverTrigger>
             <div className="flex items-center gap-x-4 hover:text-primary cursor-pointer">
               <CalendarDaysIcon className="size-5 flex-shrink-0" />
-              {`Created by ${
-                creator?.username || "Unknown"
-              } at ${formattedCreatedAt}`}
+              {formattedGroupLifetime()}
             </div>
           </PopoverTrigger>
           <PopoverContent className="">
-            <ProfileCard currentUser={creator} />
+            <div>edit end date</div>
           </PopoverContent>
         </Popover>
 
@@ -128,11 +127,11 @@ const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
         </Tooltip>
 
         <div
-          onClick={() => setShowParticipants(!showParticipants)}
+          onClick={() => {}}
           className="flex items-center gap-x-4 hover:text-primary cursor-pointer"
         >
           <UsersIcon className="size-5" />
-          {participants.length || 0} online participants
+          {participants?.length || 0} online participants
         </div>
 
         {showParticipants && (
@@ -147,12 +146,12 @@ const GroupInfoSidebar = ({ currentGroup, participants, profile }) => {
                   >
                     <Avatar
                     size="sm"
-                      src={participant.avatarUrl}
+                      //src={participant.avatarUrl}
                       className="flex-shrink-0"
                     />
                     <div>
-                      {participant.username}
-                      {participant.id === profile.id && <div>(You)</div>}
+                      {participant.nickname}
+                      {participant.id === currentParticipant.id && <div>(You)</div>}
                     </div>
                   </li>
                 ))

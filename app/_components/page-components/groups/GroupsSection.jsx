@@ -26,6 +26,7 @@ import {
   DropdownItem,
   useDisclosure,
   Checkbox,
+  Tooltip,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -109,7 +110,11 @@ const GroupsSection = () => {
       if (group) {
         const alreadyInGroup = groups.some((g) => g._id === group._id);
         if (!alreadyInGroup) {
-          await pairUserGroup(user?._id, group._id);
+          const userAsParticipnat = {
+            id: user._id,
+            nickname: user.fullname,
+          };
+          await pairUserGroup(user?._id, group._id, userAsParticipnat);
           setGroups((prevGroups) => [...prevGroups, group]);
         }
         router.push(`/group-room/${group._id}`);
@@ -137,6 +142,10 @@ const GroupsSection = () => {
   const filteredGroups = groups?.filter((group) =>
     group?.name?.toLowerCase().includes(value.toLowerCase())
   );
+
+  const isCreator = (group) => {
+    return user?._id === group?.creatorId;
+  };
 
   return (
     <div className="flex flex-1 flex-col h-full md:w-[350px] lg:w-[450px] dark:text-white bg-white dark:bg-gray-900">
@@ -220,75 +229,79 @@ const GroupsSection = () => {
                   </div>
                   <div className="flex text-start w-full gap-x-2">
                     <p className="text-sm flex-1 text-gray-500 text-wrap">
-                      {group.description || formattedGroupLifetime(group)}
+                      {group.description || (
+                        <i className={`${!isCreator(group) ? "hidden" : ""}`}>
+                          Add a description
+                        </i>
+                      )}
                     </p>
                   </div>
                 </Button>
 
                 <div className="flex items-center gap-x-1">
-                  <Button
-                    onPress={() => {
-                      if (group?.joinCode) {
-                        navigator.clipboard.writeText(group.joinCode);
-                        toast.success("Join code copied to clipboard!");
-                      } else {
-                        toast.error("No join code available to copy.");
-                      }
-                    }}
-                    variant="light"
-                    className="flex-1 text-sm flex  justify-start text-gray-700 dark:text-gray-300"
-                  >
-                    {`# ${group.joinCode}`}
-                  </Button>
-                  <Button
-                    aria-label={`Options for group ${group.name}`}
-                    isIconOnly
-                    variant="light"
-                    onPress={() => {
-                      setSelectedGroup(group);
-                      onUpdateGroupModaOpen();
-                    }}
-                  >
-                    <UserPlusIcon
-                      aria-hidden="true"
-                      className="w-6 h-6 p-1 text-gray-700 dark:text-gray-300"
-                    />
-                  </Button>
-                  {group.creatorId === user?._id ? (
+                  <div className="flex-1 p-2 text-gray-700 dark:text-gray-300 text-sm">
+                    {formattedGroupLifetime(group)}
+                  </div>
+                  <Tooltip content="Copy" placement="top" showArrow>
                     <Button
-                      aria-label={`Options for group ${group.name}`}
+                      onPress={() => {
+                        if (group?.joinCode) {
+                          navigator.clipboard.writeText(group.joinCode);
+                          toast.success("Join code copied to clipboard!");
+                        } else {
+                          toast.error("No join code available to copy.");
+                        }
+                      }}
+                      variant="light"
+                      className=" text-sm flex  justify-start text-gray-700 dark:text-gray-300"
+                    >
+                      {`# ${group.joinCode}`}
+                    </Button>
+                  </Tooltip>
+
+                  {group.creatorId === user?._id ? (
+                    <Tooltip content="Edit" placement="top" showArrow>
+                      <Button
+                        aria-label={`Options for group ${group.name}`}
+                        isIconOnly
+                        variant="light"
+                        onPress={() => {
+                          setSelectedGroup(group);
+                          onUpdateGroupModaOpen();
+                        }}
+                      >
+                        <PencilIcon
+                          aria-hidden="true"
+                          className="w-6 h-6 p-1 text-gray-700 dark:text-gray-300"
+                        />
+                      </Button>
+                    </Tooltip>
+                  ) : null}
+                  <Tooltip
+                    content={isCreator(group) ? "Delete" : "Remove"}
+                    placement="top"
+                    showArrow
+                  >
+                    <Button
+                      aria-label={`Delete group ${group.name}`}
                       isIconOnly
+                      color="danger"
                       variant="light"
                       onPress={() => {
                         setSelectedGroup(group);
-                        onUpdateGroupModaOpen();
+                        {
+                          group.creatorId === user?._id
+                            ? onDeleteGroupModaOpen()
+                            : handleRemoveGroup(group);
+                        }
                       }}
                     >
-                      <PencilIcon
+                      <TrashIcon
                         aria-hidden="true"
                         className="w-6 h-6 p-1 text-gray-700 dark:text-gray-300"
                       />
                     </Button>
-                  ) : null}
-                  <Button
-                    aria-label={`Delete group ${group.name}`}
-                    isIconOnly
-                    color="danger"
-                    variant="light"
-                    onPress={() => {
-                      setSelectedGroup(group);
-                      {
-                        group.creatorId === user?._id
-                          ? onDeleteGroupModaOpen()
-                          : handleRemoveGroup(group);
-                      }
-                    }}
-                  >
-                    <TrashIcon
-                      aria-hidden="true"
-                      className="w-6 h-6 p-1 text-gray-700 dark:text-gray-300"
-                    />
-                  </Button>
+                  </Tooltip>
                 </div>
               </div>
             </div>

@@ -33,7 +33,6 @@ const CreateGroupModal = ({ isOpen, onOpenChange }) => {
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [endDate, setEndDate] = useState(); // Default to today
 
-
   const handleValidation = () => {
     if (!groupName.trim() || groupName.length < 3) {
       setNameError(
@@ -55,10 +54,9 @@ const CreateGroupModal = ({ isOpen, onOpenChange }) => {
 
       const groupData = {
         creatorId: user._id,
-        participants: user._id,
         name: groupName,
         description: groupDescription,
-        joinCode: await generateUniqueJoinCode()
+        joinCode: await generateUniqueJoinCode(),
       };
 
       console.log("invited friends ids: ", selectedFriends);
@@ -68,7 +66,12 @@ const CreateGroupModal = ({ isOpen, onOpenChange }) => {
         Array.from(selectedFriends)
       );
 
-      await pairUserGroup(user._id, newGroup._id);
+      const userAsParticipnat = {
+        id: user._id,
+        nickname: user.fullname,
+      };
+
+      await pairUserGroup(user._id, newGroup._id, userAsParticipnat);
 
       toast.success("Group created successfully!");
       onOpenChange(false); // Close the modal

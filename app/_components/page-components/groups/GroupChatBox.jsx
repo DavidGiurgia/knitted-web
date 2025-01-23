@@ -7,14 +7,9 @@ import MessageInput from "../../MessageInput";
 import { Avatar, Button } from "@nextui-org/react";
 import { PaperAirplaneIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/app/_context/AuthContext";
-import { formatTimeFromTimestamp } from "@/app/services/utils";
+import GroupMessagesItem from "./GroupMessagesItem";
 
-const GroupChatBox = ({
-  profile,
-  currentGroup,
-  participants,
-  setParticipants,
-}) => {
+const GroupChatBox = ({ participant, currentGroup, participants, setParticipants }) => {
   const { user } = useAuth();
   const { groupSocket } = useWebSocket();
   const [message, setMessage] = useState("");
@@ -29,63 +24,61 @@ const GroupChatBox = ({
       } catch (error) {
         console.error("Failed to fetch messages:", error);
       }
-
-      if (!profile || !groupSocket) {
-        toast.error("profile or socket is null");
-        return;
-      }
-
       groupSocket.emit("joinRoom", {
         groupId: currentGroup._id,
-        profile,
+        participant,
       });
-      //log to console
-      console.log("Joining room:", currentGroup._id);
+      console.log("Joining room:", currentGroup._id, " as ", participant);
     };
 
-    if (currentGroup?._id && groupSocket) {
+    if (currentGroup?._id && participant && groupSocket) {
       loadMessages();
-      console.log("loadding messages");
-    } else {
-      console.log("grup id or grSocket is null");
-      return;
     }
 
-    return () => {
+    return async () => {
       groupSocket.emit("leaveRoom", {
-        groupId: currentGroup._id,
-        profileId: profile.id
+        groupId: currentGroup?._id,
+        participant,
       });
-      console.log("Leaving room:", currentGroup?._id, profile?.id);
+      console.log("Leaving room:", currentGroup?._id, " as ", participant?.id);
     };
-  }, [currentGroup?._id]);
+  }, [currentGroup?._id, user?._id]);
 
   useEffect(() => {
+    console.log("Group socket connected:", groupSocket.connected);
     if (!groupSocket) return;
 
     // Ascultă mesaje
-    const handleMessageReceived = (newMessage) => {
+    const handleMessageReceived = async (newMessage) => {
       console.log("Received message:", newMessage);
       setMessages((prev) => [...prev, newMessage]);
     };
 
     groupSocket.on("receiveMessage", handleMessageReceived);
 
-    const handleUpdateParticipants = (updatedParticipants) => {
-      console.log("participants updated:", updatedParticipants);
-      setParticipants(updatedParticipants);
-    };
-
-    groupSocket.on("updateParticipants", handleUpdateParticipants);
+    groupSocket.on('updateParticipants', (participants) => {
+      console.log('Updated participants:', participants);
+    
+      const normalizedParticipants = participants.map(participant => ({
+        id: participant.id,
+        nickname: participant.nickname || participant.name || 'Unknown', // Normalizare
+      }));
+    
+      setParticipants(normalizedParticipants);
+    });
+    
 
     return () => {
       groupSocket.off("receiveMessage", handleMessageReceived);
-      groupSocket.off("updateParticipants", handleUpdateParticipants);
+      groupSocket.off('updateParticipants', (participants) => {
+        console.log('Updated participants:', participants);
+      });
     };
   }, [groupSocket]);
 
   const handleSendMessage = () => {
-    if (!message.trim()) return;
+    if (!message.trim() || !groupSocket) return;
+
     if (message.length > 500) {
       toast.error("Message is too long. Maximum length is 500 characters.");
       return;
@@ -94,67 +87,20 @@ const GroupChatBox = ({
     const messageData = {
       groupId: currentGroup._id,
       content: message,
-      profile,
+      participant,
       isAnonymous: anonymous,
     };
+
+    console.log("sending message: ", messageData);
+    console.log("Group socket connected:", groupSocket.connected);
 
     groupSocket.emit("sendMessage", messageData);
     setMessage("");
   };
 
   return (
-    <div className="flex flex-col p-2 h-full items-center w-full max-w-[600px]">
-      <div className="flex-1 w-full px-2 overflow-y-auto">
-        {messages?.map((msg, index) => (
-          <div
-            key={index}
-            className={`w-full flex gap-x-2 my-1 ${
-              msg.senderId === profile?.id ? "justify-end" : "justify-start "
-            }`}
-          >
-            {msg.senderId !== profile?.id &&
-              (!msg.isAnonymous ? (
-                <Avatar
-                  src={
-                    participants?.find((p) => p.id === msg.senderId)
-                      ?.avatarUrl || null
-                  }
-                  alt="Avatar"
-                  className="w-8 h-8 rounded-full"
-                />
-              ) : (
-                <div className="w-8 h-8 p-1 rounded-full border ">
-                  <UserIcon className=" " />
-                </div>
-              ))}
-            <div
-              className={`rounded-xl px-4 py-2  ${
-                msg.senderId === profile?.id && !msg.isAnonymous
-                  ? " text-white bg-light-secondary dark:bg-dark-secondary "
-                  : " bg-gray-200 dark:bg-gray-800"
-              } `}
-            >
-              <div className="font-semibold text-sm">
-                {msg.senderId !== profile?.id &&
-                  (msg.isAnonymous
-                    ? "Anonymous"
-                    : participants.find(
-                        (participant) => participant.id === msg.senderId
-                      )?.username)}
-              </div>
-
-              <div className="flex  flex-col  ">
-                <div className="max-w-52 break-words overflow-hidden">
-                  {msg.content}
-                </div>
-                {/* <span className="text-xs text-gray-500 self-end">
-                  {formatTimeFromTimestamp(msg.createdAt)}
-                </span> */}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-col p-2  h-full items-center w-full ">
+      <GroupMessagesItem messages={messages} participant={participant} participants={participants}/>
 
       <div className="flex w-full items-center gap-x-2 ">
         {anonymous ? (
@@ -164,7 +110,7 @@ const GroupChatBox = ({
               setIdentity(false);
             }}
           >
-            <UserIcon className="p-1 " />
+            <UserIcon className="p-2 rounded-full  border border-gray-200 dark:border-gray-800 " />
           </div>
         ) : (
           <div

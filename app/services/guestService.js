@@ -1,85 +1,54 @@
-// Utilitar pentru manipularea profilelor in localStorage
-const getStoredProfile = (groupId) => {
-  if (!groupId) {
-    console.error("Group ID is required to retrieve a profile.");
-    return null;
+import { updateParticipant } from "../api/group";
+import { getProfileByUserGroup, updateProfileByUserGroup } from "../api/user-group";
+
+const generateUniqueId = () => `guest-${Math.random().toString(36).substr(2, 9)}`;
+
+const generateRandomNickname = () => `Guest-${Math.floor(Math.random() * 1000)}`;
+
+const getGuestParticipant = () => {
+  let guestParticipant = JSON.parse(sessionStorage.getItem("guestParticipant") || "null");
+
+  if (!guestParticipant) {
+    guestParticipant = {
+      id: generateUniqueId(),
+      nickname: generateRandomNickname(),
+    };
+    sessionStorage.setItem("guestParticipant", JSON.stringify(guestParticipant));
   }
 
-  const storedProfile = localStorage.getItem(`temporaryProfile-${groupId}`);
-  return storedProfile ? JSON.parse(storedProfile) : null;
+  return guestParticipant;
 };
 
-const saveProfile = (groupId, profile) => {
-  if (!groupId || !profile) {
-    console.error("Group ID and profile are required to save a profile.");
-    return;
-  }
+export const getCurrentParticipant = async (user, groupId) => {
+  if (user) {
+    if (!groupId) {
+      throw new Error("Group ID is required to fetch nickname for registered users.");
+    }
 
-  try {
-    localStorage.setItem(`temporaryProfile-${groupId}`, JSON.stringify(profile));
-  } catch (error) {
-    console.error("Failed to save profile to localStorage:", error);
+    try {
+      return await getProfileByUserGroup(user?._id, groupId);
+    } catch (error) {
+      console.error("Error fetching nickname:", error);
+    }
+  } else {
+    return getGuestParticipant();
   }
 };
 
-// Creează un profil nou pe baza utilizatorului sau a unui grup
-export const createProfile = (user, groupId) => {
-  if (!groupId) {
-    console.error("Group ID is required to create a profile.");
-    return null;
+export const updateParticipantProfile = async ( userId = null, groupId = null, participant) => {
+  if (userId) {
+    if (!groupId) {
+      throw new Error("Group ID is required to update nickname for registered users.");
+    }
+
+    try {
+      await updateProfileByUserGroup(userId, groupId, participant);
+    } catch (error) {
+      console.error("Error updating nickname:", error);
+    }
+  } else {
+    sessionStorage.setItem("guestParticipant", JSON.stringify(participant));
   }
 
-  console.log("createProfile called:", user, groupId);
-
-  const profile = user
-    ? {
-        id: `${user._id}-${groupId}`, // ID unic bazat pe utilizator și grup
-        username: user.fullname || `User-${Math.random().toString(36).substr(2, 5)}`,
-        avatarUrl: user?.avatarUrl || "",
-      }
-    : {
-        id: `guest-${Math.random().toString(36).substr(2, 9)}-${groupId}`, // ID unic pentru guest
-        username: `Guest-${Math.floor(1000 + Math.random() * 9000)}`, // Alias generat
-        avatarUrl: "",
-      };
-
-  saveProfile(groupId, profile);
-  return profile;
-};
-
-// Obține un profil pentru un anumit grup
-export const getProfile = (user, groupId) => {
-  if (!groupId) {
-    console.error("Group ID is required to get a profile.");
-    return null;
-  }
-
-  const profile = getStoredProfile(groupId);
-  if (profile && profile.id.includes(user?._id)) {
-    return profile; // Returnează profilul existent
-  }
-
-  // Creează un profil nou dacă nu există
-  return createProfile(user, groupId);
-};
-
-// Actualizează un profil existent pentru un anumit grup
-export const updateProfile = (profile, groupId) => {
-  if (!groupId || !profile) {
-    console.error("Group ID and profile are required to update a profile.");
-    return;
-  }
-
-  console.log("updateProfile called with:", { groupId, profile });
-
-  const storedProfile = getStoredProfile(groupId);
-  if (!storedProfile) {
-    console.error("Profile not found for the given group.");
-    return;
-  }
-
-  const updatedProfile = { ...storedProfile, ...profile };
-  saveProfile(groupId, updatedProfile);
-
-  console.log("Profile updated successfully:", updatedProfile);
+  await updateParticipant(groupId, participant);
 };

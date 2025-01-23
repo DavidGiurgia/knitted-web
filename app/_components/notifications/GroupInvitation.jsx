@@ -38,8 +38,13 @@ const GroupInvitation = ({ user, onClick, notification }) => {
       if (group) {
         const groups = await getUserGroups(user?._id);
         const alreadyInGroup = groups.some((g) => g._id === group._id);
+
         if (!alreadyInGroup) {
-          await pairUserGroup(user?._id, group._id);
+          const userAsParticipnat = {
+            id: user._id,
+            nickname: user.fullname,
+          };
+          await pairUserGroup(user?._id, group._id, userAsParticipnat);
         }
         router.push(`/group-room/${group._id}`);
       } else {
@@ -61,7 +66,7 @@ const GroupInvitation = ({ user, onClick, notification }) => {
         onClick={() => pushSubPanel("Profile", sender)}
       />
       <div className="flex-1">
-        <p >
+        <p>
           <span
             onClick={() => pushSubPanel("Profile", sender)}
             className="cursor-pointer font-semibold"

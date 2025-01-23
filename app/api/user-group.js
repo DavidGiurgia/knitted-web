@@ -2,9 +2,9 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8000/user-group";
 
-export const pair = async (userId, groupId) => {
+export const pair = async (userId, groupId, profile) => {
     try{
-        const response = await axios.post(`${API_BASE_URL}/pair/${userId}/${groupId}`);
+        const response = await axios.post(`${API_BASE_URL}/pair/${userId}/${groupId}`, {profile});
         return response.data;
     }
     catch(error){
@@ -21,6 +21,25 @@ export const removePair = async (userId, groupId) => {
         throw error;
     }
 }
+
+export const getProfileByUserGroup = async (userId, groupId) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/profile/${userId}/${groupId}`);
+      return response.data; // Verifică dacă acest câmp există
+    } catch (error) {
+      console.error("Error fetching nickname by user-group: " + error.message);
+      return null;
+    }
+  };
+
+export const updateProfileByUserGroup = async (userId, groupId, profile) => {
+    try{
+        await axios.post(`${API_BASE_URL}/update-profile/${userId}/${groupId}`, {profile});
+    } catch(error){
+        console.error("Error updating user-group nickname: " + error.message);
+    }
+}
+  
 
 export const fetchUserGroupsIds = async (userId) => {
     try{
@@ -39,3 +58,4 @@ export const deleteGroupDependencies = async (groupId) => {
         console.error("Error deleting group dependencies: " + error.message);
     }
 }
+

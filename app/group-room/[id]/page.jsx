@@ -1,12 +1,20 @@
 "use client";
 
 import GroupInfoSidebar from "@/app/_components/GroupInfoSidebar";
-import GroupProfileModal from "@/app/_components/modals/GroupProfileModal";
+import GroupParticipantModal from "@/app/_components/modals/GroupParticipantModal";
 import GroupChatBox from "@/app/_components/page-components/groups/GroupChatBox";
 import { useAuth } from "@/app/_context/AuthContext";
-import { useWebSocket } from "@/app/_context/WebSoketContext";
+import {
+  addParticipant,
+  getParticipants,
+  removeParticipant,
+} from "@/app/api/group";
 import { getGroupById } from "@/app/services/groupService";
-import { getProfile, updateProfile } from "@/app/services/guestService";
+import {
+  getCurrentParticipant,
+  updateParticipantProfile,
+} from "@/app/services/guestService";
+import { getUserById } from "@/app/services/userService";
 
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { Avatar, useDisclosure } from "@nextui-org/react";
@@ -16,32 +24,23 @@ import toast from "react-hot-toast";
 
 const GroupRoom = () => {
   const { user } = useAuth();
-  const { groupSocket } = useWebSocket();
   const params = useParams();
   const [sidebar, setSidebar] = useState(false);
-  const [groupDetails, setGroupDetails] = useState(null); // To store group data
+  const [groupDetails, setGroupDetails] = useState(null);
+  const [participant, setParticipant] = useState(null);
   const [participants, setParticipants] = useState([]);
-  const [profile, setProfile] = useState(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const currentProfile = getProfile(user, params?.id);
-        if (!currentProfile) {
-          toast.error("Failed to fetch profile");
-          return;
-        }
-
-        setProfile(currentProfile);
-        console.log("profile created: " + profile);
-
-        emitUpdateProfile(currentProfile);
-
         if (!params?.id) {
           toast.error("Invalid group ID");
           return;
         }
+
+        const currentParticipant = await getCurrentParticipant(user, params.id);
+        setParticipant(currentParticipant.profile);
 
         const data = await getGroupById(params.id);
         setGroupDetails(data);
@@ -51,42 +50,23 @@ const GroupRoom = () => {
       }
     };
 
-    fetchInitialData();
+    if (params?.id && user) {
+      fetchInitialData();
+    }
   }, [user, params?.id]);
 
-  const handleSaveProfile = (newProfile) => {
-    updateProfile(newProfile, params?.id);
-    setProfile(newProfile);
-
-    emitUpdateProfile(newProfile);
+  const handleSaveNewProfile = async (newParticipantProfile) => {
+    await updateParticipantProfile(
+      user?._id,
+      groupDetails?._id,
+      newParticipantProfile
+    );
+    setParticipant(newParticipantProfile);
   };
 
-  const emitUpdateProfile = (newProfile) => {
-
-    if(!newProfile || !groupSocket) {
-      console.log("profile or group socket is null");
-      return;
-    }
-
-     //log 
-     console.log("Profile updated to be saved: ", newProfile);
-     console.log("groupID: ", params.id);
-
-    groupSocket.emit("updateProfile", {
-      groupId: params.id,
-      profile: {
-        id: newProfile.id,
-        username: newProfile.username,
-        avatarUrl: newProfile.avatarUrl,
-      },
-    });
-
-   
-  };
-
-  return !params?.id ? (
+  return !params?.id || !user ? (
     <div className="flex items-center justify-center text-gray-500 h-full w-full">
-      This group is unavailable
+      Loading...
     </div>
   ) : (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
@@ -105,10 +85,14 @@ const GroupRoom = () => {
           onClick={onOpen}
           className="flex items-center justify-center gap-x-4 px-2 py-1 rounded-xl cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
         >
-          <div>{profile?.username}</div>
+          <div>
+            {typeof participant?.nickname === "string"
+              ? participant.nickname
+              : "Unknown Nickname"}
+          </div>
           <Avatar
             showFallback
-            src={profile?.avatarUrl || null}
+            src={participant?.avatarUrl || null}
             className="w-8 h-8"
           />
         </div>
@@ -119,29 +103,32 @@ const GroupRoom = () => {
           <GroupInfoSidebar
             currentGroup={groupDetails}
             participants={participants}
-            profile={profile}
+            currentParticipant={participant}
           />
         )}
 
         <div
-          className={`flex justify-center h-full flex-1 
-            ${sidebar && "hidden md:flex md:w-1/2 xl:justify-start xl:ml-48"}`}
+          className={`p-2 flex  h-full w-full
+            ${sidebar && "hidden md:flex"}`}
         >
-          <GroupChatBox
-            profile={profile}
-            currentGroup={groupDetails}
-            participants={participants}
-            setParticipants={setParticipants}
-          />
+          <div className=" w-full">
+            <GroupChatBox
+              participant={participant}
+              currentGroup={groupDetails}
+              participants={participants}
+              setParticipants={setParticipants}
+            />
+          </div>
         </div>
       </div>
 
-      <GroupProfileModal
+      <GroupParticipantModal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        profile={profile}
-        setProfile={setProfile}
-        onConfirm={(newProfile) => handleSaveProfile(newProfile)}
+        participant={participant}
+        onConfirm={async (newParticipantProfile) =>
+          await handleSaveNewProfile(newParticipantProfile)
+        }
       />
     </div>
   );

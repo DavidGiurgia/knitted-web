@@ -46,9 +46,9 @@ export const getGroupByCode = async (joinCode) => {
     }
 }
 
-export const pairUserGroup = async (userId, groupId) =>{
+export const pairUserGroup = async (userId, groupId, participant) =>{
     try{
-        return await pair(userId, groupId);
+        return await pair(userId, groupId, participant);
     }
     catch(err){
         console.error(err);
