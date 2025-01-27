@@ -3,8 +3,8 @@
 import React from "react";
 import SearchSection from "./SearchSection";
 import { usePanel } from "@/app/_context/PanelContext";
-import FriendsSection from "../../FriendsSection";
-import UserProfile from "../../UserProfile";
+import FriendsSection from "../FriendsSection";
+import UserProfile from "../UserProfile";
 
 const SearchPanel = () => {
   const { activeSubPanel, pushSubPanel, popSubPanel } = usePanel();
@@ -23,7 +23,12 @@ const SearchPanel = () => {
         );
       case "MutualFriendsSection":
         return (
-          <FriendsSection currUser={param} goBack={popSubPanel} mutualOnly={true} />
+          <FriendsSection
+            currUser={param}
+            goBack={popSubPanel}
+            onSelect={(friend) => pushSubPanel("Profile", friend)}
+            mutualOnly={true}
+          />
         );
       default:
         return <SearchSection pushSubPanel={pushSubPanel} />;

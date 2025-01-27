@@ -3,7 +3,7 @@ import FriendsList from "./FriendsList";
 import { Button } from "@nextui-org/react";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
-const FriendsSection = ({ currUser, goBack }) => {
+const FriendsSection = ({ currUser, goBack, onSelect, mutualOnly = false }) => {
   return (
     <div className="p-4 w-full h-full gap-y-2">
       <div className="flex items-center gap-x-2 mb-2">
@@ -12,7 +12,7 @@ const FriendsSection = ({ currUser, goBack }) => {
         </Button>
         <h1 className="text-lg">Friends</h1>
       </div>
-      <FriendsList currUser={currUser} />
+      <FriendsList currUser={currUser} onSelect={onSelect} mutualOnly={mutualOnly}/>
     </div>
   );
 };

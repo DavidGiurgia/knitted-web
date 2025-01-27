@@ -32,7 +32,7 @@ const links = [
 ];
 
 const LeftSidebar = () => {
-  const { activePanel, switchPanel, resetPanel } = usePanel();
+  const { activePanel, switchPanel, resetPanel, resetSession } = usePanel();
   const { logout, user } = useAuth();
 
   const handleLinkClick = (label) => {
@@ -44,6 +44,7 @@ const LeftSidebar = () => {
 
   const handleLogoutClick = () => {
     logout();
+    resetSession();
   };
 
   return (

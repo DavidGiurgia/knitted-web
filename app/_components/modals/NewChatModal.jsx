@@ -10,37 +10,24 @@ import {
 import React, { useState } from "react";
 import SelectFriends from "../SelectFriends";
 import { getUserById } from "@/app/services/userService";
+import { useAuth } from "@/app/_context/AuthContext"; // Assuming useAuth provides the current user
 
 const NewChatModal = ({ isOpen, onOpenChange, onCreate }) => {
   const [participants, setParticipants] = useState([]);
   const [name, setName] = useState("");
+  const { user } = useAuth(); // Get the current user
 
   const handleSend = async () => {
-    // Convertim Set în Array
     const participantsArray = Array.from(participants);
-  
-    if (participantsArray.length === 0) {
+
+    if (participantsArray.length < 1) {
       console.error("No participants selected");
       return;
     }
-  
-    let groupName = name;
-  
-    // Obținem primul participant
-    const firstParticipant = await getUserById(participantsArray[0]);
-  
-    if (participantsArray.length === 1) {
-      groupName = firstParticipant.fullname; // Utilizator unic
-    } else if (participantsArray.length > 1 && !groupName) {
-      groupName = `${firstParticipant.fullname} and ${
-        participantsArray.length - 1
-      } others`;
-    }
 
-  
-    await onCreate(groupName, participantsArray);
+    await onCreate(name, participantsArray); // Pass the original participants array
   };
-  
+
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
@@ -59,7 +46,7 @@ const NewChatModal = ({ isOpen, onOpenChange, onCreate }) => {
                 />
               )}
               <SelectFriends
-              label="To:"
+                label="To:"
                 placeholder="Select participants"
                 setSelectedFriends={setParticipants}
               />

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ChatBubbleLeftEllipsisIcon,
   MagnifyingGlassIcon,
@@ -8,20 +10,17 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/app/_context/AuthContext";
 import NewChatModal from "../../modals/NewChatModal";
 import { createRoom, fetchRoomsForUser } from "@/app/api/rooms";
-import ChatLinkItem from "./ChatLinkItem";
-import { searchUser } from "@/app/api/user";
-import UserListItem from "../../UserListItem";
-import { fetchFriends } from "@/app/services/friendsService";
+import ChatMembersItem from "./ChatMembersItem";
 
 const ChatsList = ({ pushSubPanel }) => {
   const { user } = useAuth();
   const [value, setValue] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [chats, setChats] = useState([]);
-  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const handleCreateRoom = async (groupName, participantsArray) => {
+    setLoading(true);
     try {
       const participants = Array.from(
         new Set([...participantsArray, user._id])
@@ -33,16 +32,20 @@ const ChatsList = ({ pushSubPanel }) => {
     } catch (error) {
       console.error("Error creating room:", error);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
+    
     const fetchChats = async () => {
+      setLoading(true);
       try {
         const userChats = await fetchRoomsForUser(user?._id);
         setChats(userChats);
       } catch (error) {
         console.error("Error fetching user chats:", error);
       }
+      setLoading(false);
     };
 
     if (user?._id) {
@@ -68,16 +71,18 @@ const ChatsList = ({ pushSubPanel }) => {
         />
       </div>
 
-      <div className="flex items-center p-2 border border-gray-200 dark:border-gray-800 rounded-lg">
-        <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2" />
-        <input
-          autoFocus
-          onChange={(event) => setValue(event.currentTarget.value)}
-          value={value}
-          placeholder="Search"
-          className="flex-1 outline-none bg-transparent"
-        />
-      </div>
+      {chats.length > 1 && (
+        <div className="flex items-center p-2 border border-gray-200 dark:border-gray-800 rounded-lg">
+          <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2" />
+          <input
+            autoFocus
+            onChange={(event) => setValue(event.currentTarget.value)}
+            value={value}
+            placeholder="Search"
+            className="flex-1 outline-none bg-transparent"
+          />
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center text-gray-500">Loading...</div>
@@ -91,9 +96,10 @@ const ChatsList = ({ pushSubPanel }) => {
                 onClick={() => pushSubPanel("ChatRoom", chat)}
               >
                 <div className="flex flex-wrap gap-1">
-                  <ChatLinkItem
+                  <ChatMembersItem
                     room={chat}
                     participants={chat.participantDetails}
+                    variant="list"
                   />
                 </div>
               </li>
@@ -124,9 +130,8 @@ const ChatsList = ({ pushSubPanel }) => {
                 className="flex w-full items-center text-sm gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg"
               >
                 <div className="flex flex-wrap gap-1">
-                  <ChatLinkItem
+                  <ChatMembersItem
                     room={chat}
-                    participants={chat.participantDetails}
                   />
                 </div>
               </div>

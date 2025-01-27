@@ -5,9 +5,9 @@ import { fetchFriends } from "../services/friendsService";
 import { useAuth } from "../_context/AuthContext";
 import { usePanel } from "../_context/PanelContext";
 
-const FriendsList = ({ currUser }) => {
+const FriendsList = ({ currUser, onSelect, mutualOnly }) => {
   const { user } = useAuth();
-  const {pushSubPanel} = usePanel();
+  
   const [friends, setFriends] = useState([]);
   const [mutualFriends, setMutualFriends] = useState([]);
 
@@ -54,7 +54,9 @@ const FriendsList = ({ currUser }) => {
             <div
               className="flex items-center px-2 py-1 justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
               key={friend._id}
-              onClick={() => pushSubPanel("Profile", friend)}
+              onClick={() => {
+                onSelect(friend);
+              }}
             >
               <UserListItem user={friend} />
             </div>
@@ -62,7 +64,7 @@ const FriendsList = ({ currUser }) => {
         </div>
       )}
 
-      {friends?.length > 0 && (
+      {!mutualOnly && friends?.length > 0 && (
         <div id="activity" className="flex flex-col gap-y-2">
           <label className="text-sm text-gray-500 " htmlFor="activity">
             All

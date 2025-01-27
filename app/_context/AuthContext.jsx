@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getCurrentUserFromApi, loginUser, registerUser } from "../api/auth";
 import { getToken, removeToken, setToken } from "../services/tokenService";
 
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -12,6 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true); // Previne redirecționările premature
   const router = useRouter();
+  
 
   const fetchProfile = async () => {
     const token = getToken();

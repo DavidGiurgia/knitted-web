@@ -12,7 +12,7 @@ import UserProfile from "../../UserProfile";
 const AccountPanel = () => {
   const { switchPanel, activeSubPanel, pushSubPanel, popSubPanel } = usePanel();
   const { subPanel, param } = activeSubPanel || {};
-  const { user, logout } = useAuth();
+  const { user, logout, resetSession } = useAuth();
 
   // Condițional pentru randarea subpanoului activ
   const renderSubPanel = () => {
@@ -41,7 +41,10 @@ const AccountPanel = () => {
         return (
           <Profile
             user={user}
-            logout={logout}
+            logout={()=>{
+              logout();
+              resetSession();
+            }}
             pushSubPanel={pushSubPanel}
             switchPanel={switchPanel}
           />

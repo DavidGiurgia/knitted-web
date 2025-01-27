@@ -11,13 +11,12 @@ import NotificationsPanel from "./_components/page-components/notifications/Noti
 import HomePanel from "./_components/page-components/home/HomePanel";
 import Bottombar from "./_components/Bottombar";
 import AccountPanel from "./_components/page-components/account/AccountPanel";
-import SearchPanel from "./_components/page-components/search/SearchPanel";
+import SearchPanel from "./_components/search/SearchPanel";
 
 const Landing = () => {
   const { activePanel } = usePanel();
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
- 
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -26,7 +25,11 @@ const Landing = () => {
   }, [isAuthenticated, router]);
 
   return (
-    <div className={`w-full h-screen flex flex-col md:flex-row ${!user && 'hidden'}`}>
+    <div
+      className={`w-full h-screen flex flex-col md:flex-row ${
+        !user && "hidden"
+      }`}
+    >
       <LeftSidebar />
 
       <div className="flex-1 flex overflow-y-auto h-full">
@@ -39,7 +42,9 @@ const Landing = () => {
           <div className={`flex-1 ${activePanel !== "Search" && "hidden"}`}>
             <SearchPanel />
           </div>
-          <div className={`flex-1 h-full ${activePanel !== "Chats" && "hidden"}`}>
+          <div
+            className={`flex-1 h-full ${activePanel !== "Chats" && "hidden"}`}
+          >
             <ChatsPanel />
           </div>
           <div className={`flex-1 ${activePanel !== "Groups" && "hidden"}`}>

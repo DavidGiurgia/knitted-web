@@ -3,21 +3,16 @@
 import GroupInfoSidebar from "@/app/_components/GroupInfoSidebar";
 import GroupParticipantModal from "@/app/_components/modals/GroupParticipantModal";
 import GroupChatBox from "@/app/_components/page-components/groups/GroupChatBox";
+import InteractionsTabs from "@/app/_components/page-components/groups/InteractionsTabs";
 import { useAuth } from "@/app/_context/AuthContext";
-import {
-  addParticipant,
-  getParticipants,
-  removeParticipant,
-} from "@/app/api/group";
 import { getGroupById } from "@/app/services/groupService";
 import {
   getCurrentParticipant,
   updateParticipantProfile,
 } from "@/app/services/guestService";
-import { getUserById } from "@/app/services/userService";
 
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import { Avatar, useDisclosure } from "@nextui-org/react";
+import { Avatar, Button, useDisclosure } from "@nextui-org/react";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -30,27 +25,37 @@ const GroupRoom = () => {
   const [participant, setParticipant] = useState(null);
   const [participants, setParticipants] = useState([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [selectedTab, setSelectedTab] = useState("chat");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      if (!params?.id) {
+        toast.error("Invalid group ID");
+        return;
+      }
       try {
-        if (!params?.id) {
-          toast.error("Invalid group ID");
-          return;
-        }
+        setLoading(true);
 
         const currentParticipant = await getCurrentParticipant(user, params.id);
-        setParticipant(currentParticipant.profile);
+        setParticipant(currentParticipant);
+
+        //log
+        console.log("Participant: ", participant);
 
         const data = await getGroupById(params.id);
         setGroupDetails(data);
+
+        console.log("Group: ", data);
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Something went wrong. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (params?.id && user) {
+    if (params?.id ) {
       fetchInitialData();
     }
   }, [user, params?.id]);
@@ -64,17 +69,21 @@ const GroupRoom = () => {
     setParticipant(newParticipantProfile);
   };
 
-  return !params?.id || !user ? (
+  return loading ? (
     <div className="flex items-center justify-center text-gray-500 h-full w-full">
       Loading...
     </div>
   ) : (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
-      <div className="flex bg-white dark:bg-gray-900 items-center justify-between py-2 px-6 border-b border-gray-300 dark:border-gray-800">
+      <div className="flex  items-center justify-between py-2 px-6 ">
         <div className="flex justify-between items-center">
-          <div onClick={() => setSidebar(!sidebar)}>
+          <Button
+            isIconOnly
+            variant="light"
+            onPress={() => setSidebar(!sidebar)}
+          >
             <Bars3Icon className="size-6" />
-          </div>
+          </Button>
 
           <div className="ml-6 text-lg hidden md:block">
             <div>{groupDetails?.name || "Loading..."}</div>
@@ -108,10 +117,19 @@ const GroupRoom = () => {
         )}
 
         <div
-          className={`p-2 flex  h-full w-full
-            ${sidebar && "hidden md:flex"}`}
+          className={` flex flex-col  h-full w-full items-center p-1 
+            ${sidebar && "hidden md:flex "}`}
         >
-          <div className=" w-full">
+          <InteractionsTabs
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+          />
+
+          <div
+            className={`w-full md:max-w-[800px] flex-1 ${
+              selectedTab !== "chat" && "hidden"
+            }`}
+          >
             <GroupChatBox
               participant={participant}
               currentGroup={groupDetails}

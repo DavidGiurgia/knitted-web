@@ -54,9 +54,20 @@ export function formatTimeFromTimestamp(createdAt) {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+export const getRoomNameByParticipants = (participants, userId) => {
+  const otherParticipants = participants.filter((p) => p._id !== userId);
 
-export const checkIsLiked = (likeList, userId) => {
-  return likeList.includes(userId);
+  if (otherParticipants.length === 0) {
+    throw new Error("No other participants found."); 
+  }
+
+  const firstParticipantName = otherParticipants[0].fullname;
+
+  if (otherParticipants.length === 1) {
+    return firstParticipantName; 
+  } else {
+    return `${firstParticipantName} and ${otherParticipants.length - 1} others`;
+  }
 };
 
 export const generateUniqueJoinCode = async () => {

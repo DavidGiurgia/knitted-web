@@ -11,4 +11,13 @@ export const fetchMessagesByRoom = async (roomId) => {
       throw error; // Asigură-te că această eroare este gestionată în `useEffect`
     }
   };
+
+  export const getLastMessageForRoom = async (roomId) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/room/${roomId}/last`);
+        return await response.data;
+    } catch (error) {
+      console.error("Error fetching last message:", error);
+    }
+  }
   

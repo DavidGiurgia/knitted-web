@@ -19,7 +19,11 @@ module.exports = {
         accent: "#00BFFF",
         primary: "#FF6700",
         'light-secondary': '#3B4E68',
+        'light-secondary-100': '#5c7aa3',
+
         'dark-secondary': '#253141',
+        'dark-secondary-100': '#131920',
+
 
         gray: {
           100: "#F3F4F6", // echivalent light-bg

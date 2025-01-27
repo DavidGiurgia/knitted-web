@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/app/_context/AuthContext";
 import React, { useEffect, useState } from "react";
-import UserListItem from "../../UserListItem";
+import UserListItem from "../UserListItem";
 import { getRecentSearches } from "@/app/services/recentSearchesService";
 import {
   addRecentSearch,
@@ -140,13 +140,17 @@ const SearchSection = ({ pushSubPanel }) => {
                     <li
                       className="flex items-center  px-2 py-1 justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                       key={currUser._id}
-                      onClick={
-                        () => pushSubPanel("Profile", currUser)
-                      }
+                      onClick={() => pushSubPanel("Profile", currUser)}
                     >
-                     <UserListItem user={currUser} />
-                     <Button size="sm" onPress={() => handleRemoveSearch(currUser)} variant="light" isIconOnly><XMarkIcon className="size-4"/></Button>
-                      
+                      <UserListItem user={currUser} />
+                      <Button
+                        size="sm"
+                        onPress={() => handleRemoveSearch(currUser)}
+                        variant="light"
+                        isIconOnly
+                      >
+                        <XMarkIcon className="size-4" />
+                      </Button>
                     </li>
                   ))}
                 </ul>

@@ -26,7 +26,8 @@ export const getCurrentParticipant = async (user, groupId) => {
     }
 
     try {
-      return await getProfileByUserGroup(user?._id, groupId);
+      const result = await getProfileByUserGroup(user?._id, groupId);
+      return result.profile;
     } catch (error) {
       console.error("Error fetching nickname:", error);
     }

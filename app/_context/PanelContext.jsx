@@ -56,6 +56,14 @@ export const PanelProvider = ({ children }) => {
     }));
   };
 
+  const resetSession = () => {
+    setPanelData((prev) => ({
+      Home: ["Home"], // Reseteazăm panoul principal Home
+    }));
+    setActivePanel("Home"); // Activăm panoul principal Home
+    setBottombar(true); // Afisează butonul de subsol
+  }
+
   //const activeSubPanel = subPanelsStack[subPanelsStack.length - 1];
 
   return (
@@ -69,7 +77,8 @@ export const PanelProvider = ({ children }) => {
         popSubPanel,
         resetPanel,
         bottombar,
-        setBottombar
+        setBottombar,
+        resetSession
       }}
     >
       {children}

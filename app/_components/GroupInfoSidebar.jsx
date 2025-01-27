@@ -11,9 +11,7 @@ import {
 import { useAuth } from "../_context/AuthContext";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
-import CustomModal from "./modals/CustomModal";
-import { deleteGroup } from "../services/groupService";
+import { useState } from "react";
 import {
   Avatar,
   Button,
@@ -24,21 +22,14 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import UpdateGroupModal from "./modals/UpdateGroupModal";
 
 const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) => {
   const { user } = useAuth();
-  const router = useRouter();
   const isCreator = currentGroup?.creatorId === user?._id;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onDeleteModaOpen,
-    onOpenChange: onDeleteModaOpenChange,
-  } = useDisclosure();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showParticipants, setShowParticipants] = useState(true);
+  const [showParticipants, setShowParticipants] = useState(false);
 
   const toggleExpanded = () => {
     setIsExpanded((prev) => !prev);
@@ -80,7 +71,7 @@ const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) =>
         >
           {currentGroup?.description || (
             <i className={`${!isCreator && "hidden"}`}>
-              Tap to add a description
+              Add a description
             </i>
           )}
         </div>
@@ -127,7 +118,7 @@ const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) =>
         </Tooltip>
 
         <div
-          onClick={() => {}}
+          onClick={() => setShowParticipants(!showParticipants)}
           className="flex items-center gap-x-4 hover:text-primary cursor-pointer"
         >
           <UsersIcon className="size-5" />
@@ -136,7 +127,7 @@ const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) =>
 
         {showParticipants && (
           <div className="flex flex-col bg-white dark:bg-gray-800 p-4 rounded-lg gap-y-2">
-            <h3 className="text-lg font-semibold">Participants</h3>
+            <h3 className="text-lg font-semibold">{'Participants '}</h3>
             <ul className="flex flex-col gap-y-1">
               {participants && participants.length > 0 ? (
                 participants?.map((participant) => (
@@ -194,17 +185,10 @@ const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) =>
           </div>
         </div>
 
-        <div
-          onClick={onDeleteModaOpen}
-          className={`cursor-pointer !text-red-500 ${!isCreator && "hidden"}`}
-        >
-          Delete group
-        </div>
-
         {!user && (
           <div className="w-full">
             <Button
-              onClick={() => window.open("/register", "_blank")}
+              onPress={() => window.open("/register", "_blank")}
               className="w-full"
               size="lg"
               variant="bordered"
@@ -220,22 +204,6 @@ const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) =>
         group={currentGroup}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-      />
-
-      <CustomModal
-        isOpen={isDeleteModalOpen}
-        onOpenChange={onDeleteModaOpenChange}
-        title="Delete Group"
-        body={`Are you sure you want to delete group "${currentGroup?.name}"? This action cannot be undone.`}
-        confirmButtonText="Delete"
-        confirmButtonColor="danger"
-        cancelButtonText="Cancel"
-        onConfirm={async () => {
-          // Perform deletion logic here
-          await deleteGroup(currentGroup?._id);
-          router.push("/");
-          toast.success("Group deleted successfully");
-        }}
       />
     </div>
   );

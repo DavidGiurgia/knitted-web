@@ -8,8 +8,14 @@ import { Avatar, Button } from "@nextui-org/react";
 import { PaperAirplaneIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/app/_context/AuthContext";
 import GroupMessagesItem from "./GroupMessagesItem";
+import toast from "react-hot-toast";
 
-const GroupChatBox = ({ participant, currentGroup, participants, setParticipants }) => {
+const GroupChatBox = ({
+  participant,
+  currentGroup,
+  participants,
+  setParticipants,
+}) => {
   const { user } = useAuth();
   const { groupSocket } = useWebSocket();
   const [message, setMessage] = useState("");
@@ -36,42 +42,44 @@ const GroupChatBox = ({ participant, currentGroup, participants, setParticipants
     }
 
     return async () => {
-      groupSocket.emit("leaveRoom", {
+      groupSocket?.emit("leaveRoom", {
         groupId: currentGroup?._id,
         participant,
       });
       console.log("Leaving room:", currentGroup?._id, " as ", participant?.id);
     };
-  }, [currentGroup?._id, user?._id]);
+  }, [currentGroup, participant]);
 
   useEffect(() => {
-    console.log("Group socket connected:", groupSocket.connected);
+    console.log("Group socket connected:", groupSocket?.connected);
     if (!groupSocket) return;
 
     // Ascultă mesaje
     const handleMessageReceived = async (newMessage) => {
-      console.log("Received message:", newMessage);
-      setMessages((prev) => [...prev, newMessage]);
+      if (newMessage.type === "log") {
+        toast(newMessage.content);
+      } else {
+        setMessages((prev) => [...prev, newMessage]);
+      }
     };
 
     groupSocket.on("receiveMessage", handleMessageReceived);
 
-    groupSocket.on('updateParticipants', (participants) => {
-      console.log('Updated participants:', participants);
-    
-      const normalizedParticipants = participants.map(participant => ({
+    groupSocket.on("updateParticipants", (participants) => {
+      console.log("Updated participants:", participants);
+
+      const normalizedParticipants = participants.map((participant) => ({
         id: participant.id,
-        nickname: participant.nickname || participant.name || 'Unknown', // Normalizare
+        nickname: participant.nickname || participant.name || "Unknown", // Normalizare
       }));
-    
+
       setParticipants(normalizedParticipants);
     });
-    
 
     return () => {
       groupSocket.off("receiveMessage", handleMessageReceived);
-      groupSocket.off('updateParticipants', (participants) => {
-        console.log('Updated participants:', participants);
+      groupSocket.off("updateParticipants", (participants) => {
+        console.log("Updated participants:", participants);
       });
     };
   }, [groupSocket]);
@@ -100,7 +108,11 @@ const GroupChatBox = ({ participant, currentGroup, participants, setParticipants
 
   return (
     <div className="flex flex-col p-2  h-full items-center w-full ">
-      <GroupMessagesItem messages={messages} participant={participant} participants={participants}/>
+      <GroupMessagesItem
+        messages={messages}
+        participant={participant}
+        participants={participants}
+      />
 
       <div className="flex w-full items-center gap-x-2 ">
         {anonymous ? (
