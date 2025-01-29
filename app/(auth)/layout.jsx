@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { HashtagIcon } from "@heroicons/react/16/solid";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { getGroupByCode } from "../services/groupService";
 
 const AuthLayout = ({ children }) => {

@@ -15,8 +15,9 @@ import {
   ChatBubbleLeftRightIcon as ChatSolid,
   UserGroupIcon as GroupSolid,
 } from "@heroicons/react/24/solid";
-import { Avatar, Button } from "@nextui-org/react";
+import { Avatar, Button } from "@heroui/react";
 import { useAuth } from "../_context/AuthContext";
+import InitialsAvatar from "./InitialsAvatar";
 
 const links = [
   { label: "Home", iconOutline: HomeOutline, iconSolid: HomeSolid },
@@ -52,15 +53,19 @@ const Bottombar = () => {
             className={`bg-transparent rounded-none w-full h-16`}
           >
             {isAvatar ? (
+              <div className={`${activePanel === "Account" && "ring-1 ring-offset-1 rounded-full  ring-primary"}`}>
+              {user?.avatarUrl ? (
               <Avatar
-              showFallback
-                src={user?.avatarUrl}
+                showFallback
+                src={user.avatarUrl}
                 radius="full"
                 size="sm"
                 className="w-8 h-8"
-                isBordered={activePanel === "Account"}
-                color={activePanel === "Account" && "primary"}
               />
+            ) : (
+              <InitialsAvatar nickname={user?.fullname} size={32} />
+            )}
+            </div>
             ) : activePanel === label ? (
               <IconSolid className="w-8 h-8 text-primary" />
             ) : (

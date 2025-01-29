@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { Avatar } from "@nextui-org/react";
+import { Avatar } from "@heroui/react";
 
 const PrivateMessagesItem = ({room, messages, participant, participants }) => {
   const messagesEndRef = useRef(null);

@@ -13,12 +13,13 @@ import {
   DropdownMenu,
   DropdownTrigger,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import ProfileModal from "../../modals/ProfileModal";
 import { getUserById } from "@/app/services/userService";
 import PictureModal from "../../modals/PictureModal";
 import { ThemeSwitcher } from "../../ThemeSwitcher";
+import InitialsAvatar from "../../InitialsAvatar";
 
 const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -134,7 +135,7 @@ const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
               />
             </div>
           ) : (
-            <Avatar className="w-24 h-24 text-large flex-shrink-0" />
+            <InitialsAvatar nickname={user?.fullname} size={96}/>
           )}
 
           <div className="">

@@ -16,7 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Textarea,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";

@@ -1,9 +1,10 @@
+'use client';
 import { UserIcon } from "@heroicons/react/24/outline";
-import { Avatar } from "@nextui-org/react";
 import React, { useEffect, useRef } from "react";
+import InitialsAvatar from "../../InitialsAvatar";
 
-const GroupMessagesItem = ({ messages, participant, participants }) => {
-  if (!messages || !participants) return null;
+const GroupMessagesItem = ({ messages, participant }) => {
+  if (!messages) return null;
 
   let lastSenderId = null;
   let lastMessageWasAnonymous = false;
@@ -18,13 +19,12 @@ const GroupMessagesItem = ({ messages, participant, participants }) => {
   }, [messages]);
 
   return (
-    <div className="flex-1 w-full px-2 overflow-y-auto">
+    <div className="w-full h-full flex flex-col p-2 overflow-y-auto">
       {messages.map((msg, index) => {
         const isSameSenderAsPrevious =
           index > 0 &&
           messages[index - 1].senderId === msg.senderId &&
           lastMessageWasAnonymous === msg.isAnonymous;
-        const sender = participants.find((p) => p.id === msg.senderId);
         const isCurrentUser = msg.senderId === participant?.id;
         const showAvatar =
           msg.type !== "log" &&
@@ -38,7 +38,7 @@ const GroupMessagesItem = ({ messages, participant, participants }) => {
 
         return (
           <div
-            onClick={()=>{}}
+            onClick={() => {}}
             key={index}
             className={`w-full flex gap-x-2 my-1 ${!isSameSenderAsPrevious && "mt-2"} ${
               msg.type === "log"
@@ -53,17 +53,15 @@ const GroupMessagesItem = ({ messages, participant, participants }) => {
                 {msg.isAnonymous ? (
                   <UserIcon className="p-1 rounded-full border border-gray-200 dark:border-gray-800" />
                 ) : (
-                  <Avatar
-                    src={sender?.avatar || null}
-                    alt="Avatar"
-                    className="w-8 h-8 rounded-full"
-                  />
+                  <InitialsAvatar nickname={msg.senderName || "U"} size={32}/>
                 )}
               </div>
             )}
 
             <div
-              className={`relative rounded-xl ${showAvatar && "rounded-tl-none"} px-4 py-2 ${
+              className={`relative rounded-xl ${
+                showAvatar && "rounded-tl-none"
+              } px-4 py-2 ${
                 isCurrentUser && !msg.isAnonymous
                   ? "bg-primary bg-opacity-10"
                   : "bg-gray-200 dark:bg-gray-800"
@@ -74,7 +72,7 @@ const GroupMessagesItem = ({ messages, participant, participants }) => {
             >
               {!isSameSenderAsPrevious && !isCurrentUser && (
                 <div className="font-semibold text-sm">
-                  {msg.isAnonymous ? "Anonymous" : sender?.nickname}
+                  {msg.isAnonymous ? "Anonymous" : msg.senderName}
                 </div>
               )}
 

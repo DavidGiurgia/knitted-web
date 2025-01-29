@@ -10,13 +10,15 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-} from "@nextui-org/react";
+} from "@heroui/react";
+import InitialsAvatar from "../InitialsAvatar";
 
 const GroupParticipantModal = ({
   isOpen,
   onOpenChange,
   participant,
-  onConfirm
+  onConfirm,
+  dismissable,
 }) => {
   const [nickname, setNickname] = useState(participant?.nickname || "");
   const [nicknameError, setNicknameError] = useState("");
@@ -28,7 +30,7 @@ const GroupParticipantModal = ({
 
   useEffect(() => {
     if (participant) {
-      setNickname(participant?.nickname || "Unknown");
+      setNickname(dismissable ? participant?.nickname || "Unknown" : "");
     }
   }, [participant, isOpen]);
 
@@ -48,28 +50,24 @@ const GroupParticipantModal = ({
       return;
     }
 
-    try {
-      const newParticipantProfile = {
-        id: participant.id,
-        nickname: nickname,
-      };
-      await onConfirm(newParticipantProfile);
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Error saving profile:", error);
-      setNicknameError("Failed to save profile. Please try again.");
-    }
+    const newParticipantProfile = {
+      id: participant.id,
+      nickname: nickname,
+    };
+
+    await onConfirm(newParticipantProfile);
+    onOpenChange(false);
   };
 
   return (
-    <Modal className="w-fit" isOpen={isOpen} onOpenChange={onOpenChange}>
-      <ModalContent>
+    <Modal backdrop={dismissable ? "opaque" : "blur"} placement="center" hideCloseButton={!dismissable} isDismissable={dismissable} className="w-fit" isOpen={isOpen} onOpenChange={onOpenChange}>
+      <ModalContent >
         {(onClose) => (
           <>
-            <ModalHeader>My profile</ModalHeader>
+            <ModalHeader >My profile</ModalHeader>
             <ModalBody>
               <div className="flex flex-col gap-y-6 items-center justify-center px-6">
-                <Avatar src={null} size="lg" />
+              <InitialsAvatar nickname={nickname} size={80}/>
 
                 <div>
                   <Input
@@ -92,10 +90,7 @@ const GroupParticipantModal = ({
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button variant="light" onPress={onClose}>
-                Cancel
-              </Button>
-              <Button isDisabled={!isModified} color="primary" onPress={handleSave}>
+              <Button isDisabled={!isModified || !nickname} color="primary" onPress={handleSave}>
                 Save
               </Button>
             </ModalFooter>

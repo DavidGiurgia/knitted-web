@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Avatar, Tooltip } from "@nextui-org/react"; // Poți folosi o bibliotecă de UI pentru avatare
+import { Avatar, Tooltip } from "@heroui/react"; // Poți folosi o bibliotecă de UI pentru avatare
 import { getUserById } from "@/app/services/userService";
 import { useAuth } from "@/app/_context/AuthContext";
 import { getLastMessageForRoom } from "@/app/api/messages";
 import { getRoomNameByParticipants } from "@/app/services/utils";
+import InitialsAvatar from "../../InitialsAvatar";
 
 const ChatMembersItem = ({ room, variant = "list" }) => {
   const [participants, setParticipants] = useState([]);
@@ -47,7 +48,7 @@ const ChatMembersItem = ({ room, variant = "list" }) => {
     }
   }, [room]);
 
-  const displayedUsers = room.isGroup
+  const displayedUsers = room?.isGroup
     ? participants.slice(0, 2)
     : participants.filter((p) => p._id !== user?._id);
 
@@ -56,8 +57,8 @@ const ChatMembersItem = ({ room, variant = "list" }) => {
       {/* Grupul de avatare */}
       <div className="flex -space-x-7 space-y-3">
         {displayedUsers.map((user, index) => (
-          <Tooltip key={index} content={user.username}>
-            <Avatar
+          <Tooltip key={index} content={user.fullname}>
+            {user?.avatarUrl ? <Avatar
               size={
                 variant === "list"
                   ? room.isGroup
@@ -70,7 +71,15 @@ const ChatMembersItem = ({ room, variant = "list" }) => {
               className="border border-gray-100 dark:border-gray-900"
               src={user.avatarUrl || ""}
               alt={user?.fullname || user.username}
-            />
+            /> : <InitialsAvatar nickname={user?.fullname} size={
+              variant === "list"
+                ? room.isGroup
+                  ? 40
+                  : 52
+                : room.isGroup
+                ? 32
+                : 40
+            }/>}
           </Tooltip>
         ))}
       </div>

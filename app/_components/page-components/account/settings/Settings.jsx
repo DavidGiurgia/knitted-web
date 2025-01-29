@@ -4,7 +4,7 @@ import {
   ArrowRightIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
-import { Avatar, Button, Divider } from "@nextui-org/react";
+import { Avatar, Button, Divider } from "@heroui/react";
 import React from "react";
 
 const Settings = ({ goBack, goTo, user }) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import GroupInfoSidebar from "@/app/_components/GroupInfoSidebar";
+import InitialsAvatar from "@/app/_components/InitialsAvatar";
 import GroupParticipantModal from "@/app/_components/modals/GroupParticipantModal";
 import GroupChatBox from "@/app/_components/page-components/groups/GroupChatBox";
 import InteractionsTabs from "@/app/_components/page-components/groups/InteractionsTabs";
@@ -12,68 +13,93 @@ import {
 } from "@/app/services/guestService";
 
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import { Avatar, Button, useDisclosure } from "@nextui-org/react";
+import { Button, useDisclosure } from "@heroui/react";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { io } from "socket.io-client";
 
 const GroupRoom = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const params = useParams();
   const [sidebar, setSidebar] = useState(false);
-  const [groupDetails, setGroupDetails] = useState(null);
+  const [group, setGroupDetails] = useState(null);
   const [participant, setParticipant] = useState(null);
-  const [participants, setParticipants] = useState([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedTab, setSelectedTab] = useState("chat");
-  const [loading, setLoading] = useState(false);
+  const [fetchingData, setFetchingData] = useState(false);
+  const [dismissable, setDismissable] = useState(true);
+
+  const [groupSocket, setGroupSocket] = useState(null);
 
   useEffect(() => {
+    const groupWs = io("http://localhost:8000/group");
+
+    groupWs.on("connect", () => {
+      console.log("Connected to Group WebSocket");
+      setGroupSocket(groupWs);
+    });
+
+    return () => {
+      groupWs.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (loading) return; // Wait for auth loading to complete
+
+    if (!isAuthenticated) {
+      setDismissable(false);
+      onOpen();
+    }
+
     const fetchInitialData = async () => {
-      if (!params?.id) {
-        toast.error("Invalid group ID");
-        return;
-      }
       try {
-        setLoading(true);
+        setFetchingData(true);
 
         const currentParticipant = await getCurrentParticipant(user, params.id);
         setParticipant(currentParticipant);
 
-        //log
-        console.log("Participant: ", participant);
-
         const data = await getGroupById(params.id);
         setGroupDetails(data);
 
-        console.log("Group: ", data);
+        if (data && groupSocket?.connected) {
+          groupSocket.emit("joinRoom", {
+            groupId: data._id,
+          });
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Something went wrong. Please try again.");
       } finally {
-        setLoading(false);
+        setFetchingData(false);
       }
     };
 
-    if (params?.id ) {
+    if (params?.id && groupSocket) {
       fetchInitialData();
     }
-  }, [user, params?.id]);
+  }, [user, params?.id, groupSocket, loading]);
 
   const handleSaveNewProfile = async (newParticipantProfile) => {
     await updateParticipantProfile(
       user?._id,
-      groupDetails?._id,
+      group?._id,
       newParticipantProfile
     );
     setParticipant(newParticipantProfile);
+    setDismissable(true);
   };
 
-  return loading ? (
-    <div className="flex items-center justify-center text-gray-500 h-full w-full">
-      Loading...
-    </div>
-  ) : (
+  if (loading || fetchingData) {
+    return (
+      <div className="flex items-center justify-center text-gray-500 h-full w-full">
+        Loading...
+      </div>
+    );
+  }
+
+  return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
       <div className="flex  items-center justify-between py-2 px-6 ">
         <div className="flex justify-between items-center">
@@ -86,7 +112,7 @@ const GroupRoom = () => {
           </Button>
 
           <div className="ml-6 text-lg hidden md:block">
-            <div>{groupDetails?.name || "Loading..."}</div>
+            <div>{group?.name || "Loading..."}</div>
           </div>
         </div>
 
@@ -99,26 +125,22 @@ const GroupRoom = () => {
               ? participant.nickname
               : "Unknown Nickname"}
           </div>
-          <Avatar
-            showFallback
-            src={participant?.avatarUrl || null}
-            className="w-8 h-8"
-          />
+          <InitialsAvatar nickname={participant?.nickname || "U"} size={32} />
         </div>
       </div>
 
       <div className="flex overflow-y-auto h-screen">
         {sidebar && (
           <GroupInfoSidebar
-            currentGroup={groupDetails}
-            participants={participants}
+            currentGroup={group}
             currentParticipant={participant}
           />
         )}
 
         <div
-          className={` flex flex-col  h-full w-full items-center p-1 
-            ${sidebar && "hidden md:flex "}`}
+          className={`flex flex-col h-full w-full items-center p-1 ${
+            sidebar && "hidden md:flex"
+          }`}
         >
           <InteractionsTabs
             selectedTab={selectedTab}
@@ -126,17 +148,24 @@ const GroupRoom = () => {
           />
 
           <div
-            className={`w-full md:max-w-[800px] flex-1 ${
+            className={`w-full h-full md:max-w-[800px] flex-1 overflow-hidden ${
               selectedTab !== "chat" && "hidden"
             }`}
           >
             <GroupChatBox
               participant={participant}
-              currentGroup={groupDetails}
-              participants={participants}
-              setParticipants={setParticipants}
+              group={group}
+              groupSocket={groupSocket}
             />
           </div>
+
+          {/* <div
+            className={`w-full h-full flex-1 overflow-hidden ${
+              selectedTab !== "whiteboard" && "hidden"
+            }`}
+          >
+            <Whiteboard groupId={group?._id} />
+          </div> */}
         </div>
       </div>
 
@@ -144,9 +173,8 @@ const GroupRoom = () => {
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         participant={participant}
-        onConfirm={async (newParticipantProfile) =>
-          await handleSaveNewProfile(newParticipantProfile)
-        }
+        onConfirm={handleSaveNewProfile}
+        dismissable={dismissable}
       />
     </div>
   );

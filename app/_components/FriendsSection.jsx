@@ -1,6 +1,6 @@
 import React from "react";
 import FriendsList from "./FriendsList";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 const FriendsSection = ({ currUser, goBack, onSelect, mutualOnly = false }) => {

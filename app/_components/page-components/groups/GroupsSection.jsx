@@ -27,7 +27,7 @@ import {
   useDisclosure,
   Checkbox,
   Tooltip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -228,7 +228,7 @@ const GroupsSection = () => {
                     <div className="text-lg text-primary">{group.name}</div>
                   </div>
                   <div className="flex text-start w-full gap-x-2">
-                    <p className="text-sm flex-1 text-gray-500 text-wrap">
+                    <p className="text-sm flex-1 text-gray-500 text-wrap line-clamp-3">
                       {group.description || (
                         <i className={`${!isCreator(group) ? "hidden" : ""}`}>
                           Add a description
@@ -239,7 +239,7 @@ const GroupsSection = () => {
                 </Button>
 
                 <div className="flex items-center gap-x-1">
-                  <div className="flex-1 p-2 text-gray-700 dark:text-gray-300 text-sm">
+                  <div className="flex-1 p-2 text-gray-700 dark:text-gray-300 text-sm ">
                     {formattedGroupLifetime(group)}
                   </div>
                   <Tooltip content="Copy" placement="top" showArrow>

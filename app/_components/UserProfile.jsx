@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { ArrowLeftIcon, Bars3Icon } from "@heroicons/react/24/outline";
 import { useAuth } from "../_context/AuthContext";
 import {
@@ -32,6 +32,7 @@ import { usePanel } from "../_context/PanelContext";
 import ProfileModal from "./modals/ProfileModal";
 import PictureModal from "./modals/PictureModal";
 import ProfileCard from "./ProfileCard";
+import InitialsAvatar from "./InitialsAvatar";
 const UserProfile = ({ currentUser }) => {
   const { pushSubPanel, popSubPanel } = usePanel();
   const { user, fetchProfile } = useAuth();
@@ -199,14 +200,18 @@ const UserProfile = ({ currentUser }) => {
           className="rounded-lg border-white dark:border-gray-800 "
           placement="bottom-right"
         >
-          <Avatar
-            onClick={() => {
-              currentUser?.avatarUrl && onOpenProfilePhoto();
-            }}
-            showFallback
-            src={currentUser?.avatarUrl}
-            className="w-24 h-24 text-large "
-          />
+          {currentUser?.avatarUrl ? (
+            <Avatar
+              onClick={() => {
+                currentUser?.avatarUrl && onOpenProfilePhoto();
+              }}
+              showFallback
+              src={currentUser?.avatarUrl}
+              className="w-24 h-24 text-large "
+            />
+          ) : (
+            <InitialsAvatar nickname={currentUser?.fullname} size={96} />
+          )}
         </Badge>
         <div className="flex-1">
           <div className="text-xl  font-medium text-dark-bg dark:text-light-bg ">

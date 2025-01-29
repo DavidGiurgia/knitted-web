@@ -20,7 +20,8 @@ import {
 import React, { useState } from "react";
 import { useAuth } from "../_context/AuthContext";
 import { usePanel } from "../_context/PanelContext";
-import { Avatar, Button, Image, Tooltip } from "@nextui-org/react";
+import { Avatar, Button, Image, Tooltip } from "@heroui/react";
+import InitialsAvatar from "./InitialsAvatar";
 
 const links = [
   { label: "Home", iconOutline: HomeOutline, iconSolid: HomeSolid },
@@ -36,8 +37,8 @@ const LeftSidebar = () => {
   const { logout, user } = useAuth();
 
   const handleLinkClick = (label) => {
-    if(activePanel === label){
-      resetPanel(); 
+    if (activePanel === label) {
+      resetPanel();
     }
     switchPanel(label);
   };
@@ -91,15 +92,19 @@ const LeftSidebar = () => {
                  }`}
                   >
                     {isAvatar ? (
-                      <Avatar
-                        showFallback
-                        src={user?.avatarUrl}
-                        radius="full"
-                        size="sm"
-                        className="w-8 h-8"
-                        isBordered={activePanel === "Account"}
-                        color={activePanel === "Account" && "primary"}
-                      />
+                      <div className={`${activePanel === "Account" && "ring-1 ring-offset-1 rounded-full  ring-primary"}`}>
+                        {user?.avatarUrl ? (
+                        <Avatar
+                          showFallback
+                          src={user.avatarUrl}
+                          radius="full"
+                          size="sm"
+                          className="w-8 h-8"
+                        />
+                      ) : (
+                        <InitialsAvatar nickname={user?.fullname} size={32} />
+                      )}
+                      </div>
                     ) : activePanel === label ? (
                       <IconSolid className="w-6 h-6 text-primary" />
                     ) : (

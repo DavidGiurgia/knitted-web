@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken } from "../../../zic-web/src/services/tokenService";
+import { getToken } from "../services/tokenService";
 
 const API_BASE_URL = "http://localhost:8000/auth"; // Înlocuiește cu URL-ul API-ului tău
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Button, Input } from '@nextui-org/react';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Button, Input } from "@heroui/react";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { deleteUserAccount } from '@/app/services/userService';

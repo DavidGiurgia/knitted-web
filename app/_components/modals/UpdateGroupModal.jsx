@@ -13,7 +13,7 @@ import {
   ModalFooter,
   ModalHeader,
   Textarea,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
   const { user } = useAuth();
@@ -89,48 +89,76 @@ const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+    <Modal radius="sm" isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="flex flex-col gap-1">
-              Edit Group
-            </ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">Settings</ModalHeader>
             <ModalBody>
-              <div className="flex flex-col gap-y-2">
-                <Input
-                  maxLength={10}
-                  color={codeError.length && "danger"}
-                  isInvalid={codeError.length}
-                  errorMessage={codeError}
-                  label="Join code"
-                  value={code}
-                  onChange={(e) => {
-                    setCode(e.target.value);
-                    setCodeError("");
-                  }}
-                  variant="faded"
-                  className="text-primary mb-4"
-                />
+              <div className="flex-1 flex flex-col gap-y-2">
                 <Input
                   maxLength={20}
                   color={nameError.length && "danger"}
                   isInvalid={nameError.length}
                   errorMessage={nameError}
-                  label="Group name"
+                  label={<div className="text-gray-500">Group name *</div>}
                   value={groupName}
                   onChange={(e) => {
                     setGroupName(e.target.value);
                     setNameError("");
                   }}
-                  variant="bordered"
+                  variant="underlined"
                 />
                 <Textarea
                   maxLength={1000}
                   value={groupDescription}
                   onChange={(e) => setGroupDescription(e.target.value)}
-                  label="Description"
-                  variant="bordered"
+                  variant="underlined"
+                  label={<div className="text-gray-500">Description</div>}
+                  placeholder="Add a description"
+                />
+                <div className="flex items-center justify-between gap-x-6 mt-4">
+                  <Input
+                    maxLength={10}
+                    color={codeError.length && "danger"}
+                    isInvalid={codeError.length}
+                    errorMessage={codeError}
+                    label={<div className="text-gray-500">Start date *</div>}
+                    value={code}
+                    onChange={(e) => {
+                      setCode(e.target.value);
+                      setCodeError("");
+                    }}
+                    variant="underlined"
+                  />
+
+                  <Input
+                    maxLength={10}
+                    color={codeError.length && "danger"}
+                    isInvalid={codeError.length}
+                    errorMessage={codeError}
+                    label={<div className="text-gray-500">End date *</div>}
+                    value={code}
+                    onChange={(e) => {
+                      setCode(e.target.value);
+                      setCodeError("");
+                    }}
+                    variant="underlined"
+                  />
+                </div>
+                <Input
+                  maxLength={10}
+                  color={codeError.length && "danger"}
+                  isInvalid={codeError.length}
+                  errorMessage={codeError}
+                  label={<div className="text-gray-500">Join code *</div>}
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value);
+                    setCodeError("");
+                  }}
+                  variant="underlined"
+                  className="text-primary mt-4"
                 />
               </div>
             </ModalBody>

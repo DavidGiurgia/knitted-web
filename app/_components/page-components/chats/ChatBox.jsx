@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import MessageInput from "../../MessageInput";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { useWebSocket } from "../../../_context/WebSoketContext";
 import { useAuth } from "../../../_context/AuthContext";
 import { fetchMessagesByRoom } from "../../../api/messages";
@@ -47,7 +47,7 @@ const ChatBox = ({ room }) => {
       chatSocket.emit("leaveRoom", { roomId: room._id });
       console.log("Leaving room", room._id);
     };
-  }, [room?._id]); // Atenție la dependințe
+  }, [room, chatSocket]); // Atenție la dependințe
 
   useEffect(() => {
     if (!chatSocket) return;
@@ -72,9 +72,12 @@ const ChatBox = ({ room }) => {
       return;
     }
 
+    console.log(message);
+
     const messageData = {
       roomId: room._id,
       senderId: user._id,
+      senderName: user.fullname,
       content: message,
       isAnonymous: false,
     };

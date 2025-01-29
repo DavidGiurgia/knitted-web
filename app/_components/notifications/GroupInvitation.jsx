@@ -6,7 +6,7 @@ import {
   pairUserGroup,
 } from "@/app/services/groupService";
 import { getUserById } from "@/app/services/userService";
-import { Avatar, Button } from "@nextui-org/react";
+import { Avatar, Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";

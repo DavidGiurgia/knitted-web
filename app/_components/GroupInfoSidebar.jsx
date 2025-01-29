@@ -20,16 +20,19 @@ import {
   PopoverTrigger,
   Tooltip,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import toast from "react-hot-toast";
 import UpdateGroupModal from "./modals/UpdateGroupModal";
 
-const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) => {
+const GroupInfoSidebar = ({
+  currentGroup,
+  participants,
+  currentParticipant,
+}) => {
   const { user } = useAuth();
   const isCreator = currentGroup?.creatorId === user?._id;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showParticipants, setShowParticipants] = useState(false);
 
   const toggleExpanded = () => {
     setIsExpanded((prev) => !prev);
@@ -70,9 +73,7 @@ const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) =>
           }`}
         >
           {currentGroup?.description || (
-            <i className={`${!isCreator && "hidden"}`}>
-              Add a description
-            </i>
+            <i className={`${!isCreator && "hidden"}`}>Add a description</i>
           )}
         </div>
         {currentGroup?.description?.length > 200 && (
@@ -86,19 +87,16 @@ const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) =>
             {isExpanded ? "Hide" : "Read more"}
           </button>
         )}
+        
       </div>
       <div className="p-6 flex flex-col gap-y-8">
-        <Popover className="">
-          <PopoverTrigger>
-            <div className="flex items-center gap-x-4 hover:text-primary cursor-pointer">
-              <CalendarDaysIcon className="size-5 flex-shrink-0" />
-              {formattedGroupLifetime()}
-            </div>
-          </PopoverTrigger>
-          <PopoverContent className="">
-            <div>edit end date</div>
-          </PopoverContent>
-        </Popover>
+        <div
+          onClick={isCreator ? onOpen : null}
+          className="flex items-center gap-x-4 hover:text-primary cursor-pointer"
+        >
+          <CalendarDaysIcon className="size-5 flex-shrink-0" />
+          {formattedGroupLifetime()}
+        </div>
 
         <Tooltip content="Copy" placement="right" showArrow>
           <div
@@ -117,42 +115,7 @@ const GroupInfoSidebar = ({ currentGroup, participants, currentParticipant }) =>
           </div>
         </Tooltip>
 
-        <div
-          onClick={() => setShowParticipants(!showParticipants)}
-          className="flex items-center gap-x-4 hover:text-primary cursor-pointer"
-        >
-          <UsersIcon className="size-5" />
-          {participants?.length || 0} online participants
-        </div>
-
-        {showParticipants && (
-          <div className="flex flex-col bg-white dark:bg-gray-800 p-4 rounded-lg gap-y-2">
-            <h3 className="text-lg font-semibold">{'Participants '}</h3>
-            <ul className="flex flex-col gap-y-1">
-              {participants && participants.length > 0 ? (
-                participants?.map((participant) => (
-                  <li
-                    key={participant.id}
-                    className="text-sm flex gap-x-2 items-center py-1 px-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
-                  >
-                    <Avatar
-                    size="sm"
-                      //src={participant.avatarUrl}
-                      className="flex-shrink-0"
-                    />
-                    <div>
-                      {participant.nickname}
-                      {participant.id === currentParticipant.id && <div>(You)</div>}
-                    </div>
-                  </li>
-                ))
-              ) : (
-                <p>No participants yet</p>
-              )}
-            </ul>
-          </div>
-        )}
-
+      
         <hr className="h-px border-gray-500  transform scale-y-50" />
 
         <div className="flex items-center justify-between">

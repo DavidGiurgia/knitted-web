@@ -3,7 +3,7 @@
 import { useAuth } from "@/app/_context/AuthContext";
 import { getNotificationsForUser } from "@/app/services/notifications";
 import { ArrowLeftIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Notification from "../../notifications/Notification";

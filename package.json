@@ -1,38 +1,39 @@
 {
-  "name": "zic_web",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@emoji-mart/data": "^1.2.1",
-    "@emoji-mart/react": "^1.1.1",
-    "@heroicons/react": "^2.2.0",
-    "@nextui-org/react": "^2.4.8",
-    "axios": "^1.7.9",
-    "date-fns": "^4.1.0",
-    "emoji-mart": "^5.6.0",
-    "framer-motion": "^11.13.1",
-    "jwt-decode": "^4.0.0",
-    "next": "^15.0.4",
-    "next-themes": "^0.4.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-hot-toast": "^2.4.1",
-    "socket.io-client": "^4.8.1",
-    "typeface-poppins": "^1.1.13",
-    "uuid": "^11.0.5"
-  },
-  "devDependencies": {
-    "@types/node": "22.10.1",
-    "@types/react": "19.0.1",
-    "eslint": "^8",
-    "eslint-config-next": "15.0.3",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1"
-  }
+   "name": "zic_web",
+   "version": "0.1.0",
+   "private": true,
+   "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "lint": "next lint"
+   },
+   "dependencies": {
+      "@emoji-mart/data": "^1.2.1",
+      "@emoji-mart/react": "^1.1.1",
+      "@heroicons/react": "^2.2.0",
+      "@heroui/react": "2.6.14",
+      "avvvatars-react": "^0.4.2",
+      "axios": "^1.7.9",
+      "date-fns": "^4.1.0",
+      "emoji-mart": "^5.6.0",
+      "framer-motion": "^11.13.1",
+      "jwt-decode": "^4.0.0",
+      "next": "^15.0.4",
+      "next-themes": "^0.4.3",
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1",
+      "react-hot-toast": "^2.4.1",
+      "socket.io-client": "^4.8.1",
+      "typeface-poppins": "^1.1.13",
+      "uuid": "^11.0.5"
+   },
+   "devDependencies": {
+      "@types/node": "22.10.1",
+      "@types/react": "19.0.1",
+      "eslint": "^8",
+      "eslint-config-next": "15.0.3",
+      "postcss": "^8",
+      "tailwindcss": "^3.4.1"
+   }
 }

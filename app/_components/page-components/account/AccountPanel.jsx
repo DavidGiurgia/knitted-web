@@ -10,9 +10,9 @@ import FriendsSection from "../../FriendsSection";
 import UserProfile from "../../UserProfile";
 
 const AccountPanel = () => {
-  const { switchPanel, activeSubPanel, pushSubPanel, popSubPanel } = usePanel();
+  const { switchPanel, activeSubPanel, pushSubPanel, popSubPanel, resetSession } = usePanel();
   const { subPanel, param } = activeSubPanel || {};
-  const { user, logout, resetSession } = useAuth();
+  const { user, logout,  } = useAuth();
 
   // Condițional pentru randarea subpanoului activ
   const renderSubPanel = () => {

@@ -5,7 +5,7 @@ import {
   MagnifyingGlassIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-import { Button, useDisclosure } from "@nextui-org/react";
+import { Button, useDisclosure } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/app/_context/AuthContext";
 import NewChatModal from "../../modals/NewChatModal";

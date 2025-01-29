@@ -1,5 +1,5 @@
 import { ChartBarIcon, ChatBubbleLeftIcon, PencilIcon, PlusIcon, QuestionMarkCircleIcon, TrophyIcon } from "@heroicons/react/16/solid";
-import { Tab, Tabs } from "@nextui-org/react";
+import { Tab, Tabs } from "@heroui/react";
 import React from "react";
 
 const InteractionsTabs = ({ selectedTab, setSelectedTab }) => {
@@ -13,12 +13,12 @@ const InteractionsTabs = ({ selectedTab, setSelectedTab }) => {
       selectedKey={selectedTab}
     >
         <Tab
-        key="q&a"
+        key="whiteboard"
         className=""
         title={
           <div className="flex items-center gap-x-2">
             <QuestionMarkCircleIcon className="size-5 " />
-            <span className=" ">Q&A</span>
+            <span className=" ">Whiteboard</span>
           </div>
         }
       />

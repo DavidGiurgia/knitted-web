@@ -1,23 +1,21 @@
 "use client";
 
-import { useWebSocket } from "@/app/_context/WebSoketContext";
 import { fetchMessagesByRoom } from "@/app/api/messages";
 import React, { useEffect, useState } from "react";
 import MessageInput from "../../MessageInput";
-import { Avatar, Button } from "@nextui-org/react";
+import { Avatar, Button } from "@heroui/react";
 import { PaperAirplaneIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/app/_context/AuthContext";
 import GroupMessagesItem from "./GroupMessagesItem";
 import toast from "react-hot-toast";
+import InitialsAvatar from "../../InitialsAvatar";
 
 const GroupChatBox = ({
   participant,
-  currentGroup,
-  participants,
-  setParticipants,
+  group,
+  groupSocket,
 }) => {
   const { user } = useAuth();
-  const { groupSocket } = useWebSocket();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [anonymous, setIdentity] = useState(false);
@@ -25,62 +23,29 @@ const GroupChatBox = ({
   useEffect(() => {
     const loadMessages = async () => {
       try {
-        const data = await fetchMessagesByRoom(currentGroup._id);
+        const data = await fetchMessagesByRoom(group._id);
         setMessages(data);
       } catch (error) {
         console.error("Failed to fetch messages:", error);
       }
-      groupSocket.emit("joinRoom", {
-        groupId: currentGroup._id,
-        participant,
-      });
-      console.log("Joining room:", currentGroup._id, " as ", participant);
     };
 
-    if (currentGroup?._id && participant && groupSocket) {
+    if (group?._id) {
       loadMessages();
     }
-
-    return async () => {
-      groupSocket?.emit("leaveRoom", {
-        groupId: currentGroup?._id,
-        participant,
-      });
-      console.log("Leaving room:", currentGroup?._id, " as ", participant?.id);
-    };
-  }, [currentGroup, participant]);
+  }, [group]);
 
   useEffect(() => {
-    console.log("Group socket connected:", groupSocket?.connected);
     if (!groupSocket) return;
 
-    // Ascultă mesaje
     const handleMessageReceived = async (newMessage) => {
-      if (newMessage.type === "log") {
-        toast(newMessage.content);
-      } else {
-        setMessages((prev) => [...prev, newMessage]);
-      }
+      setMessages((prev) => [...prev, newMessage]);
     };
 
     groupSocket.on("receiveMessage", handleMessageReceived);
 
-    groupSocket.on("updateParticipants", (participants) => {
-      console.log("Updated participants:", participants);
-
-      const normalizedParticipants = participants.map((participant) => ({
-        id: participant.id,
-        nickname: participant.nickname || participant.name || "Unknown", // Normalizare
-      }));
-
-      setParticipants(normalizedParticipants);
-    });
-
     return () => {
       groupSocket.off("receiveMessage", handleMessageReceived);
-      groupSocket.off("updateParticipants", (participants) => {
-        console.log("Updated participants:", participants);
-      });
     };
   }, [groupSocket]);
 
@@ -93,31 +58,28 @@ const GroupChatBox = ({
     }
 
     const messageData = {
-      groupId: currentGroup._id,
+      groupId: group._id,
       content: message,
-      participant,
+      senderId: participant.id,
+      senderName: participant.nickname,
       isAnonymous: anonymous,
     };
-
-    console.log("sending message: ", messageData);
-    console.log("Group socket connected:", groupSocket.connected);
 
     groupSocket.emit("sendMessage", messageData);
     setMessage("");
   };
 
   return (
-    <div className="flex flex-col p-2  h-full items-center w-full ">
+    <div className="flex flex-col p-1  flex-1 items-center w-full h-full">
       <GroupMessagesItem
         messages={messages}
         participant={participant}
-        participants={participants}
       />
 
       <div className="flex w-full items-center gap-x-2 ">
         {anonymous ? (
           <div
-            className="w-10 h-10  flex-shrink-0"
+            className="w-12 h-12  flex-shrink-0"
             onClick={() => {
               setIdentity(false);
             }}
@@ -126,17 +88,12 @@ const GroupChatBox = ({
           </div>
         ) : (
           <div
-            className="w-10 h-10 flex-shrink-0"
+            className="flex-shrink-0 cursor-pointer"
             onClick={() => {
               setIdentity(true);
             }}
           >
-            <Avatar
-              size="md"
-              showFallback
-              src={user?.avatarUrl || null}
-              className="w-full h-full"
-            />
+            <InitialsAvatar nickname={participant?.nickname || "U"} size={48}/>
           </div>
         )}
 

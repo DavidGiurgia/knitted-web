@@ -3,7 +3,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/16/solid";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Button, Image, Input } from "@nextui-org/react";
+import { Button, Image, Input } from "@heroui/react";
 import { useAuth } from "@/app/_context/AuthContext";
 
 const LoginForm = () => {

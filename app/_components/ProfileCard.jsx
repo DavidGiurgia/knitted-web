@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Badge, Button } from "@nextui-org/react";
+import { Avatar, Badge, Button } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../_context/AuthContext";
 import { usePanel } from "../_context/PanelContext";

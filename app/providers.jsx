@@ -1,6 +1,6 @@
 // app/providers.tsx
 "use client";
-import { NextUIProvider } from "@nextui-org/react";
+import { HeroUIProvider } from "@heroui/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { AuthProvider } from "./_context/AuthContext";
 import { Toaster } from "react-hot-toast";
@@ -9,7 +9,7 @@ import { WebSocketProvider } from "./_context/WebSoketContext";
 
 export function Providers({ children }) {
   return (
-    <NextUIProvider>
+    <HeroUIProvider>
       <NextThemesProvider
         attribute="class"
         defaultTheme="light" // Set a default theme
@@ -28,6 +28,6 @@ export function Providers({ children }) {
           </WebSocketProvider>
         </AuthProvider>
       </NextThemesProvider>
-    </NextUIProvider>
+    </HeroUIProvider>
   );
 }

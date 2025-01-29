@@ -10,7 +10,7 @@ import {
 } from "@/app/api/recent-searches";
 import { searchUser } from "@/app/api/user";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 
 const SearchSection = ({ pushSubPanel }) => {
   const { user } = useAuth();

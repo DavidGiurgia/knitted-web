@@ -6,10 +6,9 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import React, { useState } from "react";
 import SelectFriends from "../SelectFriends";
-import { getUserById } from "@/app/services/userService";
 import { useAuth } from "@/app/_context/AuthContext"; // Assuming useAuth provides the current user
 
 const NewChatModal = ({ isOpen, onOpenChange, onCreate }) => {

@@ -1,6 +1,6 @@
 import DeleteAccountModal from "@/app/_components/modals/DeleteAccountModal";
 import { ArrowLeftIcon, IdentificationIcon, LockClosedIcon } from "@heroicons/react/24/outline";
-import { Button, Divider, useDisclosure } from "@nextui-org/react";
+import { Button, Divider, useDisclosure } from "@heroui/react";
 import React from "react";
 
 const AccountSettings = ({ goBack, user }) => {

@@ -1,4 +1,4 @@
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react'
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react"
 import React from 'react'
 
 const CustomModal = ({isOpen, onOpenChange, title, body, onConfirm, confirmButtonText, confirmButtonColor = "primary"}) => {

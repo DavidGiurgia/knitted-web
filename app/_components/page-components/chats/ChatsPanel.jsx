@@ -7,7 +7,7 @@ import ChatsList from "./ChatsList";
 import ChatRoom from "./ChatRoom";
 
 const ChatsPanel = () => {
-  const { switchPanel, activeSubPanel, pushSubPanel, popSubPanel } = usePanel();
+  const { activeSubPanel, pushSubPanel, popSubPanel } = usePanel();
     const { subPanel, param } = activeSubPanel || {};
 
     const renderSubPanel = () => {

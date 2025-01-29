@@ -1,4 +1,4 @@
-import { Image, Modal, ModalBody, ModalContent } from '@nextui-org/react'
+import { Image, Modal, ModalBody, ModalContent } from "@heroui/react"
 import React from 'react'
 
 const PictureModal = ({isOpen, onOpenChange, src, alt = "unknown picture"}) => {
