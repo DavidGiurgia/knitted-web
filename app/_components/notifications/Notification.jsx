@@ -54,7 +54,7 @@ const Notification = ({ notification }) => {
         notification.read
           ? "bg-white"
           : "bg-opacity-30 dark:bg-opacity-30 bg-yellow-100 dark:bg-yellow-100 "
-      } dark:bg-gray-900 shadow-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer`}
+      } dark:bg-gray-950 shadow-md hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer`}
     >
       {notification.type === "friend_request" ? (
         <FriendRequest

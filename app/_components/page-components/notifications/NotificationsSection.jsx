@@ -61,7 +61,7 @@ const NotificationsSection = ({switchPanel, resetPanel }) => {
       <div className="flex items-center justify-between gap-x-6">
         <Button
           className="md:hidden"
-          onPress={() => {switchPanel("Account"); resetPanel();}}
+          onPress={() => {switchPanel("Home"); resetPanel();}}
           variant="light"
           isIconOnly
         >

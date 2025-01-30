@@ -9,14 +9,13 @@ import { useAuth } from "@/app/_context/AuthContext";
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const {login, user} = useAuth();
+  const { login, user } = useAuth();
 
   useEffect(() => {
-    if(user){
+    if (user) {
       router.push("/");
     }
-  }, [user])
-  
+  }, [user]);
 
   const toggleVisibility = () => setShowPassword(!showPassword);
 
@@ -27,13 +26,11 @@ const LoginForm = () => {
   const [passwordError, setPasswordError] = useState("");
 
   const handleLogin = async () => {
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
       setEmailError("Email is required");
       return false;
-    }else if(!emailRegex.test(email))
-    {
+    } else if (!emailRegex.test(email)) {
       setEmailError("Invalid email format");
       return false;
     }
@@ -48,7 +45,9 @@ const LoginForm = () => {
     try {
       const res = await login(email, password);
 
-      res ? toast("👋 Welcome back " + email) : toast.error("Invalid credentials!");
+      res
+        ? toast("👋 Welcome back " + email)
+        : toast.error("Invalid credentials!");
     } catch (error) {
       console.error(error.message);
     } finally {
@@ -57,7 +56,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="max-w-md w-full flex flex-col items-center p-6 space-y-4 h-screen">
+    <div className="max-w-md w-full flex flex-col items-center p-6 space-y-4 min-h-[100vh]">
       <Image
         src="/assets/ZIC-logo.svg"
         alt="Logo"
@@ -138,7 +137,9 @@ const LoginForm = () => {
           size="lg"
           color="primary"
           variant="bordered"
-          onPress={() => {router.push('/register');}}
+          onPress={() => {
+            router.push("/register");
+          }}
           className="mt-14 w-full"
         >
           Create new account

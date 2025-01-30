@@ -1,6 +1,8 @@
 import "./globals.css";
 import {Providers} from "./providers";
 import { Poppins } from "next/font/google";
+import "tailwindcss-debug-screens";
+
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -19,7 +21,7 @@ export default function RootLayout({ children }) {
       <head>
       <link rel="icon" href="/assets/Z-logo.svg" sizes="any" />
       </head>
-      <body className={`${poppins.variable} font-sans`}>
+      <body className={`${poppins.variable} font-sans (debug-screens)`}>
         <Providers>
           {children}
         </Providers>

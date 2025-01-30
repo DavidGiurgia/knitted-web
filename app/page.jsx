@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePanel } from "./_context/PanelContext";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./_context/AuthContext";
@@ -17,25 +17,34 @@ const Landing = () => {
   const { activePanel } = usePanel();
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
+  const [viewportHeight, setViewportHeight] = useState("100vh");
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
       router.push("/login");
     }
+
+    const updateHeight = () => {
+      setViewportHeight(`${window.innerHeight}px`);
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+
+    return () => window.removeEventListener("resize", updateHeight);
   }, [isAuthenticated, router]);
 
   return (
     <div
-      className={`w-full h-screen flex flex-col md:flex-row ${
-        !user && "hidden"
-      }`}
+      className={`w-full flex flex-col md:flex-row ${!user && "hidden"}`}
+      style={{ height: viewportHeight }}
     >
       <LeftSidebar />
 
       <div className="flex-1 flex overflow-y-auto h-full">
         {/* Sectiunea activă */}
         <div
-          className={`flex h-full dark:bg-gray-900 w-full md:max-w-[350px] lg:max-w-[450px] ${
+          className={`flex h-full dark:bg-gray-950 w-full md:!max-w-[350px] lg:!max-w-[450px] ${
             activePanel === "Home" && "hidden"
           }`}
         >

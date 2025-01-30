@@ -1,7 +1,8 @@
 import axios from "axios";
 import { getToken } from "../services/tokenService";
 
-const API_BASE_URL = "http://localhost:8000/auth"; // Înlocuiește cu URL-ul API-ului tău
+
+const API_BASE_URL = 'http://localhost:8000/auth'; // API URL
 
 export const registerUser = async (fullname, username, email, password) => {
   try {

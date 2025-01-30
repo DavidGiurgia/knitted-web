@@ -76,9 +76,9 @@ const GroupsSection = () => {
     }
 
     // If they are not in the same month/year
-    return `${format(createdAt, "MMM d, yyyy")} - ${format(
+    return `${format(createdAt, "MMM d")} - ${format(
       expiresAt,
-      "MMM d, yyyy"
+      "d, yyyy"
     )}`;
   };
 
@@ -148,7 +148,7 @@ const GroupsSection = () => {
   };
 
   return (
-    <div className="flex flex-1 flex-col h-full md:w-[350px] lg:w-[450px] dark:text-white bg-white dark:bg-gray-900">
+    <div className="flex flex-1 flex-col h-full md:w-[350px] lg:w-[450px] dark:text-white ">
       {/* Join Group Input */}
       <div className="flex flex-col gap-y-4 justify-center items-center py-6 px-4 bg-primary">
         <div
@@ -161,7 +161,7 @@ const GroupsSection = () => {
           />
           <input
             aria-label="Group join code"
-            className="ml-2 w-full text-xl outline-none bg-white dark:bg-gray-900 text-dark-secondary dark:text-gray-100"
+            className="ml-2 w-full text-xl outline-none  text-dark-secondary dark:text-gray-100 dark:bg-gray-900"
             placeholder="Enter code here"
             value={code}
             onChange={(e) => setCode(e.target.value)}
@@ -177,7 +177,7 @@ const GroupsSection = () => {
       </div>
 
       {/* Group List Section */}
-      <div className="py-4 px-6 dark:bg-gray-900">
+      <div className="py-4 px-6 dark:bg-gray-950">
         <div className="flex justify-between items-center">
           <h1 className="text-xl ">ZIC Groups</h1>
 
@@ -195,10 +195,9 @@ const GroupsSection = () => {
       </div>
 
       {groups.length > 1 ? (
-        <div className="flex mx-4 items-center p-2 border border-gray-200 dark:border-gray-800 rounded-lg">
-          <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2" />
+        <div className="flex mx-2 md:mx-4 items-center p-2 border border-gray-200 dark:border-gray-800 rounded-lg">
+          <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2 flex-shrink-0" />
           <input
-            autoFocus
             onChange={(event) => setValue(event.currentTarget.value)}
             value={value}
             placeholder="Search by name"
@@ -210,12 +209,12 @@ const GroupsSection = () => {
       {/* Groups Grid */}
       {filteredGroups.length > 0 ? (
         <div
-          className={`grid grid-cols-1 sm:grid-cols-1 gap-4 p-4 overflow-y-auto`}
+          className={`flex flex-col gap-y-4 p-2 md:px-4 overflow-y-auto`}
         >
           {filteredGroups.map((group) => (
             <div
               key={group._id}
-              className="flex flex-col  border-gray-800 rounded-[12px] shadow dark:shadow-gray-950 p-2"
+              className="flex flex-col  border-gray-800 rounded-[12px] shadow dark:shadow-black p-2"
             >
               <div className="h-full flex flex-col gap-y-2">
                 <Button

@@ -29,16 +29,20 @@ const links = [
 
 const Bottombar = () => {
   const { activePanel, switchPanel, resetPanel, bottombar } = usePanel();
-  const {user} = useAuth();
+  const { user } = useAuth();
   const handleLinkClick = (label) => {
-    if(activePanel === label){
+    if (activePanel === label) {
       resetPanel();
     }
     switchPanel(label);
   };
 
   return (
-    <div className={`${!bottombar && "hidden"} md:hidden flex w-full flex-shrink-0 bg-white dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 `}>
+    <div
+      className={`${
+        !bottombar && "hidden"
+      } md:hidden flex w-full flex-shrink-0 bg-white dark:bg-gray-950 border-t border-gray-300 dark:border-gray-800 `}
+    >
       {links.map(
         ({
           label,
@@ -53,19 +57,24 @@ const Bottombar = () => {
             className={`bg-transparent rounded-none w-full h-16`}
           >
             {isAvatar ? (
-              <div className={`${activePanel === "Account" && "ring-1 ring-offset-1 rounded-full  ring-primary"}`}>
-              {user?.avatarUrl ? (
-              <Avatar
-                showFallback
-                src={user.avatarUrl}
-                radius="full"
-                size="sm"
-                className="w-8 h-8"
-              />
-            ) : (
-              <InitialsAvatar nickname={user?.fullname} size={32} />
-            )}
-            </div>
+              <div
+                className={`${
+                  activePanel === "Account" &&
+                  "ring-1 ring-offset-1 rounded-full  ring-primary"
+                }`}
+              >
+                {user?.avatarUrl ? (
+                  <Avatar
+                    showFallback
+                    src={user.avatarUrl}
+                    radius="full"
+                    size="sm"
+                    className="w-8 h-8"
+                  />
+                ) : (
+                  <InitialsAvatar nickname={user?.fullname} size={32} />
+                )}
+              </div>
             ) : activePanel === label ? (
               <IconSolid className="w-8 h-8 text-primary" />
             ) : (

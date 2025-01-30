@@ -10,11 +10,7 @@ import GroupMessagesItem from "./GroupMessagesItem";
 import toast from "react-hot-toast";
 import InitialsAvatar from "../../InitialsAvatar";
 
-const GroupChatBox = ({
-  participant,
-  group,
-  groupSocket,
-}) => {
+const GroupChatBox = ({ participant, group, groupSocket }) => {
   const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -70,47 +66,53 @@ const GroupChatBox = ({
   };
 
   return (
-    <div className="flex flex-col p-1  flex-1 items-center w-full h-full">
-      <GroupMessagesItem
-        messages={messages}
-        participant={participant}
-      />
+    <div className="flex flex-col flex-1 items-center max-w-[800px] h-full p-2 pb-14">
+      {/* Mesaje */}
+      <GroupMessagesItem messages={messages} participant={participant} />
 
-      <div className="flex w-full items-center gap-x-2 ">
-        {anonymous ? (
-          <div
-            className="w-12 h-12  flex-shrink-0"
-            onClick={() => {
-              setIdentity(false);
-            }}
+      {/* Message Input - Fixat jos */}
+      <div className="fixed bottom-0 w-full max-w-[800px] bg-gray-100 dark:bg-gray-900 p-2 pt-0">
+        <div className="flex w-full items-center gap-x-2">
+          {anonymous ? (
+            <div
+              onClick={() => {
+                setIdentity(false);
+                toast(`You are now ${participant?.nickname}`);
+              }}
+              className="w-12 h-12 flex-shrink-0"
+            >
+              <UserIcon className="p-2 rounded-full border border-gray-200 dark:border-gray-800" />
+            </div>
+          ) : (
+            <div
+              className="flex-shrink-0 cursor-pointer"
+              onClick={() => {
+                setIdentity(true);
+                toast("You are now anonymous");
+              }}
+            >
+              <InitialsAvatar
+                nickname={participant?.nickname || "U"}
+                size={48}
+              />
+            </div>
+          )}
+
+          <MessageInput message={message} setMessage={setMessage} />
+
+          <Button
+            onPress={handleSendMessage}
+            isIconOnly
+            variant="ghost"
+            color={anonymous ? "" : "primary"}
+            className={`h-12 w-12 flex-shrink-0 rounded-[20px] ${
+              !message && "hidden"
+            }`}
+            disabled={!message.trim()}
           >
-            <UserIcon className="p-2 rounded-full  border border-gray-200 dark:border-gray-800 " />
-          </div>
-        ) : (
-          <div
-            className="flex-shrink-0 cursor-pointer"
-            onClick={() => {
-              setIdentity(true);
-            }}
-          >
-            <InitialsAvatar nickname={participant?.nickname || "U"} size={48}/>
-          </div>
-        )}
-
-        <MessageInput message={message} setMessage={setMessage} />
-
-        <Button
-          onPress={handleSendMessage}
-          isIconOnly
-          variant="ghost"
-          color={anonymous ? "" : "primary"}
-          className={`h-12 w-12 flex-shrink-0 rounded-[20px] ${
-            !message && "hidden"
-          }`}
-          disabled={!message.trim()}
-        >
-          <PaperAirplaneIcon className="size-6" />
-        </Button>
+            <PaperAirplaneIcon className="size-6" />
+          </Button>
+        </div>
       </div>
     </div>
   );

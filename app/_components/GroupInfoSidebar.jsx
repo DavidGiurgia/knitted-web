@@ -2,22 +2,15 @@
 
 import {
   CalendarDaysIcon,
-  ClockIcon,
   HashtagIcon,
-  LockClosedIcon,
   MoonIcon,
-  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../_context/AuthContext";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { format } from "date-fns";
 import { useState } from "react";
 import {
-  Avatar,
   Button,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   Tooltip,
   useDisclosure,
 } from "@heroui/react";
@@ -25,9 +18,7 @@ import toast from "react-hot-toast";
 import UpdateGroupModal from "./modals/UpdateGroupModal";
 
 const GroupInfoSidebar = ({
-  currentGroup,
-  participants,
-  currentParticipant,
+  currentGroup
 }) => {
   const { user } = useAuth();
   const isCreator = currentGroup?.creatorId === user?._id;
@@ -52,19 +43,19 @@ const GroupInfoSidebar = ({
     }
 
     // If they are not in the same month/year
-    return `${format(createdAt, "MMM d, yyyy")} - ${format(
+    return `${format(createdAt, "MMM d")} - ${format(
       expiresAt,
-      "MMM d, yyyy"
+      "d, yyyy"
     )}`;
   };
 
   return (
-    <div className="overflow-y-auto overflow-x-hidden flex flex-col h-full w-full md:w-fit md:max-w-80">
+    <div className="overflow-y-auto overflow-x-hidden fixed flex flex-col h-full w-full md:w-fit md:max-w-80">
       <div
         onClick={isCreator ? onOpen : null}
-        className="cursor-pointer pt-6 px-6 pb-4 w-full bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
+        className="cursor-pointer pt-6 px-6 pb-4 w-full  hover:bg-gray-200 dark:hover:bg-gray-800"
       >
-        <div className="font-medium text-lg mb-2">
+        <div className="font-medium mb-2">
           {currentGroup?.name || "Group Name"}
         </div>
         <div
@@ -92,7 +83,7 @@ const GroupInfoSidebar = ({
       <div className="p-6 flex flex-col gap-y-8">
         <div
           onClick={isCreator ? onOpen : null}
-          className="flex items-center gap-x-4 hover:text-primary cursor-pointer"
+          className="flex text-sm items-center gap-x-4 hover:text-primary cursor-pointer"
         >
           <CalendarDaysIcon className="size-5 flex-shrink-0" />
           {formattedGroupLifetime()}
@@ -108,7 +99,7 @@ const GroupInfoSidebar = ({
                 toast.error("No join code available to copy.");
               }
             }}
-            className={`w-fit flex gap-x-4 items-center hover:text-primary cursor-pointer`}
+            className={`w-fit text-sm flex gap-x-4 items-center hover:text-primary cursor-pointer`}
           >
             <HashtagIcon className="size-5" />
             {currentGroup?.joinCode || "No code"}
@@ -118,7 +109,7 @@ const GroupInfoSidebar = ({
       
         <hr className="h-px border-gray-500  transform scale-y-50" />
 
-        <div className="flex items-center justify-between">
+        <div className="flex text-sm items-center justify-between">
           <div className="flex items-center">
             <MoonIcon className="size-5 mr-4" />
             Dark mode
@@ -126,27 +117,7 @@ const GroupInfoSidebar = ({
           <ThemeSwitcher />
         </div>
 
-        <hr className="h-px border-gray-500 transform scale-y-50" />
-
-        <div className="flex items-center cursor-pointer">
-          <LockClosedIcon className="size-5 ml-2 mr-5 flex-shrink-0" />
-          <div>
-            Encryption
-            <p className="text-sm text-[#808080]">
-              Messages are end-to-end encrypted. Click to learn more.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center cursor-pointer">
-          <ClockIcon className="size-5 ml-2 mr-5 flex-shrink-0" />
-          <div>
-            Temporary
-            <p className="text-sm text-[#808080]">
-              Once the session ends, so does the data. Click to learn more.
-            </p>
-          </div>
-        </div>
+        
 
         {!user && (
           <div className="w-full">

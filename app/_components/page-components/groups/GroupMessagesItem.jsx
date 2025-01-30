@@ -19,7 +19,7 @@ const GroupMessagesItem = ({ messages, participant }) => {
   }, [messages]);
 
   return (
-    <div className="w-full h-full flex flex-col p-2 overflow-y-auto">
+    <div className="w-full h-full flex flex-col p-1 overflow-y-auto">
       {messages.map((msg, index) => {
         const isSameSenderAsPrevious =
           index > 0 &&
@@ -61,7 +61,7 @@ const GroupMessagesItem = ({ messages, participant }) => {
             <div
               className={`relative rounded-xl ${
                 showAvatar && "rounded-tl-none"
-              } px-4 py-2 ${
+              } max-w-[75%] break-words overflow-hidden  px-4 py-2 ${
                 isCurrentUser && !msg.isAnonymous
                   ? "bg-primary bg-opacity-10"
                   : "bg-gray-200 dark:bg-gray-800"

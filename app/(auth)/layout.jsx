@@ -41,9 +41,9 @@ const AuthLayout = ({ children }) => {
   };
 
   return (
-    <div className="h-screen flex flex-col w-full md:flex-row overflow-auto">
+    <div className="min-h-[100vh] flex flex-col w-full md:flex-row overflow-auto">
       {/* Fixed Left Section */}
-      <div className="flex flex-col md:items-start px-8 pt-16 pb-10 md:h-screen md:w-1/2  bg-primary justify-center md:px-16 md:py-16 text-white dark:text-gray-900">
+      <div className="flex flex-col md:items-start px-8 pt-16 pb-10 md:min-h-[100vh] md:w-1/2  bg-primary justify-center md:px-16 md:py-16 text-white dark:text-gray-900">
         <h1 className="font-semibold text-[24px] md:text-[36px] mb-3">
           Joining a private group?
         </h1>
@@ -69,7 +69,7 @@ const AuthLayout = ({ children }) => {
         </form>
       </div>
       {/* Scrollable Right Section */}
-      <div className="flex-1 h-full md:h-screen min-h-screen bg-light-bg dark:bg-dark-bg flex justify-center md:items-start p-2 overflow-auto">
+      <div className="flex-1 h-full md:min-h-[100vh] min-min-h-[100vh] bg-light-bg dark:bg-dark-bg flex justify-center md:items-start p-2 overflow-auto">
         {children}
       </div>
     </div>

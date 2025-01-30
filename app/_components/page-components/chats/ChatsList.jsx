@@ -58,7 +58,7 @@ const ChatsList = ({ pushSubPanel }) => {
   );
 
   return (
-    <div className="h-full p-6 flex flex-col gap-y-4 overflow-y-auto">
+    <div className="h-full p-3 md:p-6 flex flex-col gap-y-4 overflow-y-auto ">
       <div className="flex items-center justify-between gap-x-6">
         <div className="text-xl">Chats</div>
 
@@ -73,9 +73,8 @@ const ChatsList = ({ pushSubPanel }) => {
 
       {chats.length > 1 && (
         <div className="flex items-center p-2 border border-gray-200 dark:border-gray-800 rounded-lg">
-          <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2" />
+          <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2 flex-shrink-0" />
           <input
-            autoFocus
             onChange={(event) => setValue(event.currentTarget.value)}
             value={value}
             placeholder="Search"
@@ -127,7 +126,7 @@ const ChatsList = ({ pushSubPanel }) => {
               <div
                 key={chat._id}
                 onClick={() => pushSubPanel("ChatRoom", chat)}
-                className="flex w-full items-center text-sm gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg"
+                className="flex w-full items-center text-sm gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900 p-2 rounded-lg"
               >
                 <div className="flex flex-wrap gap-1">
                   <ChatMembersItem

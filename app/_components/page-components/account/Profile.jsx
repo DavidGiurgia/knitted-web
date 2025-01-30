@@ -59,7 +59,7 @@ const Profile = ({ user, logout, switchPanel, pushSubPanel }) => {
       <div className="flex items-center justify-between">
         <div onClick={()=>{
           pushSubPanel("AccountSettings");
-        }} className="ml-2 flex items-center gap-x-1 cursor-pointer hover:underline   text-gray-500"> 
+        }} className="ml-2 flex items-center gap-x-1 cursor-pointer hover:underline   "> 
         {user?.username}
         </div>
         <div>

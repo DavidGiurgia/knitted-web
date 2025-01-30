@@ -1,38 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 
-const MessageInput = ({message, setMessage }) => {
-  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
-  const pickerRef = useRef(null);
-  const buttonRef = useRef(null);
+const MessageInput = ({ message, setMessage }) => {
   const textareaRef = useRef(null);
-
-  // Funcție pentru a verifica dacă click-ul a fost în afacerea picker-ului sau pe butonul de emoji
-  const handleClickOutside = (e) => {
-    if (
-      pickerRef.current &&
-      !pickerRef.current.contains(e.target) &&
-      !buttonRef.current.contains(e.target)
-    ) {
-      setIsEmojiPickerOpen(false); // Închide picker-ul dacă click-ul nu a fost pe butonul de emoji sau pe picker
-    }
-  };
-
-  // Folosim un effect pentru a adăuga și elimina evenimentul de click în afacerea documentului
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
-  const toggleEmojiPicker = () => {
-    setIsEmojiPickerOpen((prev) => !prev);
-  };
 
   const handleEmojiSelect = (emojiObject) => {
     setMessage((prevMessage) => prevMessage + emojiObject.native);
@@ -51,32 +26,24 @@ const MessageInput = ({message, setMessage }) => {
   }, [message]);
 
   return (
-    <div className="relative w-full">
-      {/* Emoji Picker div care se afișează deasupra inputului */}
-      {isEmojiPickerOpen && (
-        <div
-          ref={pickerRef}
-          className="absolute bottom-full left-0 mb-2 shadow-lg"
-        >
-          <div className="overflow-auto">
-            <Picker 
+    <div className="w-full">
+      {/* Input pentru mesaj și butonul de emoji */}
+      <div className="flex min-h-12 items-center w-full rounded-[20px] border border-gray-200 dark:border-gray-800 pl-1">
+        <Popover className="overflow-auto max-w-screen">
+          <PopoverTrigger>
+            <button className="p-2 text-gray-500 dark:text-white hover:text-primary hover:dark:text-primary">
+              <FaceSmileIcon className="size-6" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="max-w-sm overflow-auto ">
+            <Picker
               data={data}
               onEmojiSelect={handleEmojiSelect}
               theme={localStorage.getItem("theme")}
             />
-          </div>
-        </div>
-      )}
+          </PopoverContent>
+        </Popover>
 
-      {/* Input pentru mesaj și butonul de emoji */}
-      <div className="flex min-h-12 items-center w-full rounded-[20px] border border-gray-200 dark:border-gray-800 pl-1">
-        <button
-          ref={buttonRef}
-          onClick={toggleEmojiPicker}
-          className="p-2 text-gray-500 dark:text-white hover:text-primary hover:dark:text-primary"
-        >
-          <FaceSmileIcon className="size-6" />
-        </button>
         <textarea
           ref={textareaRef} // Referința către textarea
           rows={1}

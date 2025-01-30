@@ -14,6 +14,7 @@ import {
 
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { Button, useDisclosure } from "@heroui/react";
+
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -101,8 +102,8 @@ const GroupRoom = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
-      <div className="flex  items-center justify-between py-2 px-6 ">
-        <div className="flex justify-between items-center">
+      <div className=" flex flex-col gap-y-2 borderbg-b py-2 px-3 md:px-6 bg-gray-200 dark:bg-gray-800">
+        <div className="flex  items-center justify-between">
           <Button
             isIconOnly
             variant="light"
@@ -111,21 +112,27 @@ const GroupRoom = () => {
             <Bars3Icon className="size-6" />
           </Button>
 
-          <div className="ml-6 text-lg hidden md:block">
+          <div className="md:ml-6 text-lg">
             <div>{group?.name || "Loading..."}</div>
+          </div>
+
+          <div className="hidden md:block flex-1">
+            <InteractionsTabs
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+          </div>
+
+          <div onClick={onOpen} className="flex-shrink-0">
+            <InitialsAvatar nickname={participant?.nickname || "U"} size={36} />
           </div>
         </div>
 
-        <div
-          onClick={onOpen}
-          className="flex items-center justify-center gap-x-4 px-2 py-1 rounded-xl cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
-        >
-          <div>
-            {typeof participant?.nickname === "string"
-              ? participant.nickname
-              : "Unknown Nickname"}
-          </div>
-          <InitialsAvatar nickname={participant?.nickname || "U"} size={32} />
+        <div className=" md:hidden flex-1 ">
+          <InteractionsTabs
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+          />
         </div>
       </div>
 
@@ -138,17 +145,12 @@ const GroupRoom = () => {
         )}
 
         <div
-          className={`flex flex-col h-full w-full items-center p-1 ${
+          className={`flex flex-col h-full w-full items-center  ${
             sidebar && "hidden md:flex"
           }`}
         >
-          <InteractionsTabs
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-          />
-
           <div
-            className={`w-full h-full md:max-w-[800px] flex-1 overflow-hidden ${
+            className={`flex justify-center w-full h-full flex-1 overflow-hidden ${
               selectedTab !== "chat" && "hidden"
             }`}
           >
@@ -158,14 +160,12 @@ const GroupRoom = () => {
               groupSocket={groupSocket}
             />
           </div>
-
-          {/* <div
-            className={`w-full h-full flex-1 overflow-hidden ${
-              selectedTab !== "whiteboard" && "hidden"
+          <div
+            className={`flex justify-center w-full h-full flex-1 overflow-hidden ${
+              selectedTab !== "q&a" && "hidden"
             }`}
           >
-            <Whiteboard groupId={group?._id} />
-          </div> */}
+          </div>
         </div>
       </div>
 

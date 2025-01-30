@@ -66,7 +66,7 @@ const RegisterForm = () => {
     }
   };
   return (
-    <div className="max-w-md w-full flex flex-col items-center p-6 space-y-4 h-screen">
+    <div className="max-w-md w-full flex flex-col items-center p-6 space-y-4 min-h-[100vh]">
       <Image
         src="/assets/ZIC-logo.svg"
         alt="Logo"

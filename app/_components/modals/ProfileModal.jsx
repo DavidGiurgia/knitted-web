@@ -20,6 +20,7 @@ import {
   deleteAvatarFromImgBB,
 } from "../../services/avatarService";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import InitialsAvatar from "../InitialsAvatar";
 
 const ProfileModal = ({ isOpen, onOpenChange }) => {
   const { user, fetchProfile } = useAuth();
@@ -113,30 +114,40 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
                   <div className="flex flex-wrap items-start gap-x-4">
                     {/* Secțiunea pentru avatar */}
                     <div className="flex flex-shrink-0 w-fit items-center flex-col gap-2">
-                      <Avatar
-                        showFallback
-                        className="w-24 h-24"
-                        src={
-                          selectedAvatar && typeof selectedAvatar === "object"
-                            ? URL.createObjectURL(selectedAvatar)
-                            : selectedAvatar || ""
-                        }
-                      />
+                      {selectedAvatar ? (
+                        <Avatar
+                          showFallback
+                          className="w-24 h-24"
+                          src={
+                            selectedAvatar && typeof selectedAvatar === "object"
+                              ? URL.createObjectURL(selectedAvatar)
+                              : selectedAvatar || ""
+                          }
+                        />
+                      ) : (
+                        <InitialsAvatar nickname={user?.fullname} size={96} />
+                      )}
 
                       <div className="flex items-center">
                         {/* Buton pentru a schimba avatarul */}
-                        <Button isIconOnly htmlFor="fileUpload" variant="light">
-                          <label htmlFor="fileUpload">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleAvatarChange}
-                              className="hidden"
-                              id="fileUpload"
-                            />
-                            <PhotoIcon className="size-5 text-gray-500" />
-                          </label>
+                        <Button
+                          isIconOnly
+                          variant="light"
+                          onPress={() =>
+                            document.getElementById("fileUpload")?.click()
+                          }
+                        >
+                          <PhotoIcon className="size-5 text-gray-500" />
                         </Button>
+
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAvatarChange}
+                          className="absolute opacity-0 w-0 h-0"
+                          id="fileUpload"
+                        />
+
                         <Button
                           onPress={() => setSelectedAvatar("")}
                           isIconOnly

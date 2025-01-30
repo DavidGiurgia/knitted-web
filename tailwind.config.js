@@ -18,6 +18,7 @@ module.exports = {
         hilight: "#FFD700",
         accent: "#00BFFF",
         primary: "#FF6700",
+        secondary: '#3B4E68',
         'light-secondary': '#3B4E68',
         'light-secondary-100': '#5c7aa3',
 
@@ -48,6 +49,7 @@ module.exports = {
   darkMode: "class",
   plugins: [
     heroui(),
+    require('tailwindcss-debug-screens'),
   ],
   
 };

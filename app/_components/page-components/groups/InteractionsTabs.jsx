@@ -1,4 +1,4 @@
-import { ChartBarIcon, ChatBubbleLeftIcon, PencilIcon, PlusIcon, QuestionMarkCircleIcon, TrophyIcon } from "@heroicons/react/16/solid";
+import { ChartBarIcon, ChatBubbleLeftIcon, InformationCircleIcon, PencilIcon, PencilSquareIcon, PlusIcon, QuestionMarkCircleIcon, TrophyIcon } from "@heroicons/react/16/solid";
 import { Tab, Tabs } from "@heroui/react";
 import React from "react";
 
@@ -6,19 +6,18 @@ const InteractionsTabs = ({ selectedTab, setSelectedTab }) => {
   return (
     <Tabs
       onSelectionChange={setSelectedTab}
-      variant="bordered"
-      color="primary"
-      className=" w-full flex items-center justify-center "
+      variant="light"
+      color="secondary"
+      className="w-full flex items-end justify-center"
       size="lg"
       selectedKey={selectedTab}
     >
-        <Tab
-        key="whiteboard"
-        className=""
+      <Tab
+        key="q&a"
         title={
-          <div className="flex items-center gap-x-2">
-            <QuestionMarkCircleIcon className="size-5 " />
-            <span className=" ">Whiteboard</span>
+          <div className="flex items-center gap-x-2 text-xl md:px-2">
+            <QuestionMarkCircleIcon className="size-6" />
+            <span className=" ">Q&A</span>
           </div>
         }
       />
@@ -26,8 +25,8 @@ const InteractionsTabs = ({ selectedTab, setSelectedTab }) => {
         key="chat"
         className=""
         title={
-          <div className="flex items-center gap-x-2">
-            <ChatBubbleLeftIcon className="size-5 " />
+          <div className="flex items-center gap-x-2 text-xl md:px-2">
+            <ChatBubbleLeftIcon className="size-6 " />
             <span className=" ">Chat</span>
           </div>
         }
@@ -35,21 +34,13 @@ const InteractionsTabs = ({ selectedTab, setSelectedTab }) => {
       <Tab
         key="polls"
         title={
-          <div className="flex items-center gap-x-2">
-            <ChartBarIcon className="size-5" />
+          <div className="flex items-center gap-x-2 text-xl md:px-2">
+            <ChartBarIcon className="size-6" />
             <span className="">Polls</span>
           </div>
         }
       />
-      <Tab
-        key="quiz"
-        title={
-          <div className="flex items-center gap-x-2">
-            <TrophyIcon className="size-5" />
-            <span className=" ">Quiz</span>
-          </div>
-        }
-      />
+      
     </Tabs>
   );
 };

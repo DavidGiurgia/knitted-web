@@ -49,8 +49,8 @@ const LeftSidebar = () => {
   };
 
   return (
-    <div className="hidden md:flex h-screen">
-      <nav className="overflow-y-auto h-screen w-20 flex-shrink-0 flex flex-col items-center justify-between bg-white dark:bg-gray-900 border-r border-gray-300 dark:border-gray-800 py-6">
+    <div className="hidden md:flex min-h-[100vh]">
+      <nav className="overflow-y-auto min-h-[100vh] w-20 flex-shrink-0 flex flex-col items-center justify-between bg-white dark:bg-gray-950 border-r border-gray-300 dark:border-gray-800 py-6">
         <div className="space-y-16">
           <div
             className="flex justify-center"
@@ -92,18 +92,23 @@ const LeftSidebar = () => {
                  }`}
                   >
                     {isAvatar ? (
-                      <div className={`${activePanel === "Account" && "ring-1 ring-offset-1 rounded-full  ring-primary"}`}>
+                      <div
+                        className={`${
+                          activePanel === "Account" &&
+                          "ring-1 ring-offset-1 rounded-full  ring-primary"
+                        }`}
+                      >
                         {user?.avatarUrl ? (
-                        <Avatar
-                          showFallback
-                          src={user.avatarUrl}
-                          radius="full"
-                          size="sm"
-                          className="w-8 h-8"
-                        />
-                      ) : (
-                        <InitialsAvatar nickname={user?.fullname} size={32} />
-                      )}
+                          <Avatar
+                            showFallback
+                            src={user.avatarUrl}
+                            radius="full"
+                            size="sm"
+                            className="w-8 h-8"
+                          />
+                        ) : (
+                          <InitialsAvatar nickname={user?.fullname} size={32} />
+                        )}
                       </div>
                     ) : activePanel === label ? (
                       <IconSolid className="w-6 h-6 text-primary" />
