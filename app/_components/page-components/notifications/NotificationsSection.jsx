@@ -2,16 +2,19 @@
 
 import { useAuth } from "@/app/_context/AuthContext";
 import { getNotificationsForUser } from "@/app/services/notifications";
-import { ArrowLeftIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
-import { Button } from "@heroui/react";
+import { ArrowLeftIcon, Bars3Icon } from "@heroicons/react/24/outline";
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/react";
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import Notification from "../../notifications/Notification";
 import { markAllNotificationsAsRead } from "@/app/api/notifications";
-import { acceptFriendRequest } from "@/app/api/friends";
-import { getUserById } from "@/app/services/userService";
 
-const NotificationsSection = ({switchPanel, resetPanel }) => {
+const NotificationsSection = ({ switchPanel }) => {
   const { user, fetchProfile } = useAuth(); // Obține utilizatorul curent
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,9 +25,6 @@ const NotificationsSection = ({switchPanel, resetPanel }) => {
     try {
       // Fetch notifications
       const userNotifications = await getNotificationsForUser(user._id);
-
-      // Mark notifications as read in one go
-      await markAllNotificationsAsRead(user._id);
 
       // Update state
       setNotifications(userNotifications);
@@ -37,22 +37,31 @@ const NotificationsSection = ({switchPanel, resetPanel }) => {
 
   useEffect(() => {
     fetchNotifications();
+
+    //settimeout and after 10 seconds mark all as read
+    setTimeout(handleMarkAllAsRead, 10000);
+
+    return () => {
+      clearTimeout(handleMarkAllAsRead);
+    };
   }, [user]);
 
-  // Handle Add back for friend requests
-  const handleAddBack = async (notification) => {
+  const handleMarkAllAsRead = async () => {
+    if (!user) return;
+
     try {
-      // Add back friend request notification
-      const response = await acceptFriendRequest(
-        user?._id,
-        notification.data.sender?._id
+      // Mark all notifications as read
+      await markAllNotificationsAsRead(user._id);
+
+      // Update state locally
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notification) => ({
+          ...notification,
+          read: true,
+        }))
       );
-      await fetchProfile();
-      if (!response?.success) {
-        toast.error(response?.message);
-      }
     } catch (error) {
-      console.error("Error adding back friend request: ", error);
+      console.error("Error marking all notifications as read:", error);
     }
   };
 
@@ -61,7 +70,9 @@ const NotificationsSection = ({switchPanel, resetPanel }) => {
       <div className="flex items-center justify-between gap-x-6">
         <Button
           className="md:hidden"
-          onPress={() => {switchPanel("Home"); resetPanel();}}
+          onPress={() => {
+            switchPanel("Home");
+          }}
           variant="light"
           isIconOnly
         >
@@ -69,20 +80,57 @@ const NotificationsSection = ({switchPanel, resetPanel }) => {
         </Button>
         <div className="text-xl">Notifications</div>
 
-        
+        <Dropdown>
+          <DropdownTrigger>
+            <Button variant="light" isIconOnly>
+              <Bars3Icon className="size-6" />
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu aria-label="Static Actions">
+            <DropdownItem
+              variant="faded"
+              key="Mark all as read"
+              onPress={handleMarkAllAsRead}
+            >
+              Mark all as read
+            </DropdownItem>
+            <DropdownItem
+              variant="faded"
+              key="Settings"
+              onPress={() => {
+                // Go to settings panel
+                switchPanel("Settings");
+              }}
+            >
+              Settings
+            </DropdownItem>
+            <DropdownItem
+              description="Help and support"
+              variant="faded"
+              key="Help and support"
+              onPress={() => {
+                // Go to help and support panel
+                switchPanel("HelpAndSupport");
+              }}
+            >
+              Help
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </div>
 
-      <div className={`mt-4 w-full flex-1 flex flex-col items-center ${loading || notifications.length === 0 ? "justify-center" : ""}`}>
+      <div
+        className={`mt-4 w-full flex-1 flex flex-col items-center ${
+          loading || notifications.length === 0 ? "justify-center" : ""
+        }`}
+      >
         {loading ? (
           <div className="text-center text-gray-500">Loading...</div>
         ) : notifications.length === 0 ? (
           <div className="text-center text-gray-500">No notifications yet!</div>
         ) : (
           notifications.map((notification) => (
-            <Notification
-              key={notification._id}
-              notification={notification}
-            />
+            <Notification key={notification._id} notification={notification} />
           ))
         )}
       </div>

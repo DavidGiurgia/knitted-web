@@ -1,13 +1,10 @@
 'use client';
+
 import { UserIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useRef } from "react";
 import InitialsAvatar from "../../InitialsAvatar";
 
 const GroupMessagesItem = ({ messages, participant }) => {
-  if (!messages) return null;
-
-  let lastSenderId = null;
-  let lastMessageWasAnonymous = false;
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -15,8 +12,15 @@ const GroupMessagesItem = ({ messages, participant }) => {
   };
 
   useEffect(() => {
-    scrollToBottom();
+    if (messages) {
+      scrollToBottom();
+    }
   }, [messages]);
+
+  if (!messages) return null;
+
+  let lastSenderId = null;
+  let lastMessageWasAnonymous = false;
 
   return (
     <div className="w-full h-full flex flex-col p-1 overflow-y-auto">

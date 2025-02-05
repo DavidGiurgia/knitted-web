@@ -3,15 +3,23 @@
 import { usePanel } from "@/app/_context/PanelContext";
 import React from "react";
 import GroupsSection from "./GroupsSection";
+import CreateGroupSection from "./CreateGroupSection";
 
 const GroupsPanel = () => {
-  const { activeSubPanel } = usePanel();
+  const { activeSubPanel, popSubPanel } = usePanel();
+  const { subPanel, param } = activeSubPanel || {};
 
-  return (
-    <div className={`h-full ${activeSubPanel !== "Groups" && "hidden"}`}>
-      <GroupsSection />
-    </div>
-  );
+
+  const renderSubPanel = () => {
+    switch (subPanel) {
+      case "CreateGroup":
+        return <CreateGroupSection goBack={popSubPanel} />;
+
+      default:
+        return <GroupsSection />;
+    }
+  };
+  return <div className="h-full">{renderSubPanel()}</div>;
 };
 
 export default GroupsPanel;

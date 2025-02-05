@@ -9,25 +9,12 @@ import {
 } from "@/app/services/groupService";
 import { HashtagIcon } from "@heroicons/react/16/solid";
 import {
-  EllipsisHorizontalIcon,
-  EllipsisVerticalIcon,
   MagnifyingGlassIcon,
   PencilIcon,
   PlusIcon,
   TrashIcon,
-  UserPlusIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline";
-import {
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  useDisclosure,
-  Checkbox,
-  Tooltip,
-} from "@heroui/react";
+import { Button, useDisclosure, Tooltip } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -36,13 +23,17 @@ import { removePair } from "@/app/api/user-group";
 import { format } from "date-fns";
 import CreateGroupModal from "../../modals/CreateGroupModal";
 import UpdateGroupModal from "../../modals/UpdateGroupModal";
+import { usePanel } from "@/app/_context/PanelContext";
 
 const GroupsSection = () => {
   const { user } = useAuth();
+  const { screenSize, pushSubPanel } = usePanel();
   const router = useRouter();
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [value, setValue] = useState("");
+  const [showJoinSection, setShowJoinSection] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   const {
     isOpen: isCreateGroupModalOpen,
@@ -76,10 +67,7 @@ const GroupsSection = () => {
     }
 
     // If they are not in the same month/year
-    return `${format(createdAt, "MMM d")} - ${format(
-      expiresAt,
-      "d, yyyy"
-    )}`;
+    return `${format(createdAt, "MMM d")} - ${format(expiresAt, "d, yyyy")}`;
   };
 
   useEffect(() => {
@@ -147,6 +135,22 @@ const GroupsSection = () => {
     return user?._id === group?.creatorId;
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY < lastScrollY) {
+        // Dacă utilizatorul face scroll în sus, afișăm secțiunea
+        setShowJoinSection(true);
+      } else {
+        // Dacă utilizatorul face scroll în jos, ascundem secțiunea
+        setShowJoinSection(false);
+      }
+      setLastScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   return (
     <div className="flex flex-1 flex-col h-full md:w-[350px] lg:w-[450px] dark:text-white ">
       {/* Join Group Input */}
@@ -184,7 +188,11 @@ const GroupsSection = () => {
           <Button
             onPress={() => {
               setSelectedGroup(null);
-              onCreateGroupModaOpen();
+              if (screenSize < 640) {
+                pushSubPanel("CreateGroup");
+              } else {
+                onCreateGroupModaOpen();
+              }
             }}
             isIconOnly
             className="p-0"
@@ -208,9 +216,7 @@ const GroupsSection = () => {
 
       {/* Groups Grid */}
       {filteredGroups.length > 0 ? (
-        <div
-          className={`flex flex-col gap-y-4 p-2 md:px-4 overflow-y-auto`}
-        >
+        <div className={`flex flex-col gap-y-4 p-2 md:px-4 overflow-y-auto`}>
           {filteredGroups.map((group) => (
             <div
               key={group._id}

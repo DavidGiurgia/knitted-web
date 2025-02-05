@@ -11,6 +11,10 @@
   padding: 0;
 }
 
+/* body {
+  overscroll-behavior: contain; /* Previne glitc
+} */
+
 @media (max-width: 767px) { /* Se aplică doar pe ecrane mai mici decât md */
   * {
     max-width: 100vw !important;

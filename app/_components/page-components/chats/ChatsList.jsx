@@ -1,42 +1,21 @@
-"use client";
+'use client';
 
-import {
-  ChatBubbleLeftEllipsisIcon,
-  MagnifyingGlassIcon,
-  PencilSquareIcon,
-} from "@heroicons/react/24/outline";
-import { Button, useDisclosure } from "@heroui/react";
 import React, { useEffect, useState } from "react";
+import { ChatBubbleLeftEllipsisIcon, MagnifyingGlassIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { Button, useDisclosure } from "@heroui/react";
 import { useAuth } from "@/app/_context/AuthContext";
 import NewChatModal from "../../modals/NewChatModal";
-import { createRoom, fetchRoomsForUser } from "@/app/api/rooms";
+import { fetchRoomsForUser } from "@/app/api/rooms";
 import ChatMembersItem from "./ChatMembersItem";
 
-const ChatsList = ({ pushSubPanel }) => {
+const ChatsList = ({ pushSubPanel, screenSize }) => {
   const { user } = useAuth();
   const [value, setValue] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const handleCreateRoom = async (groupName, participantsArray) => {
-    setLoading(true);
-    try {
-      const participants = Array.from(
-        new Set([...participantsArray, user._id])
-      );
-      // Creăm camera folosind numele calculat
-      const room = await createRoom(groupName, participants);
-      setChats((prevChats) => [room, ...prevChats]);
-      pushSubPanel("ChatRoom", room);
-    } catch (error) {
-      console.error("Error creating room:", error);
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
-    
     const fetchChats = async () => {
       setLoading(true);
       try {
@@ -45,25 +24,34 @@ const ChatsList = ({ pushSubPanel }) => {
       } catch (error) {
         console.error("Error fetching user chats:", error);
       }
-      setLoading(false);
+      finally {
+        setLoading(false);
+      }
     };
 
     if (user?._id) {
       fetchChats();
     }
   }, [user?._id]);
+  
   // Filter chats based on the search input
   const filteredChats = chats.filter((chat) =>
     chat.name.toLowerCase().includes(value.toLowerCase())
   );
 
   return (
-    <div className="h-full p-3 md:p-6 flex flex-col gap-y-4 overflow-y-auto ">
+    <div className="h-full p-3 md:p-6 flex flex-col gap-y-4 overflow-y-auto overflow-x-hidden">
       <div className="flex items-center justify-between gap-x-6">
         <div className="text-xl">Chats</div>
 
         <Button
-          onPress={onOpen}
+          onPress={() => {
+            if (screenSize > 640) {
+              onOpen();
+            } else {
+              pushSubPanel("NewChatSection");
+            }
+          }}
           isIconOnly
           className="p-0"
           startContent={<PencilSquareIcon className="w-6 h-6 " />}
@@ -84,7 +72,7 @@ const ChatsList = ({ pushSubPanel }) => {
       )}
 
       {loading ? (
-        <div className="text-center text-gray-500">Loading...</div>
+        <div className="h-full w-full flex items-center justify-center">Loading your chats...</div>
       ) : value ? (
         filteredChats.length > 0 ? (
           <ul className="flex flex-col gap-y-2">
@@ -129,9 +117,7 @@ const ChatsList = ({ pushSubPanel }) => {
                 className="flex w-full items-center text-sm gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900 p-2 rounded-lg"
               >
                 <div className="flex flex-wrap gap-1">
-                  <ChatMembersItem
-                    room={chat}
-                  />
+                  <ChatMembersItem room={chat} />
                 </div>
               </div>
             ))
@@ -140,11 +126,7 @@ const ChatsList = ({ pushSubPanel }) => {
       )}
 
       {/* New Chat Modal */}
-      <NewChatModal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        onCreate={handleCreateRoom}
-      />
+      <NewChatModal isOpen={isOpen} onOpenChange={onOpenChange} />
     </div>
   );
 };

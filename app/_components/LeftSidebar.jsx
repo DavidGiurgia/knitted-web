@@ -95,7 +95,7 @@ const LeftSidebar = () => {
                       <div
                         className={`${
                           activePanel === "Account" &&
-                          "ring-1 ring-offset-1 rounded-full  ring-primary"
+                          "ring-1 ring-offset-1 rounded-full ring-offset-gray-100 dark:ring-offset-gray-800 ring-primary"
                         }`}
                       >
                         {user?.avatarUrl ? (

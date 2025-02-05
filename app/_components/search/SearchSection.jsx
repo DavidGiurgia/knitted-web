@@ -10,7 +10,7 @@ import {
 } from "@/app/api/recent-searches";
 import { searchUser } from "@/app/api/user";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Button } from "@heroui/react";
+import { Button, Skeleton } from "@heroui/react";
 
 const SearchSection = ({ pushSubPanel }) => {
   const { user } = useAuth();
@@ -22,8 +22,15 @@ const SearchSection = ({ pushSubPanel }) => {
   useEffect(() => {
     // Obține recenții la montarea componentei
     const getRecentUsers = async () => {
-      const recentUsers = await getRecentSearches(user?._id);
-      setRecent(recentUsers);
+      try {
+        setLoading(true);
+        const recentUsers = await getRecentSearches(user?._id);
+        setRecent(recentUsers);
+      } catch (error) {
+        console.error("Error fetching recent searches: " + error.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getRecentUsers();
@@ -83,12 +90,33 @@ const SearchSection = ({ pushSubPanel }) => {
     }
   };
 
+  const renderSkeletons = () => (
+    <ul className="flex flex-col gap-y-2 mt-10">
+      {Array(5)
+        .fill()
+        .map((_, index) => (
+          <li
+            key={index}
+            className="flex items-center py-1 px-2 justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+          >
+            <div className="flex items-center gap-x-4 w-full">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div className="flex flex-col flex-1 gap-y-2">
+                <Skeleton className="w-32 h-4 rounded" />
+                <Skeleton className="w-48 h-4 rounded" />
+              </div>
+            </div>
+          </li>
+        ))}
+    </ul>
+  );
+
   return (
     <div className="w-full h-full flex-1 p-3 md:p-6 flex flex-col gap-y-4 ">
       <div className="flex items-center p-2 border border-gray-200 dark:border-gray-800 rounded-lg">
         <MagnifyingGlassIcon className="text-gray-500 size-4 mr-2 flex-shrink-0" />
         <input
-          autoFocus
+          //autoFocus
           onChange={(event) => setValue(event.currentTarget.value)}
           value={value}
           placeholder="Search"
@@ -98,7 +126,7 @@ const SearchSection = ({ pushSubPanel }) => {
 
       <div className="flex-1 h-full ">
         {loading ? (
-          <div className="text-center text-gray-500">Loading...</div>
+          renderSkeletons()
         ) : value ? (
           results?.length > 0 ? (
             <ul className="flex flex-col gap-y-2">
@@ -108,9 +136,7 @@ const SearchSection = ({ pushSubPanel }) => {
                   key={currUser._id}
                   onClick={() => {
                     handleAddToRecent(currUser);
-                    {
-                      pushSubPanel("Profile", currUser);
-                    }
+                    pushSubPanel("Profile", currUser);
                   }} // Adaugă la recents
                 >
                   <UserListItem user={currUser} />

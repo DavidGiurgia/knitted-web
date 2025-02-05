@@ -2,7 +2,7 @@ import axios from "axios";
 import { getToken } from "../services/tokenService";
 
 
-const API_BASE_URL = 'http://localhost:8000/auth'; // API URL
+const API_BASE_URL = 'http://192.168.0.103:8000/auth'; // API URL
 
 export const registerUser = async (fullname, username, email, password) => {
   try {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000/notifications"; // URL-ul API-ului backend
+const API_BASE_URL = process.env.API_BASE_URL || "http://192.168.0.103:8000/notifications"; // URL-ul API-ului backend
 
 // Creează o notificare
 export const createNotification = async (userId, type, data) => {

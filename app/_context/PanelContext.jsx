@@ -1,10 +1,22 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const PanelContext = createContext();
 
 export const PanelProvider = ({ children }) => {
+  // 🖥️ Adăugăm screenSize
+  const [screenSize, setScreenSize] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1024
+  );
+
+  useEffect(() => {
+    const updateScreenSize = () => setScreenSize(window.innerWidth);
+    window.addEventListener("resize", updateScreenSize);
+
+    return () => window.removeEventListener("resize", updateScreenSize);
+  }, []);
+
   const [bottombar, setBottombar] = useState(true);
   // Stocăm istoricul subpanourilor pentru fiecare panou principal
   const [panelData, setPanelData] = useState({
@@ -36,7 +48,6 @@ export const PanelProvider = ({ children }) => {
       [activePanel]: [...subPanelsStack, { subPanel, param }],
     }));
   };
-  
 
   // Funcție pentru a elimina ultimul subpanou din panoul curent
   const popSubPanel = () => {
@@ -62,9 +73,22 @@ export const PanelProvider = ({ children }) => {
     }));
     setActivePanel("Home"); // Activăm panoul principal Home
     setBottombar(true); // Afisează butonul de subsol
-  }
+  };
 
-  //const activeSubPanel = subPanelsStack[subPanelsStack.length - 1];
+  const activeSubPanel = subPanelsStack[subPanelsStack.length - 1];
+
+  useEffect(() => {
+    const hiddenBottombarPanels = [
+      "CreatePost",
+      "CreateGroup",
+      "NewChatSection",
+      "EditProfile",
+    ];
+    const shouldHideBottombar = hiddenBottombarPanels.includes(
+      activeSubPanel?.subPanel
+    );
+    setBottombar(!shouldHideBottombar);
+  }, [activeSubPanel]);
 
   return (
     <PanelContext.Provider
@@ -72,13 +96,14 @@ export const PanelProvider = ({ children }) => {
         activePanel,
         switchPanel,
         subPanelsStack,
-        activeSubPanel: subPanelsStack[subPanelsStack.length - 1],
+        activeSubPanel,
         pushSubPanel,
         popSubPanel,
         resetPanel,
         bottombar,
         setBottombar,
-        resetSession
+        resetSession,
+        screenSize, // 👈 Adăugat în context
       }}
     >
       {children}

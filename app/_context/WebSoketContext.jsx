@@ -6,7 +6,7 @@ export const WebSocketProvider = ({ children }) => {
   const [chatSocket, setChatSocket] = useState(null);
 
   useEffect(() => {
-    const chatWs = io("http://localhost:8000/chat");
+    const chatWs = io("http://192.168.0.103:8000/chat");
 
     chatWs.on("connect", () => {
       console.log("Connected to Chat WebSocket");

@@ -10,7 +10,7 @@ const FriendsSection = ({ currUser, goBack, onSelect, mutualOnly = false }) => {
         <Button onPress={goBack} variant="light" isIconOnly>
           <ArrowLeftIcon className="size-5" />
         </Button>
-        <h1 className="text-lg">Friends</h1>
+        <h1 className="text-lg">{currUser?.fullname}</h1>
       </div>
       <FriendsList currUser={currUser} onSelect={onSelect} mutualOnly={mutualOnly}/>
     </div>

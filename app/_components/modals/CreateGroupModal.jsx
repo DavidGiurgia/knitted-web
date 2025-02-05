@@ -5,41 +5,34 @@ import { createGroup, pairUserGroup } from "@/app/services/groupService";
 import { generateUniqueJoinCode } from "@/app/services/utils";
 import {
   Button,
-  Calendar,
   Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Textarea,
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import SelectFriends from "../SelectFriends";
+import { usePanel } from "@/app/_context/PanelContext";
+import { useKeyboard } from "@/app/_context/KeyboardContext";
 
 const CreateGroupModal = ({ isOpen, onOpenChange }) => {
   const { user } = useAuth();
   const router = useRouter();
+  const { popSubPanel } = usePanel();
 
   const [groupName, setGroupName] = useState("");
-  const [groupDescription, setGroupDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [nameError, setNameError] = useState("");
   const [selectedFriends, setSelectedFriends] = useState([]);
-  const [endDate, setEndDate] = useState(); // Default to today
+  const [inviteFriendsSection, setInviteFriendsSection] = useState(false);
 
   const handleValidation = () => {
-    if (!groupName.trim() || groupName.length < 3) {
-      setNameError(
-        groupName.length < 3
-          ? "Group name must be at least 3 characters."
-          : "Group name is required."
-      );
+    if (!groupName.trim()) {
+      setNameError("Group name is required.");
       return false;
     }
     setNameError("");
@@ -55,52 +48,45 @@ const CreateGroupModal = ({ isOpen, onOpenChange }) => {
       const groupData = {
         creatorId: user._id,
         name: groupName,
-        description: groupDescription,
         joinCode: await generateUniqueJoinCode(),
       };
-
-      console.log("invited friends ids: ", selectedFriends);
 
       const newGroup = await createGroup(
         groupData,
         Array.from(selectedFriends)
       );
 
-      const userAsParticipnat = {
+      const userAsParticipant = {
         id: user._id,
         nickname: user.fullname,
       };
 
-      await pairUserGroup(user._id, newGroup._id, userAsParticipnat);
+      await pairUserGroup(user._id, newGroup._id, userAsParticipant);
 
-      toast.success("Group created successfully!");
-      onOpenChange(false); // Close the modal
       router.push(`/group-room/${newGroup._id}`);
+
+      onOpenChange(false);
     } catch (error) {
       console.error("Error creating group:", error);
-      toast.error("An error occurred. Please try again.");
     } finally {
       setGroupName("");
-      setGroupDescription("");
       setLoading(false);
     }
   };
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">
-              Create a New Group
-            </ModalHeader>
-            <ModalBody>
+      <ModalContent className=" max-h-full overflow-y-auto ">
+        <>
+          <ModalHeader>New group</ModalHeader>
+          <ModalBody>
+            <div className="overflow-y-auto flex flex-col gap-y-2 ">
               <Input
                 maxLength={20}
                 color={nameError.length && "danger"}
                 isInvalid={!!nameError}
                 errorMessage={nameError}
-                label="Group Name"
+                label="Group subject"
                 value={groupName}
                 onChange={(e) => {
                   setGroupName(e.target.value);
@@ -108,34 +94,21 @@ const CreateGroupModal = ({ isOpen, onOpenChange }) => {
                 }}
                 variant="bordered"
               />
-              <Textarea
-                maxLength={1000}
-                value={groupDescription}
-                onChange={(e) => setGroupDescription(e.target.value)}
-                label="Description"
-                variant="bordered"
-                className="mb-4"
-              />
-              <SelectFriends
-                label="Send an invitation to:"
-                placeholder="Invite your friends"
-                setSelectedFriends={setSelectedFriends}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="light" onPress={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color="primary"
-                isLoading={loading}
-                onPress={handleCreateGroup}
-              >
-                Create
-              </Button>
-            </ModalFooter>
-          </>
-        )}
+
+              <SelectFriends setSelectedFriends={setSelectedFriends} />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              isLoading={loading}
+              className="w-full"
+              color="primary"
+              onPress={handleCreateGroup}
+            >
+              Create
+            </Button>
+          </ModalFooter>
+        </>
       </ModalContent>
     </Modal>
   );

@@ -23,7 +23,7 @@ const ChatBox = ({ room }) => {
         const data = await fetchMessagesByRoom(room._id);
         setMessages(data);
 
-        const participantPromises = room.participants.map(
+        const participantPromises = room.participants?.map(
           async (participantId) => {
             const user = await getUserById(participantId);
             return user;

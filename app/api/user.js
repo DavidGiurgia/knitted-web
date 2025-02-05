@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8000/users";
+const API_BASE_URL = "http://192.168.0.103:8000/users";
 
 export const fetchUserById = async (id) => {
     try{
@@ -26,9 +26,9 @@ export const searchUser = async (searchText, userId) => {
 }
 
 
-export const updateUser = async (userId, fullname, username, bio, avatarUrl, deleteAvatarUrl) => {
+export const updateUser = async (userId, bio, avatarUrl, deleteAvatarUrl, coverUrl, deleteCoverUrl) => {
     try{
-        const response = await axios.post(`${API_BASE_URL}/update/${userId}`, { fullname, username, bio, avatarUrl, deleteAvatarUrl });
+        const response = await axios.post(`${API_BASE_URL}/update/${userId}`, { bio, avatarUrl, deleteAvatarUrl, coverUrl, deleteCoverUrl });
         return response.data;
     }
     catch(error){

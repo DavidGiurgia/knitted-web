@@ -60,7 +60,7 @@ const Bottombar = () => {
               <div
                 className={`${
                   activePanel === "Account" &&
-                  "ring-1 ring-offset-1 rounded-full  ring-primary"
+                  "ring-1 ring-offset-1 ring-offset-white dark:ring-offset-gray-950 rounded-full  ring-primary"
                 }`}
               >
                 {user?.avatarUrl ? (

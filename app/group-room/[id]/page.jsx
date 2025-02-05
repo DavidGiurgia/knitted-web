@@ -34,7 +34,7 @@ const GroupRoom = () => {
   const [groupSocket, setGroupSocket] = useState(null);
 
   useEffect(() => {
-    const groupWs = io("http://localhost:8000/group");
+    const groupWs = io("http://192.168.0.103:8000/group");
 
     groupWs.on("connect", () => {
       console.log("Connected to Group WebSocket");
@@ -102,7 +102,7 @@ const GroupRoom = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
-      <div className=" flex flex-col gap-y-2 borderbg-b py-2 px-3 md:px-6 bg-gray-200 dark:bg-gray-800">
+      <div className=" flex flex-col gap-y-2 borderbg-b py-2 px-3 md:px-6 border-b border-gray-200 dark:border-gray-800">
         <div className="flex  items-center justify-between">
           <Button
             isIconOnly
@@ -128,12 +128,14 @@ const GroupRoom = () => {
           </div>
         </div>
 
-        <div className=" md:hidden flex-1 ">
-          <InteractionsTabs
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-          />
-        </div>
+        {!sidebar && (
+          <div className=" md:hidden flex-1 ">
+            <InteractionsTabs
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex overflow-y-auto h-screen">
@@ -164,8 +166,7 @@ const GroupRoom = () => {
             className={`flex justify-center w-full h-full flex-1 overflow-hidden ${
               selectedTab !== "q&a" && "hidden"
             }`}
-          >
-          </div>
+          ></div>
         </div>
       </div>
 

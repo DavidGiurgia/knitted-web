@@ -51,7 +51,10 @@ const AuthLayout = ({ children }) => {
           No account needed
         </h2>
         <form className="flex items-center p-2 bg-gray-100 dark:bg-gray-900 rounded-xl drop-shadow-md w-full max-w-xs">
-          <HashtagIcon className="w-8 h-8 text-light-secondary dark:text-gray-200 ml-2" />
+          <HashtagIcon
+            aria-hidden="true"
+            className="w-10 h-10 text-light-secondary dark:text-gray-200 ml-2"
+          />
           <input
             className="ml-2 w-full text-xl outline-none bg-gray-100 dark:bg-gray-900 text-dark-secondary dark:text-gray-100"
             placeholder="Enter code here"

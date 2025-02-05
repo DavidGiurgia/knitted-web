@@ -43,12 +43,8 @@ const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
   }, [groupName, groupDescription, code, group]);
 
   const handleValidation = () => {
-    if (!groupName.trim() || groupName.length < 3) {
-      setNameError(
-        groupName.length < 3
-          ? "Group name must be at least 3 characters."
-          : "Group name is required."
-      );
+    if (!groupName.trim()) {
+      setNameError("Group name is required.");
       return false;
     }
     setNameError("");
@@ -117,22 +113,7 @@ const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
                   label={<div className="text-gray-500">Description</div>}
                   placeholder="Add a description"
                 />
-                <div className="flex items-center justify-between gap-x-6 mt-4">
-                  <Input
-                    maxLength={10}
-                    color={codeError.length && "danger"}
-                    isInvalid={codeError.length}
-                    errorMessage={codeError}
-                    label={<div className="text-gray-500">Start date *</div>}
-                    value={code}
-                    onChange={(e) => {
-                      setCode(e.target.value);
-                      setCodeError("");
-                    }}
-                    variant="underlined"
-                  />
-
-                  <Input
+                <Input
                     maxLength={10}
                     color={codeError.length && "danger"}
                     isInvalid={codeError.length}
@@ -145,7 +126,6 @@ const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
                     }}
                     variant="underlined"
                   />
-                </div>
                 <Input
                   maxLength={10}
                   color={codeError.length && "danger"}

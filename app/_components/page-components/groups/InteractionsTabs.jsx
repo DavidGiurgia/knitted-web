@@ -7,7 +7,7 @@ const InteractionsTabs = ({ selectedTab, setSelectedTab }) => {
     <Tabs
       onSelectionChange={setSelectedTab}
       variant="light"
-      color="secondary"
+      color="primary"
       className="w-full flex items-end justify-center"
       size="lg"
       selectedKey={selectedTab}

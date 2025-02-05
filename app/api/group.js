@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8000/group";
+const API_BASE_URL = "http://192.168.0.103:8000/group";
 
 export const create = async (groupData, invitedUserIds) => {
     try{

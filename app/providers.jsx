@@ -6,6 +6,7 @@ import { AuthProvider } from "./_context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import { PanelProvider } from "./_context/PanelContext";
 import { WebSocketProvider } from "./_context/WebSoketContext";
+import { KeyboardProvider } from "./_context/KeyboardContext";
 
 export function Providers({ children }) {
   return (
@@ -17,14 +18,16 @@ export function Providers({ children }) {
       >
         <AuthProvider>
           <WebSocketProvider>
-            <PanelProvider>
-              {children}
-              <Toaster
-                toastOptions={{
-                  className: "dark:text-white dark:bg-gray-900",
-                }}
-              />
-            </PanelProvider>
+            <KeyboardProvider>
+              <PanelProvider>
+                {children}
+                <Toaster
+                  toastOptions={{
+                    className: "dark:text-white dark:bg-gray-900",
+                  }}
+                />
+              </PanelProvider>
+            </KeyboardProvider>
           </WebSocketProvider>
         </AuthProvider>
       </NextThemesProvider>

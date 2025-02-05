@@ -8,21 +8,33 @@ import { useAuth } from "@/app/_context/AuthContext";
 import AccountSettings from "./settings/AccountSettings";
 import FriendsSection from "../../FriendsSection";
 import UserProfile from "../../UserProfile";
+import EditProfileSection from "./EditProfileSection";
+import CreatePostSection from "../home/CreatePostSection";
 
 const AccountPanel = () => {
-  const { switchPanel, activeSubPanel, pushSubPanel, popSubPanel, resetSession } = usePanel();
+  const {
+    switchPanel,
+    activeSubPanel,
+    pushSubPanel,
+    popSubPanel,
+    resetSession,
+  } = usePanel();
   const { subPanel, param } = activeSubPanel || {};
-  const { user, logout,  } = useAuth();
+  const { user, logout } = useAuth();
 
   // Condițional pentru randarea subpanoului activ
   const renderSubPanel = () => {
     switch (subPanel) {
+      case "CreatePost":
+        return <CreatePostSection />;
       case "Settings":
         return (
           <Settings user={user} goBack={popSubPanel} goTo={pushSubPanel} />
         );
       case "AccountSettings":
         return <AccountSettings user={user} goBack={popSubPanel} />;
+      case "EditProfile":
+        return <EditProfileSection />;
       case "FriendsSection":
         return (
           <FriendsSection
@@ -41,7 +53,7 @@ const AccountPanel = () => {
         return (
           <Profile
             user={user}
-            logout={()=>{
+            logout={() => {
               logout();
               resetSession();
             }}

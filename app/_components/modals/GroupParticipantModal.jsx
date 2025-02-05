@@ -45,10 +45,6 @@ const GroupParticipantModal = ({
       setNicknameError("Name cannot be empty.");
       return;
     }
-    if (nickname.length < 3) {
-      setNicknameError("Your name should have at least three characters.");
-      return;
-    }
 
     const newParticipantProfile = {
       id: participant.id,
