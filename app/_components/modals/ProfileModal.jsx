@@ -32,19 +32,33 @@ import Image from "next/image";
 const ProfileModal = ({ isOpen, onOpenChange }) => {
   const { user, fetchProfile } = useAuth();
   const [bio, setBio] = useState("");
+  const [initialBio, setInitialBio] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState("");
+  const [initialAvatar, setInitialAvatar] = useState("");
   const [selectedCover, setSelectedCover] = useState("");
+  const [initialCover, setInitialCover] = useState("");
   const [previewMode, setPreviewMode] = useState(false);
 
   useEffect(() => {
     if (user) {
-      setPreviewMode(false);
       setBio(user.bio || "");
+      setInitialBio(user.bio || "");
       setSelectedAvatar(user.avatarUrl || "");
+      setInitialAvatar(user.avatarUrl || "");
       setSelectedCover(user.coverUrl || "");
+      setInitialCover(user.coverUrl || "");
+      setPreviewMode(false);
     }
   }, [user, isOpen]);
+
+  const isModified = () => {
+    return (
+      bio !== initialBio ||
+      selectedAvatar !== initialAvatar ||
+      selectedCover !== initialCover
+    );
+  };
 
   const handleSaveProfile = async () => {
     setLoading(true);
@@ -314,13 +328,16 @@ const ProfileModal = ({ isOpen, onOpenChange }) => {
               )}
             </ModalBody>
             <ModalFooter>
+              {isModified() && (
+                <Button
+                  variant="faded"
+                  onPress={() => setPreviewMode(!previewMode)}
+                >
+                  {previewMode ? "Back" : "Preview"}
+                </Button>
+              )}
               <Button
-                variant="faded"
-                onPress={() => setPreviewMode(!previewMode)}
-              >
-                {previewMode ? "Back" : "Preview"}
-              </Button>
-              <Button
+                isDisabled={!isModified()}
                 color="primary"
                 isLoading={loading}
                 onPress={async () => {

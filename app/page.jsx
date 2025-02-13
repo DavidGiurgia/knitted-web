@@ -12,11 +12,13 @@ import HomePanel from "./_components/page-components/home/HomePanel";
 import Bottombar from "./_components/Bottombar";
 import AccountPanel from "./_components/page-components/account/AccountPanel";
 import SearchPanel from "./_components/search/SearchPanel";
+import { Skeleton } from "@heroui/react";
+import LoadingScreen from "./_components/LoadingScreen";
 
 const Landing = () => {
   const { activePanel } = usePanel();
   const router = useRouter();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
   const [viewportHeight, setViewportHeight] = useState("100vh");
 
   useEffect(() => {
@@ -34,6 +36,9 @@ const Landing = () => {
     return () => window.removeEventListener("resize", updateHeight);
   }, [isAuthenticated, router]);
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
   return (
     <div
       className={`w-full flex flex-col md:flex-row ${!user && "hidden"}`}

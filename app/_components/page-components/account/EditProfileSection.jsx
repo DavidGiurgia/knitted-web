@@ -40,6 +40,7 @@ const EditProfileSection = () => {
       setInitialAvatar(user.avatarUrl || "");
       setSelectedCover(user.coverUrl || "");
       setInitialCover(user.coverUrl || "");
+      setPreviewMode(false)
     }
   }, [user]);
 
@@ -121,7 +122,7 @@ const EditProfileSection = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full  ">
       {previewMode ? (
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col">

@@ -34,7 +34,7 @@ const GroupRoom = () => {
   const [groupSocket, setGroupSocket] = useState(null);
 
   useEffect(() => {
-    const groupWs = io("http://192.168.0.103:8000/group");
+    const groupWs = io(`${process.env.NEXT_PUBLIC_BACKEND_URL}/group`);
 
     groupWs.on("connect", () => {
       console.log("Connected to Group WebSocket");
@@ -103,7 +103,7 @@ const GroupRoom = () => {
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
       <div className=" flex flex-col gap-y-2 borderbg-b py-2 px-3 md:px-6 border-b border-gray-200 dark:border-gray-800">
-        <div className="flex  items-center justify-between">
+        <div className="flex  items-center justify-between ">
           <Button
             isIconOnly
             variant="light"
@@ -116,14 +116,7 @@ const GroupRoom = () => {
             <div>{group?.name || "Loading..."}</div>
           </div>
 
-          <div className="hidden md:block flex-1">
-            <InteractionsTabs
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-            />
-          </div>
-
-          <div onClick={onOpen} className="flex-shrink-0">
+          <div onClick={onOpen} className="flex-shrink-0 md:ml-auto ">
             <InitialsAvatar nickname={participant?.nickname || "U"} size={36} />
           </div>
         </div>
@@ -167,6 +160,14 @@ const GroupRoom = () => {
               selectedTab !== "q&a" && "hidden"
             }`}
           ></div>
+        </div>
+
+        <div className="hidden md:flex p-4  justify-center">
+          <InteractionsTabs
+          isVertical
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+          />
         </div>
       </div>
 

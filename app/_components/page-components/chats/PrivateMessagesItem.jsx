@@ -2,9 +2,13 @@
 
 import React, { useEffect, useRef } from "react";
 import { Avatar } from "@heroui/react";
+import InitialsAvatar from "../../InitialsAvatar";
+import { useKeyboard } from "@/app/_context/KeyboardContext";
 
-const PrivateMessagesItem = ({room, messages, participant, participants }) => {
+const PrivateMessagesItem = ({ room, messages, participant, participants }) => {
   const messagesEndRef = useRef(null);
+    const { isKeyboardOpen } = useKeyboard();
+  
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -12,21 +16,23 @@ const PrivateMessagesItem = ({room, messages, participant, participants }) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages,isKeyboardOpen]);
 
   return (
     <div
-      className="flex-1 w-full p-1 overflow-y-auto flex flex-col"
-      style={{ maxHeight: "calc(100vh - 80px)" }}
+      className="h-full w-full p-1 overflow-y-auto flex flex-col"
     >
       {messages?.map((msg, index) => {
-        const isGroup = room.isGroup;
+        const isGroup = room?.isGroup;
         const isSameSenderAsPrevious =
           index > 0 && messages[index - 1].senderId === msg.senderId;
         const sender = participants?.find((p) => p._id === msg.senderId);
         const isCurrentUser = msg.senderId === participant?._id;
         const showAvatar =
-        isGroup && msg.type !== "log" && !isSameSenderAsPrevious && !isCurrentUser;
+          isGroup &&
+          msg.type !== "log" &&
+          !isSameSenderAsPrevious &&
+          !isCurrentUser;
 
         return (
           <div
@@ -35,13 +41,16 @@ const PrivateMessagesItem = ({room, messages, participant, participants }) => {
               isCurrentUser ? "justify-end" : "justify-start"
             }`}
           >
-            {showAvatar && (
-              <Avatar
-                src={sender?.avatarUrl || null}
-                alt="Avatar"
-                className="w-8 h-8 rounded-full"
-              />
-            )}
+            {showAvatar &&
+              (sender?.avatarUrl ? (
+                <Avatar
+                  src={sender.avatarUrl || null}
+                  alt="Avatar"
+                  className="w-8 h-8 rounded-full"
+                />
+              ) : (
+                <InitialsAvatar nickname={sender?.fullname} size={32} />
+              ))}
             <div
               className={`flex flex-col gap-x-2 rounded-xl px-4 py-2 break-words text-ellipsis ${
                 isCurrentUser
@@ -53,7 +62,8 @@ const PrivateMessagesItem = ({room, messages, participant, participants }) => {
                     } bg-gray-100 dark:bg-gray-800`
               }`}
               style={{
-                marginLeft: !showAvatar && !isCurrentUser  && isGroup ? "2.5rem" : "0",
+                marginLeft:
+                  !showAvatar && !isCurrentUser && isGroup ? "2.5rem" : "0",
                 maxWidth: "80%",
               }}
             >
@@ -62,7 +72,11 @@ const PrivateMessagesItem = ({room, messages, participant, participants }) => {
                   {sender?.fullname || "Anonymous"}
                 </div>
               )}
-              <div className={`flex ${msg.content.length > 5 ? "flex-col" : "flex-row gap-x-2"} `}>
+              <div
+                className={`flex ${
+                  msg.content.length > 5 ? "flex-col" : "flex-row gap-x-2"
+                } `}
+              >
                 <div className="max-w-52 break-words overflow-hidden">
                   {msg.content}
                 </div>
@@ -83,5 +97,8 @@ export default PrivateMessagesItem;
 
 const formatTimeFromTimestamp = (timestamp) => {
   // Implement your time formatting logic here
-  return new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  return new Date(timestamp).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };

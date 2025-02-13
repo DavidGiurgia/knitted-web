@@ -5,7 +5,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 const FriendsSection = ({ currUser, goBack, onSelect, mutualOnly = false }) => {
   return (
-    <div className="p-4 w-full h-full gap-y-2">
+    <div className="p-2 w-full h-full gap-y-2">
       <div className="flex items-center gap-x-2 mb-2">
         <Button onPress={goBack} variant="light" isIconOnly>
           <ArrowLeftIcon className="size-5" />

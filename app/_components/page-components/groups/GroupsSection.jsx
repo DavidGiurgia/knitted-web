@@ -70,6 +70,26 @@ const GroupsSection = () => {
     return `${format(createdAt, "MMM d")} - ${format(expiresAt, "d, yyyy")}`;
   };
 
+  const handleCopyJoinCode = () => {
+    if (!navigator.clipboard) {
+      toast.error("Clipboard API not supported.");
+      return;
+    }
+
+    if (currentGroup?.joinCode) {
+      navigator.clipboard
+        .writeText(currentGroup.joinCode)
+        .then(() => {
+          toast.success("Join code copied to clipboard!");
+        })
+        .catch(() => {
+          toast.error("Failed to copy join code.");
+        });
+    } else {
+      toast.error("No join code available to copy.");
+    }
+  };
+
   useEffect(() => {
     const fetchGroups = async () => {
       try {
@@ -249,14 +269,7 @@ const GroupsSection = () => {
                   </div>
                   <Tooltip content="Copy" placement="top" showArrow>
                     <Button
-                      onPress={() => {
-                        if (group?.joinCode) {
-                          navigator.clipboard.writeText(group.joinCode);
-                          toast.success("Join code copied to clipboard!");
-                        } else {
-                          toast.error("No join code available to copy.");
-                        }
-                      }}
+                      onPress={handleCopyJoinCode}
                       variant="light"
                       className=" text-sm flex  justify-start text-gray-700 dark:text-gray-300"
                     >
@@ -324,7 +337,11 @@ const GroupsSection = () => {
                 <button
                   onClick={() => {
                     setSelectedGroup(null);
-                    onCreateGroupModaOpen();
+                    if (screenSize < 640) {
+                      pushSubPanel("CreateGroup");
+                    } else {
+                      onCreateGroupModaOpen();
+                    }
                   }}
                   className="text-primary hover:underline"
                 >

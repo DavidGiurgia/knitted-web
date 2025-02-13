@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://192.168.0.103:8000/rooms";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms`;
 
 export const createRoom = async (name, participants) => {
     try {

@@ -4,6 +4,7 @@ import UserListItem from "./UserListItem";
 import { fetchFriends } from "../services/friendsService";
 import { useAuth } from "../_context/AuthContext";
 import { Tabs, Tab, Skeleton } from "@heroui/react";
+import toast from "react-hot-toast";
 
 const FriendsList = ({ currUser, onSelect, mutualOnly }) => {
   const { user } = useAuth();
@@ -16,11 +17,11 @@ const FriendsList = ({ currUser, onSelect, mutualOnly }) => {
     const fetchFriendAvatars = async () => {
       setLoading(true);
       try {
-        if (!currUser?._id) return;
+        if (!currUser?._id || !currUser?.friendsIds) return;
 
         let friendData = await fetchFriends(currUser._id);
 
-        if (!user?.friendsIds) return;
+        if (!user?.friendsIds || !friendData) return;
         const mutualOnly = friendData.filter((friend) =>
           user.friendsIds.includes(friend._id)
         );

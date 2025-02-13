@@ -43,6 +43,8 @@ export const PanelProvider = ({ children }) => {
 
   // Funcție pentru a adăuga un subpanou la panoul curent
   const pushSubPanel = (subPanel, param = null) => {
+    window.history.pushState(null, "", window.location.href); // Adaugă un state fals în istoric
+
     setPanelData((prev) => ({
       ...prev,
       [activePanel]: [...subPanelsStack, { subPanel, param }],
@@ -83,12 +85,44 @@ export const PanelProvider = ({ children }) => {
       "CreateGroup",
       "NewChatSection",
       "EditProfile",
+      "ChatRoom",
+      "CreateDrawing",
+      "EditImage",
+      "TextStatus",
+      "PostSettings"
     ];
     const shouldHideBottombar = hiddenBottombarPanels.includes(
       activeSubPanel?.subPanel
     );
     setBottombar(!shouldHideBottombar);
   }, [activeSubPanel]);
+
+  useEffect(() => {
+    const handleBackButton = (event) => {
+      event.preventDefault(); // Prevenim comportamentul implicit al browserului
+  
+      if (subPanelsStack.length > 1) {
+        popSubPanel(); // Dacă există subpanouri, elimină ultimul subpanou
+      } else if (activePanel !== "Home") {
+        switchPanel("Home"); // Dacă nu mai sunt subpanouri, trecem la Home
+      } else {
+        resetSession(); // Dacă suntem deja în Home, resetăm sesiunea
+      }
+  
+      // Adăugăm un nou state fals în istoric pentru a împiedica navigarea nativă
+      window.history.pushState(null, "", window.location.href);
+    };
+  
+    // Adăugăm un state fals la inițializare
+    window.history.pushState(null, "", window.location.href);
+  
+    window.addEventListener("popstate", handleBackButton);
+  
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, [activePanel, subPanelsStack]);
+  
 
   return (
     <PanelContext.Provider

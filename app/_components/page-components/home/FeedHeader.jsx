@@ -13,7 +13,7 @@ import {
 } from "@heroui/react";
 import Image from "next/image";
 import React from "react";
-import CreatePostModal from "../../modals/CreatePostModal";
+import CreatePostModal from "../../post-items/CreatePostModal";
 import { usePanel } from "@/app/_context/PanelContext";
 
 const FeedHeader = ({ switchPanel }) => {

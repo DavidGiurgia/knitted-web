@@ -4,17 +4,18 @@ import { fetchMessagesByRoom } from "@/app/api/messages";
 import React, { useEffect, useState } from "react";
 import MessageInput from "../../MessageInput";
 import { Avatar, Button } from "@heroui/react";
-import { PaperAirplaneIcon, UserIcon } from "@heroicons/react/24/outline";
+import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/app/_context/AuthContext";
 import GroupMessagesItem from "./GroupMessagesItem";
 import toast from "react-hot-toast";
 import InitialsAvatar from "../../InitialsAvatar";
+import { UserIcon } from "@heroicons/react/16/solid";
 
 const GroupChatBox = ({ participant, group, groupSocket }) => {
   const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [anonymous, setIdentity] = useState(false);
+  const [anonymous, setAnonymous] = useState(false);
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -66,53 +67,24 @@ const GroupChatBox = ({ participant, group, groupSocket }) => {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center max-w-[800px] h-full p-2 pb-14">
+    <div className="flex flex-col flex-1 items-center max-w-[800px] h-full p-2 ">
       {/* Mesaje */}
       <GroupMessagesItem messages={messages} participant={participant} />
 
       {/* Message Input - Fixat jos */}
-      <div className="fixed bottom-0 w-full max-w-[800px] bg-gray-100 dark:bg-gray-900 p-2 pt-0">
-        <div className="flex w-full items-center gap-x-2">
-          {anonymous ? (
-            <div
-              onClick={() => {
-                setIdentity(false);
-                toast(`You are now ${participant?.nickname}`);
-              }}
-              className="w-12 h-12 flex-shrink-0"
-            >
-              <UserIcon className="p-2 rounded-full border border-gray-200 dark:border-gray-800" />
-            </div>
-          ) : (
-            <div
-              className="flex-shrink-0 cursor-pointer"
-              onClick={() => {
-                setIdentity(true);
-                toast("You are now anonymous");
-              }}
-            >
-              <InitialsAvatar
-                nickname={participant?.nickname || "U"}
-                size={48}
-              />
-            </div>
-          )}
-
-          <MessageInput message={message} setMessage={setMessage} />
-
-          <Button
-            onPress={handleSendMessage}
-            isIconOnly
-            variant="ghost"
-            color={anonymous ? "" : "primary"}
-            className={`h-12 w-12 flex-shrink-0 rounded-[20px] ${
-              !message && "hidden"
-            }`}
-            disabled={!message.trim()}
-          >
-            <PaperAirplaneIcon className="size-6" />
-          </Button>
-        </div>
+      <div
+        className="flex w-full items-end gap-x-2 "
+        style={{ minHeight: "50px" }}
+      >
+        <MessageInput
+          anonymousMode={true}
+          senderName={participant?.nickname}
+          anonymous={anonymous}
+          setAnonymous={setAnonymous}
+          message={message}
+          setMessage={setMessage}
+          handleSendMessage={handleSendMessage}
+        />
       </div>
     </div>
   );

@@ -5,15 +5,13 @@ import { useRouter } from "next/navigation";
 import { getCurrentUserFromApi, loginUser, registerUser } from "../api/auth";
 import { getToken, removeToken, setToken } from "../services/tokenService";
 
-
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Previne redirecționările premature
+  const [loading, setLoading] = useState(false); // Previne redirecționările premature
   const router = useRouter();
-  
 
   const fetchProfile = async () => {
     const token = getToken();
@@ -26,14 +24,12 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
+      setLoading(true);
       const profile = await getCurrentUserFromApi();
 
       if (profile) {
         setUser(profile);
-        console.log(profile);
         setIsAuthenticated(true);
-
-        
       } else {
         setIsAuthenticated(false);
         setUser(null);
@@ -56,6 +52,7 @@ export const AuthProvider = ({ children }) => {
   // Funcție pentru înregistrare
   const register = async (fullname, username, email, password) => {
     try {
+      setLoading(false);
       const token = await registerUser(fullname, username, email, password);
 
       if (token) {
@@ -67,12 +64,15 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Eroare la înregistrare:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   // Funcție pentru login
   const login = async (email, password) => {
     try {
+      setLoading(false);
       const token = await loginUser(email, password);
 
       if (token) {
@@ -87,6 +87,8 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Eroare la login:", error);
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 

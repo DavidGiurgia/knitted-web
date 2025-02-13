@@ -166,7 +166,7 @@ const UserProfile = ({ currentUser }) => {
             <ArrowLeftIcon className="size-5" />
           </Button>
 
-          <div>{currentUser.username}</div>
+          <div>{currentUser.fullname}</div>
         </div>
         <Dropdown>
           <DropdownTrigger>

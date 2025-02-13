@@ -76,10 +76,10 @@ const ChatMembersItem = ({ room, variant = "list" }) => {
               <Avatar
                 size={
                   variant === "list"
-                    ? room.isGroup
+                    ? room?.isGroup
                       ? "md"
                       : "lg"
-                    : room.isGroup
+                    : room?.isGroup
                     ? "sm"
                     : "md"
                 }
@@ -92,10 +92,10 @@ const ChatMembersItem = ({ room, variant = "list" }) => {
                 nickname={user?.fullname}
                 size={
                   variant === "list"
-                    ? room.isGroup
+                    ? room?.isGroup
                       ? 40
                       : 52
-                    : room.isGroup
+                    : room?.isGroup
                     ? 32
                     : 40
                 }
@@ -106,12 +106,12 @@ const ChatMembersItem = ({ room, variant = "list" }) => {
       </div>
 
       <div className={`flex flex-col ${variant === "list" ? "gap-y-1" : ""}`}>
-        <span className="">{room.name || roomName}</span>
+        <span className="">{room?.name || roomName}</span>
         {variant === "list" ? (
           lastMessage?.content ? (
             <pre className="text-gray-500 text-sm font-semibold">
               {`${
-                room.isGroup
+                room?.isGroup
                   ? user?._id === lastMessage?.senderId
                     ? "You: "
                     : participants?.find((p) => p._id === lastMessage?.senderId)
@@ -122,20 +122,20 @@ const ChatMembersItem = ({ room, variant = "list" }) => {
             </pre>
           ) : (
             <p className="text-sm text-gray-500">
-              {room.name ? roomName : "Start a conversation"}
+              {room?.name ? roomName : "Start a conversation"}
             </p>
           )
         ) : variant === "details" ? (
           <p className="text-xs text-gray-500">
-            {room.name
+            {room?.name
               ? roomName + " >"
-              : room.isGroup
+              : room?.isGroup
               ? "Tap here for group info"
-              : participants?.find((p) => p._id === lastMessage?.senderId)
+              : participants?.find((p) => p._id !== user?._id)
                   ?.username + " >"}
           </p>
         ) : (
-          <div>nmc</div>
+          null
         )}
       </div>
     </div>

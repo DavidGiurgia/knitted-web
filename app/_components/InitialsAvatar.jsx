@@ -21,7 +21,7 @@ const InitialsAvatar = ({ nickname, size = 64 }) => {
 
   return (
     <div
-      className="flex items-center justify-center flex-shrink-0 "
+      className="flex flex-shrink-0 "
     >
       <Avvvatars value={initials} size={size} />
     </div>

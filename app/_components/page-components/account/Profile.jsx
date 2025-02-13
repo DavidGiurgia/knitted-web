@@ -17,7 +17,7 @@ import { getUserById } from "@/app/services/userService";
 import PictureModal from "../../modals/PictureModal";
 import { ThemeSwitcher } from "../../ThemeSwitcher";
 import InitialsAvatar from "../../InitialsAvatar";
-import CreatePostModal from "../../modals/CreatePostModal";
+import CreatePostModal from "../../post-items/CreatePostModal";
 import { usePanel } from "@/app/_context/PanelContext";
 import Image from "next/image";
 
@@ -62,7 +62,7 @@ const Profile = ({ user, logout, pushSubPanel }) => {
   }, [user]);
 
   return (
-    <div className=" flex flex-col ">
+    <div className=" flex flex-col border-red-500">
       <div className="flex items-center justify-between p-2">
         <Button variant="light" onPress={() => {}}>
           {user?.username}

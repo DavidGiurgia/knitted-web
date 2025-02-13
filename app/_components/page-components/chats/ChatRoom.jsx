@@ -2,20 +2,20 @@
 
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { Button } from "@heroui/react";
-import React, { useEffect } from "react";
+import React from "react";
 import ChatBox from "./ChatBox";
 import { usePanel } from "@/app/_context/PanelContext";
 import ChatLinkItem from "./ChatMembersItem";
-import { useKeyboard } from "@/app/_context/KeyboardContext";
 
 const ChatRoom = ({ room, goBack }) => {
   const { pushSubPanel } = usePanel();
-  const { isKeyboardOpen, keyboardHeight } = useKeyboard();
-
+  
 
   return (
-    <div className={`flex flex-col h-full w-full `}>
-      <div className="flex w-full justify-between gap-x-2 items-center px-4 py-2 border-b border-gray-300 dark:border-gray-800 md:border-none">
+    <div
+      className={`flex flex-col w-full h-full max-h-screen overflow-hidden`}
+    >
+      <div className=" flex w-full justify-between gap-x-2 items-center px-4 py-2 border-b border-gray-300 dark:border-gray-800 md:border-none">
         <Button
           onPress={() => {
             goBack();

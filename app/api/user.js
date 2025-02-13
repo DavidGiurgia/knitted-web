@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://192.168.0.103:8000/users";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/users`;
 
 export const fetchUserById = async (id) => {
     try{

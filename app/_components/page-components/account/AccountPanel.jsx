@@ -3,13 +3,13 @@
 import { usePanel } from "@/app/_context/PanelContext";
 import React from "react";
 import Settings from "./settings/Settings";
-import Profile from "./Profile";
 import { useAuth } from "@/app/_context/AuthContext";
 import AccountSettings from "./settings/AccountSettings";
 import FriendsSection from "../../FriendsSection";
 import UserProfile from "../../UserProfile";
 import EditProfileSection from "./EditProfileSection";
-import CreatePostSection from "../home/CreatePostSection";
+import CreatePostSection from "../../post-items/CreatePostSection";
+import Profile from "./Profile";
 
 const AccountPanel = () => {
   const {

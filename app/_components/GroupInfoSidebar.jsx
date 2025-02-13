@@ -6,12 +6,11 @@ import {
   HashtagIcon,
   LockClosedIcon,
   MoonIcon,
-  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../_context/AuthContext";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CustomModal from "./modals/CustomModal";
 import { deleteGroup } from "../services/groupService";
 
@@ -19,7 +18,6 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import UpdateGroupModal from "./modals/UpdateGroupModal";
 import {
-  Avatar,
   Button,
   Popover,
   PopoverContent,
@@ -28,11 +26,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 
-const GroupInfoSidebar = ({
-  currentGroup,
-  participants,
-  currentParticipant,
-}) => {
+const GroupInfoSidebar = ({ currentGroup }) => {
   const { user } = useAuth();
   const router = useRouter();
   const isCreator = currentGroup?.creatorId === user?._id;
@@ -43,7 +37,26 @@ const GroupInfoSidebar = ({
     onOpenChange: onDeleteModaOpenChange,
   } = useDisclosure();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showParticipants, setShowParticipants] = useState(true);
+
+  const handleCopyJoinCode = () => {
+    if (!navigator.clipboard) {
+      toast.error("Clipboard API not supported.");
+      return;
+    }
+
+    if (currentGroup?.joinCode) {
+      navigator.clipboard
+        .writeText(currentGroup.joinCode)
+        .then(() => {
+          toast.success("Join code copied to clipboard!");
+        })
+        .catch(() => {
+          toast.error("Failed to copy join code.");
+        });
+    } else {
+      toast.error("No join code available to copy.");
+    }
+  };
 
   const toggleExpanded = () => {
     setIsExpanded((prev) => !prev);
@@ -99,28 +112,17 @@ const GroupInfoSidebar = ({
         )}
       </div>
       <div className="p-6 flex flex-col gap-y-8">
-        <Popover className="">
-          <PopoverTrigger>
-            <div className="flex items-center gap-x-4 hover:text-primary cursor-pointer">
-              <CalendarDaysIcon className="size-5 flex-shrink-0" />
-              {formattedGroupLifetime()}
-            </div>
-          </PopoverTrigger>
-          <PopoverContent className="">
-            <div>edit end date</div>
-          </PopoverContent>
-        </Popover>
+        <div
+          onClick={isCreator ? onOpen : null}
+          className="flex items-center gap-x-4 hover:text-primary cursor-pointer"
+        >
+          <CalendarDaysIcon className="size-5 flex-shrink-0" />
+          {formattedGroupLifetime()}
+        </div>
 
         <Tooltip content="Copy" placement="right" showArrow>
           <div
-            onClick={() => {
-              if (currentGroup?.joinCode) {
-                navigator.clipboard.writeText(currentGroup.joinCode);
-                toast.success("Join code copied to clipboard!");
-              } else {
-                toast.error("No join code available to copy.");
-              }
-            }}
+            onClick={handleCopyJoinCode}
             className={`w-fit flex gap-x-4 items-center hover:text-primary cursor-pointer`}
           >
             <HashtagIcon className="size-5" />

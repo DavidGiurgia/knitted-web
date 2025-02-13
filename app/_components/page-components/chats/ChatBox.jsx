@@ -9,6 +9,7 @@ import { useAuth } from "../../../_context/AuthContext";
 import { fetchMessagesByRoom } from "../../../api/messages";
 import { getUserById } from "../../../services/userService";
 import PrivateMessagesItem from "./PrivateMessagesItem";
+import { useKeyboard } from "@/app/_context/KeyboardContext";
 
 const ChatBox = ({ room }) => {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ const ChatBox = ({ room }) => {
   const { chatSocket } = useWebSocket();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const { isKeyboardOpen, keyboardHeight } = useKeyboard();
 
   useEffect(() => {
     const loadMessagesAndParticipants = async () => {
@@ -23,7 +25,9 @@ const ChatBox = ({ room }) => {
         const data = await fetchMessagesByRoom(room._id);
         setMessages(data);
 
-        const participantPromises = room.participants?.map(
+        if (!room.participants) return;
+
+        const participantPromises = room.participants.map(
           async (participantId) => {
             const user = await getUserById(participantId);
             return user;
@@ -44,8 +48,8 @@ const ChatBox = ({ room }) => {
       loadMessagesAndParticipants();
     }
     return () => {
-      chatSocket.emit("leaveRoom", { roomId: room._id });
-      console.log("Leaving room", room._id);
+      chatSocket?.emit("leaveRoom", { roomId: room?._id });
+      console.log("Leaving room", room?._id);
     };
   }, [room, chatSocket]); // Atenție la dependințe
 
@@ -88,28 +92,20 @@ const ChatBox = ({ room }) => {
   };
 
   return (
-    <div
-      className="p-2 w-full  flex flex-col h-full"
-      style={{ maxHeight: "100vh", overflow: "hidden" }}
-    >
-      <PrivateMessagesItem room={room} messages={messages} participant={user} participants={participants}/>
-      <div
-        className="flex w-full items-end gap-x-2 "
-        style={{ minHeight: "60px" }}
-      >
-        <MessageInput message={message} setMessage={setMessage} />
-        <Button
-          onPress={handleSendMessage}
-          isIconOnly
-          variant="ghost"
-          color="primary"
-          className={`h-12 w-12 flex-shrink-0 rounded-[20px] ${
-            !message && "hidden"
-          }`}
-        >
-          <PaperAirplaneIcon className="size-6" />
-        </Button>
-      </div>
+    <div className="p-2 w-full flex flex-col h-full overflow-hidden max-h-full">
+      <PrivateMessagesItem
+        room={room}
+        messages={messages}
+        participant={user}
+        participants={participants}
+      />
+      <MessageInput
+        anonymousMode={false}
+        senderName={user?.nickname}
+        message={message}
+        setMessage={setMessage}
+        handleSendMessage={handleSendMessage}
+      />
     </div>
   );
 };

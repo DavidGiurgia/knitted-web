@@ -113,19 +113,7 @@ const UpdateGroupModal = ({ isOpen, onOpenChange, group = null }) => {
                   label={<div className="text-gray-500">Description</div>}
                   placeholder="Add a description"
                 />
-                <Input
-                    maxLength={10}
-                    color={codeError.length && "danger"}
-                    isInvalid={codeError.length}
-                    errorMessage={codeError}
-                    label={<div className="text-gray-500">End date *</div>}
-                    value={code}
-                    onChange={(e) => {
-                      setCode(e.target.value);
-                      setCodeError("");
-                    }}
-                    variant="underlined"
-                  />
+                {/*adauga un timer care arata cat a mai ramas pana la timpul de expirare si un buton add time sau ceva si  o optiune allow joining by code */}
                 <Input
                   maxLength={10}
                   color={codeError.length && "danger"}
