@@ -64,7 +64,7 @@ const AuthLayout = ({ children }) => {
           />
           <Button
             type="submit"
-            onClick={(e) => handleJoin(e)} // Apelează funcția handleJoin când se apasă butonul
+            onPress={(e) => handleJoin(e)} // Apelează funcția handleJoin când se apasă butonul
             className="px-4 py-2 bg-primary rounded-lg text-xl font-semibold ml-2 text-white dark:text-black"
           >
             Join

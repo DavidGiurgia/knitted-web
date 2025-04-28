@@ -2,7 +2,7 @@
 
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { Button } from "@heroui/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SelectFriends from "../../SelectFriends";
 import { useAuth } from "@/app/_context/AuthContext";
 import { createRoom } from "@/app/api/rooms";

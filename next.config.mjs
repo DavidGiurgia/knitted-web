@@ -2,7 +2,7 @@
 const nextConfig = {
     // Alte configurări
     images: {
-      domains: ['i.ibb.co'],  // Adaugă aici domeniile permise
+      domains: ['res.cloudinary.com'],  // Adaugă aici domeniile permise
     },
     reactStrictMode: true,
   env: {

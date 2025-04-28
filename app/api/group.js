@@ -68,40 +68,40 @@ export const checkCode = async (joinCode) => {
     }
 }
 
-export const addParticipant = async (groupId, participant) => {
-    try{
-        await axios.post(`${API_BASE_URL}/add-participant/${groupId}`, {participant});
-    }
-    catch(error){
-        console.error("Error adding user to group:", error);
-    }
-}
+// export const addParticipant = async (groupId, participant) => {
+//     try{
+//         await axios.post(`${API_BASE_URL}/add-participant/${groupId}`, {participant});
+//     }
+//     catch(error){
+//         console.error("Error adding user to group:", error);
+//     }
+// }
 
-export const removeParticipant = async (groupId, participantId) => {
-    try{
-        await axios.post(`${API_BASE_URL}/remove-participant/${groupId}/${participantId}`);
-    }
-    catch(error){
-        console.error("Error removing user from group:", error);
-    }
-}
+// export const removeParticipant = async (groupId, participantId) => {
+//     try{
+//         await axios.post(`${API_BASE_URL}/remove-participant/${groupId}/${participantId}`);
+//     }
+//     catch(error){
+//         console.error("Error removing user from group:", error);
+//     }
+// }
 
-export const updateParticipant = async (groupId, participant) => {
-    try{
-        await axios.post(`${API_BASE_URL}/update-participant/${groupId}`, {participant});
-    }
-    catch(error){
-        console.error("Error updating user in group:", error);
-    }
-}
+// export const updateParticipant = async (groupId, participant) => {
+//     try{
+//         await axios.post(`${API_BASE_URL}/update-participant/${groupId}`, {participant});
+//     }
+//     catch(error){
+//         console.error("Error updating user in group:", error);
+//     }
+// }
 
-export const getParticipants = async (groupId) => {
-    try{
-        const response = await axios.get(`${API_BASE_URL}/participants/${groupId}`);
-        return await response.data;
-    }
-    catch(error){
-        console.error("Error getting participants in group:", error);
-        throw error;
-    }
-}
+// export const getParticipants = async (groupId) => {
+//     try{
+//         const response = await axios.get(`${API_BASE_URL}/participants/${groupId}`);
+//         return await response.data;
+//     }
+//     catch(error){
+//         console.error("Error getting participants in group:", error);
+//         throw error;
+//     }
+// }
