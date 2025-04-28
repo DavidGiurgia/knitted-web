@@ -34,9 +34,12 @@ Welcome to **Knitted Web**, the web application of a modern social platform buil
 ---
 
 ### Screenshots
-(Screenshots showcasing key features will be added here)
 
----
+![Screenshot 2025-04-28 192616](https://github.com/user-attachments/assets/8f7bac88-e337-4672-970b-de00acc5c39c)
+![Screenshot 2025-04-28 192749](https://github.com/user-attachments/assets/926da9f9-a97c-41df-8a81-d6219e9dad9f)
+![Screenshot 2025-04-28 192707](https://github.com/user-attachments/assets/9750027b-cbc6-4bc6-8461-b7f8e40df9ac)
+![Screenshot 2025-04-28 193113](https://github.com/user-attachments/assets/368f3577-45ad-49ae-9cd4-5160fb7d94b4)
+
 
 ### How to Run Locally
 ```bash
