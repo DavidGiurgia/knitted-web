@@ -39,6 +39,9 @@ Welcome to **Knitted Web**, the web application of a modern social platform buil
 ![Screenshot 2025-04-28 192749](https://github.com/user-attachments/assets/926da9f9-a97c-41df-8a81-d6219e9dad9f)
 ![Screenshot 2025-04-28 192707](https://github.com/user-attachments/assets/9750027b-cbc6-4bc6-8461-b7f8e40df9ac)
 ![Screenshot 2025-04-28 193113](https://github.com/user-attachments/assets/368f3577-45ad-49ae-9cd4-5160fb7d94b4)
+![Screenshot 2025-04-28 193759](https://github.com/user-attachments/assets/04004387-81e1-453b-b3fc-f9a65b69388c)
+![Screenshot 2025-04-28 193953](https://github.com/user-attachments/assets/e4f0640d-0006-44db-8225-98d67f373001)
+![Screenshot 2025-04-28 193910](https://github.com/user-attachments/assets/2cc8ad91-58c5-4e2b-8954-0bc54f1f5669)
 
 
 ### How to Run Locally
