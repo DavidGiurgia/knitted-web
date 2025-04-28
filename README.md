@@ -41,10 +41,10 @@ Welcome to **Knitted Web**, the web application of a modern social platform buil
 ### How to Run Locally
 ```bash
 # Clone the repository
- git clone https://github.com/DavidGiurgia/zic_web
+ git clone https://github.com/DavidGiurgia/knitted-web
 
 # Navigate to the project directory
- cd zic_web
+ cd knitted-web
 
 # Install dependencies
  npm install
