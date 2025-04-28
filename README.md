@@ -1,6 +1,6 @@
-## Knitted Web - Social Platform (Next.js)
+## ZIC Web - Social Platform (Next.js)
 
-Welcome to **Knitted Web**, the web application of a modern social platform built with cutting-edge technologies! The project is under continuous development, aiming to create a fast, intuitive, and secure social experience for users.
+Welcome to **ZIC Web**, the web application of a modern social platform built with cutting-edge technologies! The project is under continuous development, aiming to create a fast, intuitive, and secure social experience for users.
 
 ---
 
@@ -47,10 +47,10 @@ Welcome to **Knitted Web**, the web application of a modern social platform buil
 ### How to Run Locally
 ```bash
 # Clone the repository
- git clone https://github.com/DavidGiurgia/knitted-web
+ git clone https://github.com/DavidGiurgia/zic_web
 
 # Navigate to the project directory
- cd knitted-web
+ cd zic_web
 
 # Install dependencies
  npm install
@@ -83,5 +83,5 @@ For more details:
 
 ---
 
-**Knitted Web** - Build real connections. Fast, secure, and elegant.
+**ZIC Web** - Build real connections. Fast, secure, and elegant.
 
