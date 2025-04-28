@@ -44,25 +44,6 @@ Welcome to **ZIC Web**, the web application of a modern social platform built wi
 ![Screenshot 2025-04-28 193910](https://github.com/user-attachments/assets/2cc8ad91-58c5-4e2b-8954-0bc54f1f5669)
 
 
-### How to Run Locally
-```bash
-# Clone the repository
- git clone https://github.com/DavidGiurgia/zic_web
-
-# Navigate to the project directory
- cd zic_web
-
-# Install dependencies
- npm install
-
-# Start the development server
- npm run dev
-
-# Application will be available at
- http://localhost:3000
-```
-
----
 
 ### Contributions
 This is a private project. Contributions or collaborations are not accepted.
